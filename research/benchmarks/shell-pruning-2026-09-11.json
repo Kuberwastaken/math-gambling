@@ -1,0 +1,253 @@
+{
+  "schema": "math-gambling-shell-pruning-benchmark-v1",
+  "date": "2026-09-11",
+  "baseline_commit": "66b5274a8a438f2d97879140ffaba7813f92d3d2",
+  "optimized_commit": "535a1e4dd64ad9a920298c9b4b07e774d01c6706",
+  "baseline_git_blobs": {
+    "tools/search_core.py": "bd30211375040722a0e83344d51977d09133b6aa",
+    "web/engine.mjs": "585853a6923db7c517b0f5c40e5372d974e9e70e"
+  },
+  "corpus": {
+    "tasks": 243,
+    "all_contexts": 81,
+    "row_stride": 128,
+    "per_context_pairs": [
+      "(0,0)",
+      "(floor((totalRows-1)/128)*128,blocks-1)",
+      "(floor(floor(totalRows/7)/128)*128,floor(blocks/2))"
+    ],
+    "canonical_results_sha256": "b8db130a82bd3cfd37f3d99e4de84c112b6ffb9176f51d12618b3a9a7f9bb780"
+  },
+  "method": "Same-process paired full task plus digest timings; alternating baseline/optimized order; results compared outside timed region; filter caches warmed before measurement.",
+  "python": {
+    "runtime": "3.14.6",
+    "platform": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+    "repeats": 5,
+    "groups": {
+      "all": {
+        "tasks": 243,
+        "baseline_ms": 1197.704749996774,
+        "optimized_ms": 1057.9033329850063,
+        "median_paired_speedup": 1.119155948896463,
+        "samples_ms": {
+          "baseline": [
+            1166.3525000039954,
+            1205.213208013447,
+            1176.0557499947026,
+            1271.8679580138996,
+            1197.704749996774
+          ],
+          "optimized": [
+            1048.5641660052352,
+            1057.9033329850063,
+            1050.8417090168223,
+            1069.5105000049807,
+            1144.4153329939581
+          ]
+        }
+      },
+      "empty": {
+        "tasks": 162,
+        "baseline_ms": 112.06541699357331,
+        "optimized_ms": 33.10845801024698,
+        "median_paired_speedup": 3.2517257364443837,
+        "samples_ms": {
+          "baseline": [
+            107.65962500590831,
+            112.16200000490062,
+            112.06541699357331,
+            114.12591702537611,
+            108.27933298423886
+          ],
+          "optimized": [
+            33.10845801024698,
+            32.80241700122133,
+            35.23395798401907,
+            36.72449997975491,
+            33.06245798012242
+          ]
+        }
+      },
+      "partial": {
+        "tasks": 54,
+        "baseline_ms": 495.27129100169986,
+        "optimized_ms": 483.2174170005601,
+        "median_paired_speedup": 1.0249450321471458,
+        "samples_ms": {
+          "baseline": [
+            535.0883750070352,
+            495.27129100169986,
+            522.1907499944791,
+            491.7040000145789,
+            480.9264999930747
+          ],
+          "optimized": [
+            471.5356249944307,
+            483.2174170005601,
+            503.3555419940967,
+            537.1335419768002,
+            482.8681249928195
+          ]
+        }
+      },
+      "full": {
+        "tasks": 27,
+        "baseline_ms": 599.3029170203954,
+        "optimized_ms": 602.7891249977984,
+        "median_paired_speedup": 1.0593368837311172,
+        "samples_ms": {
+          "baseline": [
+            711.1544579965994,
+            649.7796250041574,
+            599.3029170203954,
+            587.2182500024792,
+            598.6792079929728
+          ],
+          "optimized": [
+            635.6422500102781,
+            602.7891249977984,
+            621.2844999972731,
+            597.8836670110468,
+            565.1452500023879
+          ]
+        }
+      }
+    }
+  },
+  "javascript_initial": {
+    "runtime": "v26.3.1",
+    "platform": "darwin arm64",
+    "repeats": 5,
+    "groups": {
+      "all": {
+        "tasks": 243,
+        "baseline_ms": 632.3284999999996,
+        "optimized_ms": 624.069,
+        "median_paired_speedup": 1.0356194960752159,
+        "samples_ms": {
+          "baseline": [
+            649.812625,
+            615.0193340000001,
+            605.2765420000001,
+            740.9094160000004,
+            632.3284999999996
+          ],
+          "optimized": [
+            579.106125,
+            624.069,
+            656.5885420000004,
+            715.4262920000001,
+            563.2244999999994
+          ]
+        }
+      },
+      "empty": {
+        "tasks": 162,
+        "baseline_ms": 58.98199999999997,
+        "optimized_ms": 16.460000000000036,
+        "median_paired_speedup": 3.614342898332785,
+        "samples_ms": {
+          "baseline": [
+            65.54025000000001,
+            58.98199999999997,
+            59.71687500000007,
+            57.93133399999988,
+            58.91649999999936
+          ],
+          "optimized": [
+            16.779333999999835,
+            16.43262500000037,
+            16.460000000000036,
+            16.566083000000617,
+            16.300750000000335
+          ]
+        }
+      },
+      "partial": {
+        "tasks": 54,
+        "baseline_ms": 253.7953749999997,
+        "optimized_ms": 236.0151249999999,
+        "median_paired_speedup": 1.0753352142156136,
+        "samples_ms": {
+          "baseline": [
+            253.53820799999994,
+            259.0759170000001,
+            252.9267089999994,
+            253.7953749999997,
+            254.2073330000003
+          ],
+          "optimized": [
+            236.62112499999967,
+            241.9772499999999,
+            231.86887500000012,
+            236.0151249999999,
+            233.19741700000122
+          ]
+        }
+      },
+      "full": {
+        "tasks": 27,
+        "baseline_ms": 303.4534999999996,
+        "optimized_ms": 294.8406250000007,
+        "median_paired_speedup": 1.022636274212981,
+        "samples_ms": {
+          "baseline": [
+            306.19475000000057,
+            315.3967499999999,
+            299.53662500000064,
+            303.3025830000006,
+            303.4534999999996
+          ],
+          "optimized": [
+            294.8406250000007,
+            308.4153750000005,
+            293.0555839999997,
+            301.557166999999,
+            290.53350000000137
+          ]
+        }
+      }
+    }
+  },
+  "javascript_confirmation": {
+    "runtime": "v26.3.1",
+    "repeats": 11,
+    "warmup_passes": 2,
+    "samples_ms": {
+      "baseline": [
+        589.7745410000002,
+        594.9420829999999,
+        624.8482089999998,
+        620.4264170000006,
+        610.4126249999999,
+        608.0818749999999,
+        602.1302919999998,
+        676.264541999999,
+        610.0261250000003,
+        638.3358749999989,
+        629.5297919999994
+      ],
+      "optimized": [
+        521.4233330000002,
+        530.6217500000002,
+        659.3052499999994,
+        651.9512500000001,
+        543.7472080000007,
+        637.9754169999997,
+        540.0622500000009,
+        554.5148749999989,
+        543.3532079999986,
+        560.542625,
+        569.3376250000001
+      ]
+    },
+    "baseline_ms": 610.4126249999999,
+    "optimized_ms": 554.5148749999989,
+    "median_paired_speedup": 1.121216917700791
+  },
+  "limits": [
+    "Fixed corpus is not the live scheduling distribution.",
+    "Node confirmation followed a noisy initial run; both are retained.",
+    "Wall-clock timings on one shared Mac do not imply a universal speedup or improved probability per distinct candidate."
+  ]
+}

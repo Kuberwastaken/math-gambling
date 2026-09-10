@@ -155,17 +155,54 @@ export function scanCurve(k, d, r, qlo, qhi, {sieve = true, minimal = true, onHi
   return {counters, hits};
 }
 
+export function shellInterval(base, ell, tlo, thi, lower, upper, constant, linear) {
+  // N(a)=a^3-linear*a+constant; N'(a)=3*a^2-linear. Endpoint integer
+  // bounds prove monotonicity. If they cannot, retain the complete interval.
+  const a0 = base + ell * BigInt(tlo), a1 = base + ell * BigInt(thi);
+  const n0 = a0 * a0 * a0 - linear * a0 + constant;
+  // N(a+ell) == N(a) (mod ell), including all generators omitted below.
+  if (n0 % ell) throw new Error('norm lattice divisibility failed');
+  const minimumAbsA = a0 >= 0n ? a0 : a1 <= 0n ? -a1 : 0n;
+  if (3n * minimumAbsA * minimumAbsA < linear) return [tlo, thi];
+  const n1 = a1 * a1 * a1 - linear * a1 + constant;
+  if (n1 <= lower || n0 > upper) return [tlo, tlo - 1];
+  let first = tlo, last = thi;
+  if (n0 <= lower) {
+    let left = tlo + 1, right = thi;
+    while (left < right) {
+      const middle = Math.floor((left + right) / 2), a = base + ell * BigInt(middle);
+      if (a * a * a - linear * a + constant <= lower) left = middle + 1;
+      else right = middle;
+    }
+    first = left;
+  }
+  if (n1 > upper) {
+    let left = first, right = thi;
+    while (left < right) {
+      const middle = Math.floor((left + right) / 2), a = base + ell * BigInt(middle);
+      if (a * a * a - linear * a + constant <= upper) left = middle + 1;
+      else right = middle;
+    }
+    last = left - 1;
+  }
+  return [first, last];
+}
+
 function runRow(task, c, row, onHit) {
   const ell = BigInt(c.ell), radius = BigInt(c.radius), width = 2n * radius + 1n;
   const b = row % width - radius, cc = row / width - radius, base = offsetBase(ell, b, cc);
   const tlo = c.tlo + BLOCK_SIZE * task.block, thi = Math.min(tlo + BLOCK_SIZE - 1, c.thi);
   const counters = emptyCounters(), hits = [];
-  for (let t = tlo; t <= thi; t++) {
-    counters.generators++;
-    const a = base + ell * BigInt(t), n = norm(a, b, cc);
+  const constant = 114n * b * b * b + 12996n * cc * cc * cc, linear = 342n * b * cc;
+  const dlo = BigInt(c.dlo), dhi = BigInt(c.dhi);
+  const [first, last] = shellInterval(base, ell, tlo, thi, ell * dlo, ell * dhi, constant, linear);
+  counters.generators = thi - tlo + 1;
+  counters.outside_shell = counters.generators - Math.max(0, last - first + 1);
+  for (let t = first; t <= last; t++) {
+    const a = base + ell * BigInt(t), n = a * a * a - linear * a + constant;
     if (n % ell) throw new Error('norm lattice divisibility failed');
     const d = n / ell;
-    if (d <= BigInt(c.dlo) || d > BigInt(c.dhi)) { counters.outside_shell++; continue; }
+    if (d <= dlo || d > dhi) { counters.outside_shell++; continue; }
     if (d < 2n || d % 3n === 0n) { counters.invalid_d++; continue; }
     const s = d % 3n === 1n ? d : -d;
     if ([0, 4, 6].includes(Number(mod(s, 8n))) || [0, 19, 76, 95, 114, 133, 171, 209, 304, 323].includes(Number(mod(s, 361n)))) { counters.signed_excluded++; continue; }

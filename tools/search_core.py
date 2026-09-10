@@ -178,7 +178,50 @@ def scan_curve(k, d, r, qlo, qhi, *, sieve=True, minimal=True, on_hit=None):
     return dict(counters=stats, hits=hits)
 
 
-def _run_row(task, c, row, on_hit=None):
+def _shell_interval(base, ell, tlo, thi, lower, upper, constant, linear):
+    """Conservatively restrict integer t to lower < N(base+ell*t) <= upper.
+
+    N(a)=a^3-linear*a+constant. Its derivative is 3*a^2-linear:
+    integer endpoint bounds prove monotonicity without approximate roots.
+    When that proof fails we keep the entire interval. Empty intervals retain
+    their logical generator/outside-shell counts in the caller.
+    """
+    a0, a1 = base+ell*tlo, base+ell*thi
+    n0 = a0*a0*a0-linear*a0+constant
+    # N(a+ell) == N(a) (mod ell), so this one check covers omitted t too.
+    if n0 % ell:
+        raise ArithmeticError("norm lattice divisibility failed")
+    minimum_abs_a = a0 if a0 >= 0 else -a1 if a1 <= 0 else 0
+    if 3*minimum_abs_a*minimum_abs_a < linear:
+        return tlo, thi
+    n1 = a1*a1*a1-linear*a1+constant
+    if n1 <= lower or n0 > upper:
+        return tlo, tlo-1
+    first, last = tlo, thi
+    if n0 <= lower:
+        left, right = tlo+1, thi
+        while left < right:
+            middle = (left+right)//2
+            a = base+ell*middle
+            if a*a*a-linear*a+constant <= lower:
+                left = middle+1
+            else:
+                right = middle
+        first = left
+    if n1 > upper:
+        left, right = first, thi
+        while left < right:
+            middle = (left+right)//2
+            a = base+ell*middle
+            if a*a*a-linear*a+constant <= upper:
+                left = middle+1
+            else:
+                right = middle
+        last = left-1
+    return first, last
+
+
+def _run_row(task, c, row, on_hit=None, on_curve=None):
     ell, radius = c["ell"], c["radius"]
     width = 2*radius+1
     b, cc = row % width-radius, row//width-radius
@@ -186,14 +229,18 @@ def _run_row(task, c, row, on_hit=None):
     tlo = c["tlo"]+BLOCK_SIZE*task["block"]
     thi = min(tlo+BLOCK_SIZE-1, c["thi"])
     counters, hits = empty_counters(), []
-    for t in range(tlo, thi+1):
-        counters["generators"] += 1
+    constant, linear = 114*b*b*b+12996*cc*cc*cc, 342*b*cc
+    dlo, dhi = int(c["dlo"]), int(c["dhi"])
+    first, last = _shell_interval(base, ell, tlo, thi, ell*dlo, ell*dhi, constant, linear)
+    counters["generators"] = thi-tlo+1
+    counters["outside_shell"] = counters["generators"]-max(0, last-first+1)
+    for t in range(first, last+1):
         a = base+ell*t
-        n = norm(a, b, cc)
+        n = a*a*a-linear*a+constant
         if n % ell:
             raise ArithmeticError("norm lattice divisibility failed")
         d = n//ell
-        if not int(c["dlo"]) < d <= int(c["dhi"]):
+        if not dlo < d <= dhi:
             counters["outside_shell"] += 1
             continue
         if d < 2 or d % 3 == 0:
@@ -220,6 +267,11 @@ def _run_row(task, c, row, on_hit=None):
         def report_hit(hit):
             on_hit({**hit, 'abc': [str(a), str(b), str(cc)], 't': t, 'row': str(row)})
         found = scan_curve(114, d, r, qlo, qhi, on_hit=report_hit if on_hit is not None else None)
+        if on_curve is not None:
+            # These are inclusive q bounds, z=r+D*q and s=x+y. The scan only
+            # accepts identities with |z| <= min(|x|,|y|). This observer is
+            # outside the result/digest and runs only after a complete scan.
+            on_curve(dict(D=str(d), r=str(r), s=str(s), qlo=str(qlo), qhi=str(qhi), minimal_abs_z=True))
         for key, value in found["counters"].items():
             counters[key] += value
         for hit in found["hits"]:
@@ -232,13 +284,13 @@ def _run_row(task, c, row, on_hit=None):
     return counters, hits
 
 
-def run_task(task, on_hit=None):
+def run_task(task, on_hit=None, on_curve=None):
     task = validate_task(task)
     c = CONTEXT_BY_ID[task["context"]]
     counters, hits = empty_counters(), []
     start = int(task['row'])
     for row in range(start, min(start+ROWS_PER_TASK, int(c['totalRows']))):
-        row_counters, row_hits = _run_row(task, c, row, on_hit=on_hit)
+        row_counters, row_hits = _run_row(task, c, row, on_hit=on_hit, on_curve=on_curve)
         for key, value in row_counters.items():
             counters[key] += value
         hits.extend(row_hits)

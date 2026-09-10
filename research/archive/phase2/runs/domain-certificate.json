@@ -1,0 +1,299 @@
+{
+  "passed": true,
+  "scope": "Exact fixed-domain prerequisites; no ledger or native implementation audit.",
+  "geometry_context_count": 81,
+  "config_checked": "./phase2/runs/context-specs.json",
+  "config_sha256": "6b429cee001534281ac124fba0445093d63da21ef5d3af5a9f9eb78036856fea",
+  "guard_rejected_mutations": [
+    "unproved_radius",
+    "unproved_offset",
+    "changed_shell",
+    "changed_ratio",
+    "boolean_integer",
+    "duplicate_geometry",
+    "duplicate_key",
+    "wrong_family",
+    "wrong_row_total",
+    "infinite_weight",
+    "nan_weight",
+    "boolean_weight",
+    "zero_weight",
+    "missing_context"
+  ],
+  "symbolic_polynomial_identities": [
+    "B^3-114C^3=N(114c^3-b^3)",
+    "A^2-114BC=Na",
+    "B^2-AC=Nc",
+    "aC+bB+cA=0"
+  ],
+  "geometry": {
+    "D0": 185185185185185185,
+    "beta_lower": 4133238949,
+    "shapes": [
+      {
+        "ell": 1,
+        "radius": 6000000,
+        "tlo": 8,
+        "thi": 31,
+        "exact": {
+          "epsilon": "3/250000000000",
+          "real_lower": "1874999999997/250000000000",
+          "real_upper": "7875000000003/250000000000"
+        },
+        "approximate": {
+          "epsilon": 1.2e-11,
+          "real_lower": 7.499999999988,
+          "real_upper": 31.500000000012
+        }
+      },
+      {
+        "ell": 1,
+        "radius": 1500000,
+        "tlo": 128,
+        "thi": 511,
+        "exact": {
+          "epsilon": "3/1000000000000",
+          "real_lower": "127499999999997/1000000000000",
+          "real_upper": "511500000000003/1000000000000"
+        },
+        "approximate": {
+          "epsilon": 3e-12,
+          "real_lower": 127.499999999997,
+          "real_upper": 511.500000000003
+        }
+      },
+      {
+        "ell": 1,
+        "radius": 375000,
+        "tlo": 2048,
+        "thi": 8191,
+        "exact": {
+          "epsilon": "3/4000000000000",
+          "real_lower": "8189999999999997/4000000000000",
+          "real_upper": "32766000000000003/4000000000000"
+        },
+        "approximate": {
+          "epsilon": 7.5e-13,
+          "real_lower": 2047.4999999999993,
+          "real_upper": 8191.500000000001
+        }
+      },
+      {
+        "ell": 5,
+        "radius": 6000000,
+        "tlo": 8,
+        "thi": 31,
+        "exact": {
+          "epsilon": "3/250000000000",
+          "real_lower": "9374999999997/250000000000",
+          "real_upper": "39375000000003/250000000000"
+        },
+        "approximate": {
+          "epsilon": 1.2e-11,
+          "real_lower": 37.499999999988,
+          "real_upper": 157.500000000012
+        }
+      },
+      {
+        "ell": 5,
+        "radius": 1500000,
+        "tlo": 128,
+        "thi": 511,
+        "exact": {
+          "epsilon": "3/1000000000000",
+          "real_lower": "637499999999997/1000000000000",
+          "real_upper": "2557500000000003/1000000000000"
+        },
+        "approximate": {
+          "epsilon": 3e-12,
+          "real_lower": 637.499999999997,
+          "real_upper": 2557.500000000003
+        }
+      },
+      {
+        "ell": 5,
+        "radius": 375000,
+        "tlo": 2048,
+        "thi": 8191,
+        "exact": {
+          "epsilon": "3/4000000000000",
+          "real_lower": "40949999999999997/4000000000000",
+          "real_upper": "163830000000000003/4000000000000"
+        },
+        "approximate": {
+          "epsilon": 7.5e-13,
+          "real_lower": 10237.5,
+          "real_upper": 40957.5
+        }
+      },
+      {
+        "ell": 25,
+        "radius": 6000000,
+        "tlo": 8,
+        "thi": 31,
+        "exact": {
+          "epsilon": "3/250000000000",
+          "real_lower": "46874999999997/250000000000",
+          "real_upper": "196875000000003/250000000000"
+        },
+        "approximate": {
+          "epsilon": 1.2e-11,
+          "real_lower": 187.499999999988,
+          "real_upper": 787.500000000012
+        }
+      },
+      {
+        "ell": 25,
+        "radius": 1500000,
+        "tlo": 128,
+        "thi": 511,
+        "exact": {
+          "epsilon": "3/1000000000000",
+          "real_lower": "3187499999999997/1000000000000",
+          "real_upper": "12787500000000003/1000000000000"
+        },
+        "approximate": {
+          "epsilon": 3e-12,
+          "real_lower": 3187.499999999997,
+          "real_upper": 12787.500000000004
+        }
+      },
+      {
+        "ell": 25,
+        "radius": 375000,
+        "tlo": 2048,
+        "thi": 8191,
+        "exact": {
+          "epsilon": "3/4000000000000",
+          "real_lower": "204749999999999997/4000000000000",
+          "real_upper": "819150000000000003/4000000000000"
+        },
+        "approximate": {
+          "epsilon": 7.5e-13,
+          "real_lower": 51187.5,
+          "real_upper": 204787.5
+        }
+      }
+    ],
+    "separation": [
+      {
+        "ell": 1,
+        "old_box_upper": 1550000,
+        "exact": {
+          "within_new_max": "3640666666666667/3333333333328",
+          "box_over_new_min": "9557945041816009600/1015746000000000093",
+          "box_over_new_max": "387500000000000000/1874999999997",
+          "new_over_plane_min": "624999999999/250000000000",
+          "new_over_plane_max": "4095750000000000375000/92592592592592593"
+        },
+        "approximate": {
+          "within_new_max": 1092.2000000017476,
+          "box_over_new_min": 9.409778666926583,
+          "box_over_new_max": 206666.66666699733,
+          "new_over_plane_min": 2.499999999996,
+          "new_over_plane_max": 44234.100000000006
+        }
+      },
+      {
+        "ell": 5,
+        "old_box_upper": 2650473,
+        "exact": {
+          "within_new_max": "54610000000000001/49999999999984",
+          "box_over_new_min": "3703703703703703720000000000000/1150906917080522091075021371187",
+          "box_over_new_max": "220872750000000000/3124999999999",
+          "new_over_plane_min": "3124999999999/1250000000000",
+          "new_over_plane_max": "4095750000000000075000/92592592592592593"
+        },
+        "approximate": {
+          "within_new_max": 1092.2000000003495,
+          "box_over_new_min": 3.218074067274528,
+          "box_over_new_max": 70679.28000002261,
+          "new_over_plane_min": 2.4999999999992,
+          "new_over_plane_max": 44234.1
+        }
+      },
+      {
+        "ell": 25,
+        "old_box_upper": 4532255,
+        "exact": {
+          "within_new_max": "30338888888888889/27777777777776",
+          "box_over_new_min": "740740740740740744000000000000/673057395225729152464960246203",
+          "box_over_new_max": "87158750000000000/3605769230769",
+          "new_over_plane_min": "15624999999999/6250000000000",
+          "new_over_plane_max": "4095750000000000015000/92592592592592593"
+        },
+        "approximate": {
+          "within_new_max": 1092.2000000000698,
+          "box_over_new_min": 1.1005610308944187,
+          "box_over_new_max": 24172.026666668215,
+          "new_over_plane_min": 2.49999999999984,
+          "new_over_plane_max": 44234.1
+        }
+      }
+    ],
+    "arithmetic": [
+      {
+        "radius": 6000000,
+        "a_abs_upper": 170159244,
+        "norm_absolute_terms_upper": 9853580003878496465198784,
+        "rounding_numerator_abs_upper": 340316984084058858136000000,
+        "adjoint_C_abs_upper": 1056955464000000,
+        "adjoint_B_abs_upper": 5124955464000000,
+        "derivative_radicand_abs_upper": 4104000000000000,
+        "norm_first_difference_abs_upper": 2479362942947463325,
+        "row_count": 144000024000001,
+        "coefficient_count": 3456000576000024
+      },
+      {
+        "radius": 1500000,
+        "a_abs_upper": 42552402,
+        "norm_absolute_terms_upper": 154040251931518809188808,
+        "rounding_numerator_abs_upper": 85079300771014714534000000,
+        "adjoint_C_abs_upper": 66078603000000,
+        "adjoint_B_abs_upper": 320328603000000,
+        "derivative_radicand_abs_upper": 256500000000000,
+        "norm_first_difference_abs_upper": 155040598483489675,
+        "row_count": 9000006000001,
+        "coefficient_count": 3456002304000384
+      },
+      {
+        "radius": 375000,
+        "a_abs_upper": 10839691,
+        "norm_absolute_terms_upper": 2486320824695062616371,
+        "rounding_numerator_abs_upper": 21269879942753678633500000,
+        "adjoint_C_abs_upper": 4205509125000,
+        "adjoint_B_abs_upper": 20096134125000,
+        "derivative_radicand_abs_upper": 16031250000000,
+        "norm_first_difference_abs_upper": 10014781647597325,
+        "row_count": 562501500001,
+        "coefficient_count": 3456009216006144
+      }
+    ],
+    "maximum_D": 1481481481481481480,
+    "maximum_abs_z": 6068148148148148142080
+  },
+  "field_certificate": {
+    "program": "K=bnfinit(t^3-114,1); if(bnfcertify(K)!=1,error(\"field certification failed\")); if(K.zk!=[1,t,t^2],error(\"basis mismatch\")); if(K.cyc!=[3],error(\"class group mismatch\")); J=idealhnf(K,5,t-4); if(bnfisprincipal(K,J,0)[1]%3==0,error(\"J is principal\")); if(idealpow(K,J,2)!=idealhnf(K,25,t-4),error(\"J squared mismatch\")); beta=Mod(4133238949+852423792*t+175800705*t^2,t^3-114); U=bnfisunit(K,beta); if(abs(U[1])!=1 || K.tu[1]!=2,error(\"unit group mismatch\")); if(nfeltnorm(K,beta)!=1,error(\"unit norm mismatch\")); print(\"FIELD_CERTIFIED=1\"); print(\"CLASS_GROUP=\",K.cyc); print(\"BETA_UNIT_EXPONENTS=\",U); print(\"ROOTS_OF_UNITY=\",K.tu[1]); print(\"NORM_BETA=\",nfeltnorm(K,beta)); quit;\n",
+    "stdout": "FIELD_CERTIFIED=1\nCLASS_GROUP=[3]\nBETA_UNIT_EXPONENTS=[-1, 0]~\nROOTS_OF_UNITY=2\nNORM_BETA=1\n",
+    "gp_sha256": "78ebab773c83eb1be9f736072261f61162635590278d805557c2975f0bc32e10"
+  },
+  "phase1_certificate_sha256": "bc7a28f06a2be76017125202390ea9d728919ce9b0a9474599e60ceb7068a901",
+  "phase1_sources_match_certificate": true,
+  "source_snapshot": {
+    "DOMAIN_PROOF.md": "a2186c33a2a175554e79116cc071552733a9e6eb6c55c2bcdc5d7eee7593181e",
+    "README.md": "d16ea9d4c04eafa9df1b589c3a6c43f1e602ee6eeec6c4531c4c1808c845d5bd",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "bin/offset_worker": "4a2d9639bfb69cf33e3520aec03fc66b2c8237df82d4b914076cc3b29e4e4ffa",
+    "build_worker.py": "22cc2cef48afdeb96b31fd8233889ec7544455cfdcaccb746867a53eb660c58d",
+    "campaign.py": "3911464a136962cf6cef62b90105dab61f2273de333bec0fb35a987b50ffe2a7",
+    "launch_campaign.py": "e9fca4ac4dcd013690bb37ea2138306ac52b33c8d3247e16fa1901e337303665",
+    "offset_worker.c": "087de923d2ba242633774ad9db0285d960c01acc0e8b1d4a2d36808e72de7a12",
+    "online_model.py": "7a867a3a5ef0b6721e616b02c46c139776f171cdb5276646b68005f8297b05ad",
+    "validate_controller.py": "0083128352f4d58ec7dac1f5e2ae8ae03d9421c2caffe8263e73a559a0224839",
+    "validate_online_model.py": "e4d4dacfbee4b4caa837babacabb4d49686bbeec4565d099ab9121813116fa48",
+    "validate_worker.py": "f454d0d171e9edea65676bf06eefc35c9029750545da07278740ae2d4d0f52db",
+    "verify_domain.py": "731144d387529c933d0096a52843f659c6dc3638e686782e731e7c965224d147"
+  },
+  "cpu_seconds": 0.03249,
+  "elapsed_seconds": 0.033847792001324706
+}

@@ -1,0 +1,3 @@
+# Manifest scope
+
+`SHA256.json` records package artifacts at the final preparation checkpoint. It excludes itself, Python bytecode/cache files, OS metadata, and the live `runs/campaign/` directories at package root, `phase2/`, and `phase3/`, whose status, database and log change while the search runs. The campaign database separately records the exact hashes of its controller, mathematical source, worker binaries and PARI library. Re-running a validation or editing a document changes that artifact's manifest hash; the manifest is a reproducibility record, not a signature or a mathematical proof.

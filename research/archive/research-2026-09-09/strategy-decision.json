@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "decided_utc": "2026-09-09T13:35:59.659587+00:00",
+  "decision": "retain_phase3",
+  "interpretation": "Best-supported tested configuration for this Mac; no claim of global optimality or calibrated discovery probability",
+  "selected": {
+    "campaign": "./phase3/runs/campaign",
+    "workers": 12,
+    "contexts": 81,
+    "exploration_worker_time_fraction": 0.4,
+    "learning": "Conditional arithmetic exposure/cost only",
+    "source_identity": {
+      "campaign.py": "1ad8fdc86934e071e2921b0faa358ac43655dcbd9dc6d6715fc8f10e6218dd58",
+      "offset_worker.c": "43eba3c4a0c91df79ce50087749556700e2e027a552e49acf8f483c0167c713a",
+      "online_model.py": "7a867a3a5ef0b6721e616b02c46c139776f171cdb5276646b68005f8297b05ad",
+      "verify_domain.py": "731144d387529c933d0096a52843f659c6dc3638e686782e731e7c965224d147",
+      "bin/offset_worker": "3a0503298ae55f678f3bfb3728f3869b1aa0cce8d6a15239d7950b930e57b819",
+      "checker.c": "9125cd2ff10b42201162845b98a7aa702a8c5b4eea496f09cd6c2af4934767df",
+      "../bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd"
+    },
+    "observed_state": "running",
+    "hourly_monitoring": true
+  },
+  "normalized_square_sieve": {
+    "status": "not_promoted",
+    "arithmetic_validation": "passed",
+    "known_positive_fixtures": 662,
+    "pairs": 81,
+    "cpu_seconds": {
+      "old": 8.663611,
+      "new": 8.733281
+    },
+    "exact_tests": {
+      "old": 9826,
+      "new": 6532
+    },
+    "reason": "Stronger necessary condition but no end-to-end speed gain established in exploratory paired timing"
+  },
+  "discovery_learning": {
+    "status": "not_promoted",
+    "joint_holdout_distinct_solutions_uniform": 1,
+    "joint_holdout_distinct_solutions_learned": 1,
+    "joint_holdout_distinct_solutions_best_fixed": 0,
+    "qualifying_seed_recurrences_each_mixture": 2,
+    "reason": "Failed preregistered count and gain requirements; unequal actual CPU from attempt caps, saturation and scale transfer limit interpretation"
+  },
+  "positive_unit_phase_tube": {
+    "status": "research_design_only",
+    "small_cells": 12,
+    "rectangle_positions": 83473,
+    "exact_cell_members": 166,
+    "native_production_validation": false,
+    "performance_gain_established": false
+  },
+  "operational_changes": {
+    "search_restarted": false,
+    "frozen_sources_changed": false,
+    "coverage_replayed": false,
+    "automation_cadence_changed": false,
+    "automation_research_decision_added": true
+  },
+  "report": "SEARCH_VERDICT.md"
+}

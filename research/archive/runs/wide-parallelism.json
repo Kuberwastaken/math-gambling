@@ -1,0 +1,168 @@
+{
+  "calibration_only": true,
+  "counts_are_new_coverage": false,
+  "hardware": {
+    "platform": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+    "architecture": "arm64",
+    "logical_cpus": 15,
+    "processor": "arm",
+    "cpu_brand": null,
+    "physical_cpus": null,
+    "memory_bytes": null,
+    "python": "3.14.6",
+    "load_average": [
+      2.998046875,
+      4.93310546875,
+      5.00830078125
+    ]
+  },
+  "levels": [
+    4,
+    8,
+    12,
+    15
+  ],
+  "runs": [
+    {
+      "workers": 15,
+      "repeat": 0,
+      "elapsed_seconds": 0.6017920829981449,
+      "cpu_seconds": 6.493101,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 4,
+      "repeat": 0,
+      "elapsed_seconds": 1.4157674160014722,
+      "cpu_seconds": 5.524983000000001,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 12,
+      "repeat": 0,
+      "elapsed_seconds": 0.5660546250001062,
+      "cpu_seconds": 6.291328,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 8,
+      "repeat": 0,
+      "elapsed_seconds": 0.7944504170009168,
+      "cpu_seconds": 6.101482000000001,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 12,
+      "repeat": 1,
+      "elapsed_seconds": 0.573111624995363,
+      "cpu_seconds": 6.3469390000000026,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 15,
+      "repeat": 1,
+      "elapsed_seconds": 0.5586994999976014,
+      "cpu_seconds": 6.3753530000000005,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 4,
+      "repeat": 1,
+      "elapsed_seconds": 1.4272651669962215,
+      "cpu_seconds": 5.560862999999998,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 8,
+      "repeat": 1,
+      "elapsed_seconds": 0.8007053330002236,
+      "cpu_seconds": 6.040839999999996,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 12,
+      "repeat": 2,
+      "elapsed_seconds": 0.5756010000040988,
+      "cpu_seconds": 6.365134000000005,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 4,
+      "repeat": 2,
+      "elapsed_seconds": 1.4631828330020653,
+      "cpu_seconds": 5.668900000000001,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 15,
+      "repeat": 2,
+      "elapsed_seconds": 0.6337344590065186,
+      "cpu_seconds": 6.526753999999997,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    },
+    {
+      "workers": 8,
+      "repeat": 2,
+      "elapsed_seconds": 0.7952385419994243,
+      "cpu_seconds": 6.095155000000005,
+      "checked_tiles": 48,
+      "all_fingerprints_match": true,
+      "generator_inputs": 34518848,
+      "curve_checks": 4595116
+    }
+  ],
+  "complete": true,
+  "source_and_binary_sha256": {
+    "benchmark_campaign_performance.py": "7fbcb1e272e2b3e71b3e4246ecd1bf10214bfec5a3dc38afaff66531f0137e23",
+    "campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "plane_worker.c": "ccc0ed4746dab6dbb699bfca1de1d2047fd6eac10e6aa337c325906513a38914",
+    "bin/campaign_worker": "a41963799ebb83d9d94de4e5fc119791cc8f91d192299f35e4fee03eece66e76",
+    "bin/plane_worker": "d91341e30b0cbfabb5f8f37e4cc75e45cf466c153fa144c95ee882c563b49fde",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd"
+  },
+  "median_seconds": {
+    "4": 1.4272651669962215,
+    "8": 0.7952385419994243,
+    "12": 0.573111624995363,
+    "15": 0.6017920829981449
+  },
+  "recommended_workers": 12,
+  "selection_rule": "Smallest worker count within 5% of fastest measured throughput",
+  "speedup_over_four": 2.4903790199819618,
+  "cpu_seconds": 73.398874,
+  "wall_seconds": 10.21495899999718,
+  "caution": "Short matched timings do not establish sustained thermal or battery performance."
+}

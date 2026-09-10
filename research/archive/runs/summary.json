@@ -1,0 +1,58 @@
+{
+  "platform": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "pari": "2.17.4",
+  "workers": 2,
+  "ratio": 64,
+  "base_radius": 50000,
+  "runs": {
+    "pilot": {
+      "batches": 222,
+      "coefficient_triples": 22200000,
+      "curve_checks": 6079209,
+      "sum_worker_elapsed_seconds": 240.95715304102487,
+      "hits": 0,
+      "overflowed": 0,
+      "exact_tests": null,
+      "multiplier_bucket_checks": [
+        0,
+        0,
+        0
+      ]
+    },
+    "native-pilot": {
+      "batches": 588,
+      "coefficient_triples": 588000000,
+      "curve_checks": 160573749,
+      "sum_worker_elapsed_seconds": 120.2038413741102,
+      "hits": 0,
+      "overflowed": 0,
+      "exact_tests": 49956,
+      "multiplier_bucket_checks": [
+        0,
+        0,
+        0
+      ]
+    },
+    "class-pilot": {
+      "batches": 574,
+      "coefficient_triples": 574000000,
+      "curve_checks": 145212303,
+      "sum_worker_elapsed_seconds": 120.10837176901259,
+      "hits": 0,
+      "overflowed": 0,
+      "exact_tests": 45893,
+      "multiplier_bucket_checks": [
+        48401357,
+        48407695,
+        48403251
+      ]
+    }
+  },
+  "limitations": [
+    "Curve checks are not globally unique.",
+    "Selective search, not exhaustive in any height box.",
+    "Elapsed worker time is not measured CPU time.",
+    "Speedup comparison is to the GP prototype, not Booker-Sutherland."
+  ]
+}

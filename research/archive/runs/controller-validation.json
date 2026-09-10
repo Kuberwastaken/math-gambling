@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "started_utc": "2026-09-08T19:03:16Z",
+  "hashes_before": {
+    "validate_controller.py": "649e422b3ccbf45da914312a99899998bf2a4e263d76d00e1f52f59cdf5d7ba9",
+    "campaign.py": "6962b53ed50d105f4494cbcc46fbff34b5f4b041828177678389e836a69c63a9",
+    "campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "bin/campaign_worker": "a41963799ebb83d9d94de4e5fc119791cc8f91d192299f35e4fee03eece66e76",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "plane_worker.c": "ccc0ed4746dab6dbb699bfca1de1d2047fd6eac10e6aa337c325906513a38914",
+    "bin/plane_worker": "d91341e30b0cbfabb5f8f37e4cc75e45cf466c153fa144c95ee882c563b49fde"
+  },
+  "tests": {
+    "protocol": {
+      "real_worker_passed": true,
+      "mutations": {
+        "complete": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "k": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "mode": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "version": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "policy": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "candidates": {
+          "rejected": true,
+          "error": "Worker coverage metadata mismatch"
+        },
+        "curves": {
+          "rejected": true,
+          "error": "Invalid integer counter: curves"
+        },
+        "start": {
+          "rejected": true,
+          "error": "Invalid integer counter: start"
+        },
+        "permutation_stride": {
+          "rejected": true,
+          "error": "Worker coverage metadata mismatch"
+        },
+        "quotient_points": {
+          "rejected": true,
+          "error": "Quotient filters do not account for all positions"
+        },
+        "duplicate_stats": {
+          "rejected": true,
+          "error": "Missing, duplicated, or unknown worker records"
+        },
+        "unknown_record": {
+          "rejected": true,
+          "error": "Missing, duplicated, or unknown worker records"
+        },
+        "malformed_record": {
+          "rejected": true,
+          "error": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+        },
+        "wrong_json_type": {
+          "rejected": true,
+          "error": "'list' object has no attribute 'get'"
+        }
+      },
+      "actual_discoveries": []
+    },
+    "reservations": {
+      "interrupted_range_preserved": true,
+      "timeout_split": [
+        [
+          0,
+          500
+        ],
+        [
+          500,
+          500
+        ]
+      ],
+      "split_audit": {
+        "database_integrity": "ok",
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 0,
+        "unfinished_tiles": 2
+      },
+      "pending_second_half_selected": true,
+      "changed_identity_rejected": true,
+      "final_audit": {
+        "database_integrity": "ok",
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 1,
+        "unfinished_tiles": 1
+      },
+      "actual_discoveries": []
+    },
+    "hit_rescue": {
+      "warning": "Injected positive routing tests are not solutions of 114.",
+      "scenarios": {
+        "reject_false_identity": {
+          "passed": true,
+          "injected_verifier": false,
+          "routed_records": 0,
+          "timed_out": false
+        },
+        "nonzero_exit": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": false
+        },
+        "timeout_bytes": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": true
+        },
+        "bad_json_type_after_hit": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": false
+        },
+        "truncated_last_line": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": true
+        }
+      }
+    },
+    "exclusive_writer_lock": {
+      "second_writer_rejected": true,
+      "blocked_writer_created_no_database": true,
+      "lock_release_allows_run": true,
+      "audit": {
+        "database_integrity": "ok",
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 1,
+        "unfinished_tiles": 0
+      }
+    },
+    "real_cli_resume": {
+      "audit": {
+        "database_integrity": "ok",
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 8,
+        "unfinished_tiles": 0
+      },
+      "totals": {
+        "generator_inputs": 32000,
+        "curve_checks": 5422,
+        "quotient_points": 9694876,
+        "exact_tests": 20,
+        "excluded_mod243": 9216077,
+        "excluded_parity": 160343,
+        "unsupported_D": 0,
+        "noninvertible_C": 2318,
+        "symmetry_duplicates": 16003
+      },
+      "actual_discoveries": []
+    },
+    "real_plane_integration": [
+      {
+        "ell": 1,
+        "policy_agreement": true,
+        "candidates": 128,
+        "curves": 11,
+        "actual_discoveries": []
+      },
+      {
+        "ell": 5,
+        "policy_agreement": true,
+        "candidates": 128,
+        "curves": 21,
+        "actual_discoveries": []
+      },
+      {
+        "ell": 25,
+        "policy_agreement": true,
+        "candidates": 128,
+        "curves": 12,
+        "actual_discoveries": []
+      }
+    ]
+  },
+  "failures": [],
+  "limitations": [
+    "Finite fault tests, not a formal verification.",
+    "Positive rescue routing uses an explicitly injected verifier; no synthetic solution is asserted."
+  ],
+  "hashes_after": {
+    "validate_controller.py": "649e422b3ccbf45da914312a99899998bf2a4e263d76d00e1f52f59cdf5d7ba9",
+    "campaign.py": "6962b53ed50d105f4494cbcc46fbff34b5f4b041828177678389e836a69c63a9",
+    "campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "bin/campaign_worker": "a41963799ebb83d9d94de4e5fc119791cc8f91d192299f35e4fee03eece66e76",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "plane_worker.c": "ccc0ed4746dab6dbb699bfca1de1d2047fd6eac10e6aa337c325906513a38914",
+    "bin/plane_worker": "d91341e30b0cbfabb5f8f37e4cc75e45cf466c153fa144c95ee882c563b49fde"
+  },
+  "plane_integration_skipped": false,
+  "elapsed_seconds": 0.5295969580038218,
+  "passed": true
+}

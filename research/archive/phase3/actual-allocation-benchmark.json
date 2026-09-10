@@ -1,0 +1,4048 @@
+{
+  "status": "passed",
+  "scope": "Independent differential finite-domain audit and calibration",
+  "machine": {
+    "system": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+    "machine": "arm64",
+    "logical_cpus": 15,
+    "python": "3.14.6"
+  },
+  "source_and_binary_sha256": {
+    "./phase2/offset_worker.c": "087de923d2ba242633774ad9db0285d960c01acc0e8b1d4a2d36808e72de7a12",
+    "./phase2/bin/offset_worker": "4a2d9639bfb69cf33e3520aec03fc66b2c8237df82d4b914076cc3b29e4e4ffa",
+    "./campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "./phase3/offset_worker.c": "43eba3c4a0c91df79ce50087749556700e2e027a552e49acf8f483c0167c713a",
+    "./phase3/checker.c": "9125cd2ff10b42201162845b98a7aa702a8c5b4eea496f09cd6c2af4934767df",
+    "./phase3/bin/offset_worker": "3a0503298ae55f678f3bfb3728f3869b1aa0cce8d6a15239d7950b930e57b819"
+  },
+  "correctness": {
+    "status": "passed",
+    "all_geometry_strata": 81,
+    "fixed_and_adaptive_native_pairs": 162,
+    "candidate_oracle_checks": 179094,
+    "candidate_traces_compared": 31821,
+    "optimized_root_traces_compared": 10399,
+    "full_small_domains": 6,
+    "shell_endpoint_cases": 36,
+    "partition_and_qband_tests": [
+      {
+        "ell": 1,
+        "quotients": 4890165
+      },
+      {
+        "ell": 5,
+        "quotients": 4976154
+      },
+      {
+        "ell": 25,
+        "quotients": 5115438
+      }
+    ],
+    "interval_cases": 43,
+    "known_positive_fixtures": 19,
+    "independent_q_visits": 769,
+    "independent_exact_survivors": 19,
+    "empty_intervals_rejected": true,
+    "ubsan": true,
+    "trace_note": "Candidate trace builds disable row skipping; ROOT-only UBSan build separately exercises optimized skipping.",
+    "geometry_records": [
+      {
+        "key": "offset:1:0:0:0:64",
+        "start": 777,
+        "seed": 18446744073709551615,
+        "oracle_inputs": 24,
+        "roots": 3,
+        "native_quotients": 954
+      },
+      {
+        "key": "offset:1:0:0:64:256",
+        "start": 814,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 3456
+      },
+      {
+        "key": "offset:1:0:0:256:4096",
+        "start": 851,
+        "seed": 18446744073709551613,
+        "oracle_inputs": 24,
+        "roots": 1,
+        "native_quotients": 38400
+      },
+      {
+        "key": "offset:1:0:1:0:64",
+        "start": 888,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 2297
+      },
+      {
+        "key": "offset:1:0:1:64:256",
+        "start": 925,
+        "seed": 18446744073709551611,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 6336
+      },
+      {
+        "key": "offset:1:0:1:256:4096",
+        "start": 962,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 4,
+        "native_quotients": 92160
+      },
+      {
+        "key": "offset:1:0:2:0:64",
+        "start": 999,
+        "seed": 18446744073709551609,
+        "oracle_inputs": 24,
+        "roots": 4,
+        "native_quotients": 1087
+      },
+      {
+        "key": "offset:1:0:2:64:256",
+        "start": 1036,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 4,
+        "native_quotients": 3264
+      },
+      {
+        "key": "offset:1:0:2:256:4096",
+        "start": 1073,
+        "seed": 18446744073709551607,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 61440
+      },
+      {
+        "key": "offset:1:1:0:0:64",
+        "start": 1110,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 68,
+        "native_quotients": 19781
+      },
+      {
+        "key": "offset:1:1:0:64:256",
+        "start": 1147,
+        "seed": 18446744073709551605,
+        "oracle_inputs": 384,
+        "roots": 5,
+        "native_quotients": 78336
+      },
+      {
+        "key": "offset:1:1:0:256:4096",
+        "start": 1184,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 114,
+        "native_quotients": 1163520
+      },
+      {
+        "key": "offset:1:1:1:0:64",
+        "start": 1221,
+        "seed": 18446744073709551603,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 26219
+      },
+      {
+        "key": "offset:1:1:1:64:256",
+        "start": 1258,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 84672
+      },
+      {
+        "key": "offset:1:1:1:256:4096",
+        "start": 1295,
+        "seed": 18446744073709551601,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 1259520
+      },
+      {
+        "key": "offset:1:1:2:0:64",
+        "start": 1332,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 18152
+      },
+      {
+        "key": "offset:1:1:2:64:256",
+        "start": 1369,
+        "seed": 18446744073709551599,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 64704
+      },
+      {
+        "key": "offset:1:1:2:256:4096",
+        "start": 1406,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 1789440
+      },
+      {
+        "key": "offset:1:2:0:0:64",
+        "start": 1443,
+        "seed": 18446744073709551597,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 390832
+      },
+      {
+        "key": "offset:1:2:0:64:256",
+        "start": 1480,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 738,
+        "native_quotients": 1086528
+      },
+      {
+        "key": "offset:1:2:0:256:4096",
+        "start": 1517,
+        "seed": 18446744073709551595,
+        "oracle_inputs": 6144,
+        "roots": 126,
+        "native_quotients": 23942400
+      },
+      {
+        "key": "offset:1:2:1:0:64",
+        "start": 1554,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 461806
+      },
+      {
+        "key": "offset:1:2:1:64:256",
+        "start": 1591,
+        "seed": 18446744073709551593,
+        "oracle_inputs": 6144,
+        "roots": 969,
+        "native_quotients": 1092864
+      },
+      {
+        "key": "offset:1:2:1:256:4096",
+        "start": 1628,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 766,
+        "native_quotients": 25739520
+      },
+      {
+        "key": "offset:1:2:2:0:64",
+        "start": 1665,
+        "seed": 18446744073709551591,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 351446
+      },
+      {
+        "key": "offset:1:2:2:64:256",
+        "start": 1702,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 891648
+      },
+      {
+        "key": "offset:1:2:2:256:4096",
+        "start": 1739,
+        "seed": 18446744073709551589,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 18942720
+      },
+      {
+        "key": "offset:5:0:0:0:64",
+        "start": 1776,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 5,
+        "native_quotients": 1462
+      },
+      {
+        "key": "offset:5:0:0:64:256",
+        "start": 1813,
+        "seed": 18446744073709551587,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 2880
+      },
+      {
+        "key": "offset:5:0:0:256:4096",
+        "start": 1850,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 46080
+      },
+      {
+        "key": "offset:5:0:1:0:64",
+        "start": 1887,
+        "seed": 18446744073709551585,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 1468
+      },
+      {
+        "key": "offset:5:0:1:64:256",
+        "start": 1924,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 7,
+        "native_quotients": 4800
+      },
+      {
+        "key": "offset:5:0:1:256:4096",
+        "start": 1961,
+        "seed": 18446744073709551583,
+        "oracle_inputs": 24,
+        "roots": 3,
+        "native_quotients": 126720
+      },
+      {
+        "key": "offset:5:0:2:0:64",
+        "start": 1998,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 893
+      },
+      {
+        "key": "offset:5:0:2:64:256",
+        "start": 2035,
+        "seed": 18446744073709551581,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 4608
+      },
+      {
+        "key": "offset:5:0:2:256:4096",
+        "start": 2072,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 49920
+      },
+      {
+        "key": "offset:5:1:0:0:64",
+        "start": 2109,
+        "seed": 18446744073709551579,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 17747
+      },
+      {
+        "key": "offset:5:1:0:64:256",
+        "start": 2146,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 45888
+      },
+      {
+        "key": "offset:5:1:0:256:4096",
+        "start": 2183,
+        "seed": 18446744073709551577,
+        "oracle_inputs": 384,
+        "roots": 8,
+        "native_quotients": 1059840
+      },
+      {
+        "key": "offset:5:1:1:0:64",
+        "start": 2220,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 47,
+        "native_quotients": 23358
+      },
+      {
+        "key": "offset:5:1:1:64:256",
+        "start": 2257,
+        "seed": 18446744073709551575,
+        "oracle_inputs": 384,
+        "roots": 60,
+        "native_quotients": 76416
+      },
+      {
+        "key": "offset:5:1:1:256:4096",
+        "start": 2294,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 1743360
+      },
+      {
+        "key": "offset:5:1:2:0:64",
+        "start": 2331,
+        "seed": 18446744073709551573,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 0
+      },
+      {
+        "key": "offset:5:1:2:64:256",
+        "start": 2368,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 13,
+        "native_quotients": 58176
+      },
+      {
+        "key": "offset:5:1:2:256:4096",
+        "start": 2405,
+        "seed": 18446744073709551571,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 1516800
+      },
+      {
+        "key": "offset:5:2:0:0:64",
+        "start": 2442,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 261638
+      },
+      {
+        "key": "offset:5:2:0:64:256",
+        "start": 2479,
+        "seed": 18446744073709551569,
+        "oracle_inputs": 6144,
+        "roots": 239,
+        "native_quotients": 814464
+      },
+      {
+        "key": "offset:5:2:0:256:4096",
+        "start": 2516,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 17879040
+      },
+      {
+        "key": "offset:5:2:1:0:64",
+        "start": 2553,
+        "seed": 18446744073709551567,
+        "oracle_inputs": 6144,
+        "roots": 566,
+        "native_quotients": 352234
+      },
+      {
+        "key": "offset:5:2:1:64:256",
+        "start": 2590,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 1247040
+      },
+      {
+        "key": "offset:5:2:1:256:4096",
+        "start": 2627,
+        "seed": 18446744073709551565,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 23815680
+      },
+      {
+        "key": "offset:5:2:2:0:64",
+        "start": 2664,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 1098,
+        "native_quotients": 332716
+      },
+      {
+        "key": "offset:5:2:2:64:256",
+        "start": 2701,
+        "seed": 18446744073709551563,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 791424
+      },
+      {
+        "key": "offset:5:2:2:256:4096",
+        "start": 2738,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 19607040
+      },
+      {
+        "key": "offset:25:0:0:0:64",
+        "start": 2775,
+        "seed": 18446744073709551561,
+        "oracle_inputs": 24,
+        "roots": 3,
+        "native_quotients": 1340
+      },
+      {
+        "key": "offset:25:0:0:64:256",
+        "start": 2812,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 4,
+        "native_quotients": 2688
+      },
+      {
+        "key": "offset:25:0:0:256:4096",
+        "start": 2849,
+        "seed": 18446744073709551559,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 88320
+      },
+      {
+        "key": "offset:25:0:1:0:64",
+        "start": 2886,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 2934
+      },
+      {
+        "key": "offset:25:0:1:64:256",
+        "start": 2923,
+        "seed": 18446744073709551557,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 3456
+      },
+      {
+        "key": "offset:25:0:1:256:4096",
+        "start": 2960,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 153600
+      },
+      {
+        "key": "offset:25:0:2:0:64",
+        "start": 2997,
+        "seed": 18446744073709551555,
+        "oracle_inputs": 24,
+        "roots": 4,
+        "native_quotients": 2425
+      },
+      {
+        "key": "offset:25:0:2:64:256",
+        "start": 3034,
+        "seed": 114,
+        "oracle_inputs": 24,
+        "roots": 0,
+        "native_quotients": 7296
+      },
+      {
+        "key": "offset:25:0:2:256:4096",
+        "start": 3071,
+        "seed": 18446744073709551553,
+        "oracle_inputs": 24,
+        "roots": 4,
+        "native_quotients": 65280
+      },
+      {
+        "key": "offset:25:1:0:0:64",
+        "start": 3108,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 14185
+      },
+      {
+        "key": "offset:25:1:0:64:256",
+        "start": 3145,
+        "seed": 18446744073709551551,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 50304
+      },
+      {
+        "key": "offset:25:1:0:256:4096",
+        "start": 3182,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 1701120
+      },
+      {
+        "key": "offset:25:1:1:0:64",
+        "start": 3219,
+        "seed": 18446744073709551549,
+        "oracle_inputs": 384,
+        "roots": 64,
+        "native_quotients": 31334
+      },
+      {
+        "key": "offset:25:1:1:64:256",
+        "start": 3256,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 58176
+      },
+      {
+        "key": "offset:25:1:1:256:4096",
+        "start": 3293,
+        "seed": 18446744073709551547,
+        "oracle_inputs": 384,
+        "roots": 60,
+        "native_quotients": 1616640
+      },
+      {
+        "key": "offset:25:1:2:0:64",
+        "start": 3330,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 17256
+      },
+      {
+        "key": "offset:25:1:2:64:256",
+        "start": 3367,
+        "seed": 18446744073709551545,
+        "oracle_inputs": 384,
+        "roots": 60,
+        "native_quotients": 48384
+      },
+      {
+        "key": "offset:25:1:2:256:4096",
+        "start": 3404,
+        "seed": 114,
+        "oracle_inputs": 384,
+        "roots": 0,
+        "native_quotients": 998400
+      },
+      {
+        "key": "offset:25:2:0:0:64",
+        "start": 3441,
+        "seed": 18446744073709551543,
+        "oracle_inputs": 6144,
+        "roots": 321,
+        "native_quotients": 294328
+      },
+      {
+        "key": "offset:25:2:0:64:256",
+        "start": 3478,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 1061,
+        "native_quotients": 1111104
+      },
+      {
+        "key": "offset:25:2:0:256:4096",
+        "start": 3515,
+        "seed": 18446744073709551541,
+        "oracle_inputs": 6144,
+        "roots": 724,
+        "native_quotients": 18777600
+      },
+      {
+        "key": "offset:25:2:1:0:64",
+        "start": 3552,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 536355
+      },
+      {
+        "key": "offset:25:2:1:64:256",
+        "start": 3589,
+        "seed": 18446744073709551539,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 875520
+      },
+      {
+        "key": "offset:25:2:1:256:4096",
+        "start": 3626,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 540,
+        "native_quotients": 23028480
+      },
+      {
+        "key": "offset:25:2:2:0:64",
+        "start": 3663,
+        "seed": 18446744073709551537,
+        "oracle_inputs": 6144,
+        "roots": 1982,
+        "native_quotients": 336377
+      },
+      {
+        "key": "offset:25:2:2:64:256",
+        "start": 3700,
+        "seed": 114,
+        "oracle_inputs": 6144,
+        "roots": 0,
+        "native_quotients": 1068288
+      },
+      {
+        "key": "offset:25:2:2:256:4096",
+        "start": 3737,
+        "seed": 18446744073709551535,
+        "oracle_inputs": 6144,
+        "roots": 724,
+        "native_quotients": 20394240
+      }
+    ]
+  },
+  "reused_correctness_artifact": {
+    "path": "work/phase3-benchmark-correctness.json",
+    "sha256": "44a05acbcb9e7ac77664cc4d73a1f556d4dc1203a45fde3986ed71bf3e1ef158"
+  },
+  "actual_allocation": {
+    "scope": "Exact replay of latest12 completed phase2 job IDs; calibration only, zero new-coverage credit.",
+    "database": "outputs/three-cubes-lab/phase2/runs/campaign/campaign.sqlite3",
+    "selection_query": "SELECT * FROM jobs WHERE status='complete' ORDER BY id DESC LIMIT 12",
+    "selection_not_conditioned_on_benchmark_results": true,
+    "workers": 12,
+    "seed": 1142,
+    "budget_seconds": 60.0,
+    "elapsed_seconds": 9.240692291990854,
+    "complete_six_pairs": true,
+    "jobs": [
+      {
+        "id": 89685,
+        "context": "offset:25:2:2:0:64",
+        "start": 6392662,
+        "count": 6192,
+        "strategy": "explore",
+        "elapsed": 1.0702727080060868,
+        "stats": {
+          "Dhi": 1481481481481481480,
+          "Dlo": 740740740740740740,
+          "calibration_samples": 4490,
+          "candidates": 38043648,
+          "complete": true,
+          "count": 6192,
+          "covered": 0,
+          "cpu_seconds": 0.947788,
+          "curves": 2487003,
+          "direct_curves": 2487003,
+          "eligible_inputs": 6575873,
+          "ell": 25,
+          "empty_rows": 3798,
+          "end": 6398854,
+          "exact_tests": 334,
+          "exposure_sum": 466008.90460095793,
+          "filters": [
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 1440,
+              "prime": 5,
+              "rejected": 21269,
+              "tested": 66210
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2923,
+              "prime": 7,
+              "rejected": 3016706,
+              "tested": 4689601
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 1920,
+              "prime": 11,
+              "rejected": 10421,
+              "tested": 25279
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2202,
+              "prime": 13,
+              "rejected": 48431,
+              "tested": 97327
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 1995,
+              "prime": 17,
+              "rejected": 4053,
+              "tested": 9153
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 1345,
+              "prime": 19,
+              "rejected": 1019,
+              "tested": 3279
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2061,
+              "prime": 23,
+              "rejected": 3464,
+              "tested": 7508
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2350,
+              "prime": 31,
+              "rejected": 796468,
+              "tested": 1516123
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2326,
+              "prime": 37,
+              "rejected": 346897,
+              "tested": 675342
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2073,
+              "prime": 41,
+              "rejected": 6488,
+              "tested": 13712
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2283,
+              "prime": 43,
+              "rejected": 244462,
+              "tested": 477257
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2192,
+              "prime": 47,
+              "rejected": 26350,
+              "tested": 55100
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2153,
+              "prime": 53,
+              "rejected": 40392,
+              "tested": 84146
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 2196,
+              "prime": 59,
+              "rejected": 142945,
+              "tested": 295902
+            },
+            {
+              "calibrated": 4490,
+              "calibration_rejected": 1942,
+              "prime": 61,
+              "rejected": 977,
+              "tested": 2271
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            37,
+            43,
+            13,
+            59,
+            47,
+            53,
+            41,
+            23,
+            17,
+            61,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2191936,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 177778,
+          "norm_evaluations": 54916,
+          "outside_shell": 31467775,
+          "permutation_offset": 332026926536,
+          "permutation_seed": 1142,
+          "permutation_stride": 241977762500,
+          "policy": "adaptive",
+          "quotient_points": 158916752,
+          "radius": 375000,
+          "ratio": 64,
+          "recurrence_steps": 6573479,
+          "rejected_mod243": 151067147,
+          "rejected_parity": 3138929,
+          "rejected_signed": 1719156,
+          "rejected_signed361": 75879,
+          "rejected_signed8": 1643277,
+          "reorders": 70,
+          "rows": 6192,
+          "start": 6392662,
+          "symmetry_rejected": 0,
+          "thi": 8191,
+          "tlo": 2048,
+          "total": 562501500001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.055788,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89684,
+        "context": "offset:25:2:0:0:64",
+        "start": 38284299,
+        "count": 5705,
+        "strategy": "model",
+        "elapsed": 1.0506125419924501,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 4409,
+          "candidates": 35051520,
+          "complete": true,
+          "count": 5705,
+          "covered": 0,
+          "cpu_seconds": 0.915948,
+          "curves": 2361476,
+          "direct_curves": 2361476,
+          "eligible_inputs": 6192441,
+          "ell": 25,
+          "empty_rows": 2394,
+          "end": 38290004,
+          "exact_tests": 296,
+          "exposure_sum": 1672585.1589760194,
+          "filters": [
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 1428,
+              "prime": 5,
+              "rejected": 22334,
+              "tested": 69994
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2862,
+              "prime": 7,
+              "rejected": 2847160,
+              "tested": 4430777
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 1815,
+              "prime": 11,
+              "rejected": 7623,
+              "tested": 18093
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2177,
+              "prime": 13,
+              "rejected": 66834,
+              "tested": 133602
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 1888,
+              "prime": 17,
+              "rejected": 3191,
+              "tested": 7320
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 1403,
+              "prime": 19,
+              "rejected": 990,
+              "tested": 3353
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2020,
+              "prime": 23,
+              "rejected": 44676,
+              "tested": 97698
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2303,
+              "prime": 31,
+              "rejected": 658204,
+              "tested": 1250726
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2310,
+              "prime": 37,
+              "rejected": 409603,
+              "tested": 796374
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2086,
+              "prime": 41,
+              "rejected": 26503,
+              "tested": 55872
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2272,
+              "prime": 43,
+              "rejected": 139106,
+              "tested": 271438
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2097,
+              "prime": 47,
+              "rejected": 9767,
+              "tested": 20376
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2160,
+              "prime": 53,
+              "rejected": 32654,
+              "tested": 67874
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 2169,
+              "prime": 59,
+              "rejected": 182344,
+              "tested": 378078
+            },
+            {
+              "calibrated": 4409,
+              "calibration_rejected": 1923,
+              "prime": 61,
+              "rejected": 1643,
+              "tested": 3716
+            }
+          ],
+          "final_order": [
+            7,
+            37,
+            31,
+            43,
+            13,
+            59,
+            53,
+            47,
+            41,
+            23,
+            61,
+            17,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2064121,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 147818,
+          "norm_evaluations": 69844,
+          "outside_shell": 28859079,
+          "permutation_offset": 332026926536,
+          "permutation_seed": 1142,
+          "permutation_stride": 241977762500,
+          "policy": "adaptive",
+          "quotient_points": 150232016,
+          "radius": 375000,
+          "ratio": 64,
+          "recurrence_steps": 6189130,
+          "rejected_mod243": 142813287,
+          "rejected_parity": 2965801,
+          "rejected_signed": 1619026,
+          "rejected_signed361": 71507,
+          "rejected_signed8": 1547519,
+          "reorders": 68,
+          "rows": 5705,
+          "start": 38284299,
+          "symmetry_rejected": 0,
+          "thi": 8191,
+          "tlo": 2048,
+          "total": 562501500001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.042914,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89683,
+        "context": "offset:1:0:2:0:64",
+        "start": 1433547048,
+        "count": 1000000,
+        "strategy": "explore",
+        "elapsed": 0.855379582993919,
+        "stats": {
+          "Dhi": 1481481481481481480,
+          "Dlo": 740740740740740740,
+          "calibration_samples": 2862,
+          "candidates": 24000000,
+          "complete": true,
+          "count": 1000000,
+          "covered": 0,
+          "cpu_seconds": 0.72419,
+          "curves": 1529405,
+          "direct_curves": 1529405,
+          "eligible_inputs": 4023883,
+          "ell": 1,
+          "empty_rows": 624198,
+          "end": 1434547048,
+          "exact_tests": 219,
+          "exposure_sum": 286970.2895652314,
+          "filters": [
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 888,
+              "prime": 5,
+              "rejected": 22502,
+              "tested": 70410
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1859,
+              "prime": 7,
+              "rejected": 1847697,
+              "tested": 2873746
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1209,
+              "prime": 11,
+              "rejected": 7509,
+              "tested": 17989
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1421,
+              "prime": 13,
+              "rejected": 61756,
+              "tested": 124013
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1271,
+              "prime": 17,
+              "rejected": 3234,
+              "tested": 7326
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 899,
+              "prime": 19,
+              "rejected": 974,
+              "tested": 3183
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1317,
+              "prime": 23,
+              "rejected": 2843,
+              "tested": 6095
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1462,
+              "prime": 31,
+              "rejected": 368841,
+              "tested": 701125
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1465,
+              "prime": 37,
+              "rejected": 326252,
+              "tested": 634542
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1359,
+              "prime": 41,
+              "rejected": 11020,
+              "tested": 23173
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1461,
+              "prime": 43,
+              "rejected": 191533,
+              "tested": 373369
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1349,
+              "prime": 47,
+              "rejected": 9706,
+              "tested": 20495
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1374,
+              "prime": 53,
+              "rejected": 24587,
+              "tested": 51404
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1374,
+              "prime": 59,
+              "rejected": 16698,
+              "tested": 34419
+            },
+            {
+              "calibrated": 2862,
+              "calibration_rejected": 1241,
+              "prime": 61,
+              "rejected": 775,
+              "tested": 1850
+            }
+          ],
+          "final_order": [
+            7,
+            37,
+            43,
+            31,
+            13,
+            53,
+            59,
+            47,
+            41,
+            23,
+            17,
+            61,
+            11,
+            19,
+            5
+          ],
+          "hits": 0,
+          "invalid_d": 1341341,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 100615,
+          "norm_evaluations": 4664357,
+          "outside_shell": 19976117,
+          "permutation_offset": 10331100636978,
+          "permutation_seed": 1142,
+          "permutation_stride": 42953055902795,
+          "policy": "adaptive",
+          "quotient_points": 97726191,
+          "radius": 6000000,
+          "ratio": 64,
+          "recurrence_steps": 3648081,
+          "rejected_mod243": 92899759,
+          "rejected_parity": 1930286,
+          "rejected_signed": 1052522,
+          "rejected_signed361": 46443,
+          "rejected_signed8": 1006079,
+          "reorders": 44,
+          "rows": 1000000,
+          "start": 1433547048,
+          "symmetry_rejected": 0,
+          "thi": 31,
+          "tlo": 8,
+          "total": 144000024000001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 0.848579,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89682,
+        "context": "offset:1:2:0:0:64",
+        "start": 38384662,
+        "count": 5750,
+        "strategy": "model",
+        "elapsed": 1.0912045419972856,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 4628,
+          "candidates": 35328000,
+          "complete": true,
+          "count": 5750,
+          "covered": 0,
+          "cpu_seconds": 0.949032,
+          "curves": 2417508,
+          "direct_curves": 2417508,
+          "eligible_inputs": 6169631,
+          "ell": 1,
+          "empty_rows": 2389,
+          "end": 38390412,
+          "exact_tests": 316,
+          "exposure_sum": 1708732.4854164058,
+          "filters": [
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 1535,
+              "prime": 5,
+              "rejected": 20912,
+              "tested": 65533
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 3008,
+              "prime": 7,
+              "rejected": 2975260,
+              "tested": 4629151
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 1934,
+              "prime": 11,
+              "rejected": 7110,
+              "tested": 16923
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2377,
+              "prime": 13,
+              "rejected": 147122,
+              "tested": 293189
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2017,
+              "prime": 17,
+              "rejected": 3442,
+              "tested": 7723
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 1416,
+              "prime": 19,
+              "rejected": 942,
+              "tested": 3039
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2109,
+              "prime": 23,
+              "rejected": 5256,
+              "tested": 11492
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2456,
+              "prime": 31,
+              "rejected": 826804,
+              "tested": 1567485
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2365,
+              "prime": 37,
+              "rejected": 355351,
+              "tested": 691190
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2195,
+              "prime": 41,
+              "rejected": 59764,
+              "tested": 125828
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2359,
+              "prime": 43,
+              "rejected": 189490,
+              "tested": 369415
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2171,
+              "prime": 47,
+              "rejected": 5040,
+              "tested": 10614
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2206,
+              "prime": 53,
+              "rejected": 17521,
+              "tested": 36143
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2278,
+              "prime": 59,
+              "rejected": 34396,
+              "tested": 71158
+            },
+            {
+              "calibrated": 4628,
+              "calibration_rejected": 2029,
+              "prime": 61,
+              "rejected": 1119,
+              "tested": 2576
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            13,
+            37,
+            43,
+            59,
+            53,
+            41,
+            47,
+            23,
+            61,
+            17,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2056555,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 161975,
+          "norm_evaluations": 70675,
+          "outside_shell": 29158369,
+          "permutation_offset": 203690996248,
+          "permutation_seed": 1142,
+          "permutation_stride": 313696975916,
+          "policy": "adaptive",
+          "quotient_points": 153797832,
+          "radius": 375000,
+          "ratio": 64,
+          "recurrence_steps": 6166270,
+          "rejected_mod243": 146201918,
+          "rejected_parity": 2946069,
+          "rejected_signed": 1533593,
+          "rejected_signed361": 73511,
+          "rejected_signed8": 1460082,
+          "reorders": 72,
+          "rows": 5750,
+          "start": 38384662,
+          "symmetry_rejected": 0,
+          "thi": 8191,
+          "tlo": 2048,
+          "total": 562501500001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.084452,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89681,
+        "context": "offset:5:2:0:0:64",
+        "start": 38144106,
+        "count": 5719,
+        "strategy": "model",
+        "elapsed": 1.0839973330002977,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 4254,
+          "candidates": 35137536,
+          "complete": true,
+          "count": 5719,
+          "covered": 0,
+          "cpu_seconds": 0.940576,
+          "curves": 2382774,
+          "direct_curves": 2382774,
+          "eligible_inputs": 6125560,
+          "ell": 5,
+          "empty_rows": 2443,
+          "end": 38149825,
+          "exact_tests": 288,
+          "exposure_sum": 1689616.5221171994,
+          "filters": [
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1310,
+              "prime": 5,
+              "rejected": 24204,
+              "tested": 76114
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2756,
+              "prime": 7,
+              "rejected": 2874582,
+              "tested": 4469582
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1751,
+              "prime": 11,
+              "rejected": 8145,
+              "tested": 19402
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2133,
+              "prime": 13,
+              "rejected": 184109,
+              "tested": 368310
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1898,
+              "prime": 17,
+              "rejected": 7900,
+              "tested": 17844
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1296,
+              "prime": 19,
+              "rejected": 1070,
+              "tested": 3456
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1929,
+              "prime": 23,
+              "rejected": 4303,
+              "tested": 9300
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2222,
+              "prime": 31,
+              "rejected": 715690,
+              "tested": 1358093
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2181,
+              "prime": 37,
+              "rejected": 381977,
+              "tested": 743963
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2048,
+              "prime": 41,
+              "rejected": 23977,
+              "tested": 50321
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2147,
+              "prime": 43,
+              "rejected": 191391,
+              "tested": 374621
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2004,
+              "prime": 47,
+              "rejected": 11934,
+              "tested": 24779
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1998,
+              "prime": 53,
+              "rejected": 15765,
+              "tested": 32950
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 2053,
+              "prime": 59,
+              "rejected": 47176,
+              "tested": 97252
+            },
+            {
+              "calibrated": 4254,
+              "calibration_rejected": 1890,
+              "prime": 61,
+              "rejected": 1092,
+              "tested": 2458
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            37,
+            43,
+            13,
+            59,
+            41,
+            47,
+            53,
+            23,
+            17,
+            61,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2041829,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 99057,
+          "norm_evaluations": 69500,
+          "outside_shell": 29011976,
+          "permutation_offset": 19443211880,
+          "permutation_seed": 1142,
+          "permutation_stride": 771562590,
+          "policy": "adaptive",
+          "quotient_points": 151585302,
+          "radius": 375000,
+          "ratio": 64,
+          "recurrence_steps": 6122284,
+          "rejected_mod243": 144098747,
+          "rejected_parity": 2992952,
+          "rejected_signed": 1601900,
+          "rejected_signed361": 70468,
+          "rejected_signed8": 1531432,
+          "reorders": 66,
+          "rows": 5719,
+          "start": 38144106,
+          "symmetry_rejected": 0,
+          "thi": 8191,
+          "tlo": 2048,
+          "total": 562501500001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.078527,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89680,
+        "context": "offset:5:2:2:0:64",
+        "start": 6398964,
+        "count": 6167,
+        "strategy": "explore",
+        "elapsed": 1.1019840840017423,
+        "stats": {
+          "Dhi": 1481481481481481480,
+          "Dlo": 740740740740740740,
+          "calibration_samples": 4363,
+          "candidates": 37890048,
+          "complete": true,
+          "count": 6167,
+          "covered": 0,
+          "cpu_seconds": 0.949249,
+          "curves": 2378813,
+          "direct_curves": 2378813,
+          "eligible_inputs": 6210245,
+          "ell": 5,
+          "empty_rows": 3907,
+          "end": 6405131,
+          "exact_tests": 327,
+          "exposure_sum": 445825.6107436994,
+          "filters": [
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 1418,
+              "prime": 5,
+              "rejected": 22941,
+              "tested": 71577
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2840,
+              "prime": 7,
+              "rejected": 2882748,
+              "tested": 4481425
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 1829,
+              "prime": 11,
+              "rejected": 7692,
+              "tested": 18613
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2234,
+              "prime": 13,
+              "rejected": 158989,
+              "tested": 318042
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 1939,
+              "prime": 17,
+              "rejected": 4320,
+              "tested": 9886
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 1355,
+              "prime": 19,
+              "rejected": 1059,
+              "tested": 3513
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2022,
+              "prime": 23,
+              "rejected": 7384,
+              "tested": 16250
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2332,
+              "prime": 31,
+              "rejected": 823390,
+              "tested": 1570182
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2226,
+              "prime": 37,
+              "rejected": 291392,
+              "tested": 567260
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2093,
+              "prime": 41,
+              "rejected": 24073,
+              "tested": 50537
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2211,
+              "prime": 43,
+              "rejected": 200297,
+              "tested": 392096
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2096,
+              "prime": 47,
+              "rejected": 9689,
+              "tested": 20327
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2111,
+              "prime": 53,
+              "rejected": 51779,
+              "tested": 107387
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 2090,
+              "prime": 59,
+              "rejected": 16831,
+              "tested": 34892
+            },
+            {
+              "calibrated": 4363,
+              "calibration_rejected": 1932,
+              "prime": 61,
+              "rejected": 1269,
+              "tested": 2839
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            13,
+            37,
+            43,
+            53,
+            47,
+            59,
+            41,
+            23,
+            17,
+            61,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2070073,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 137185,
+          "norm_evaluations": 52425,
+          "outside_shell": 31679803,
+          "permutation_offset": 19443211880,
+          "permutation_seed": 1142,
+          "permutation_stride": 771562590,
+          "policy": "adaptive",
+          "quotient_points": 152003316,
+          "radius": 375000,
+          "ratio": 64,
+          "recurrence_steps": 6207985,
+          "rejected_mod243": 144497460,
+          "rejected_parity": 3001676,
+          "rejected_signed": 1624174,
+          "rejected_signed361": 71390,
+          "rejected_signed8": 1552784,
+          "reorders": 68,
+          "rows": 6167,
+          "start": 6398964,
+          "symmetry_rejected": 0,
+          "thi": 8191,
+          "tlo": 2048,
+          "total": 562501500001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.094898,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89679,
+        "context": "offset:5:0:0:0:64",
+        "start": 5969529711,
+        "count": 1000000,
+        "strategy": "model",
+        "elapsed": 0.9129077079996932,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 3059,
+          "candidates": 24000000,
+          "complete": true,
+          "count": 1000000,
+          "covered": 0,
+          "cpu_seconds": 0.781947,
+          "curves": 1631651,
+          "direct_curves": 1631651,
+          "eligible_inputs": 4292555,
+          "ell": 5,
+          "empty_rows": 423542,
+          "end": 5970529711,
+          "exact_tests": 222,
+          "exposure_sum": 1154907.1326509074,
+          "filters": [
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1046,
+              "prime": 5,
+              "rejected": 19048,
+              "tested": 59809
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 2012,
+              "prime": 7,
+              "rejected": 1965393,
+              "tested": 3056845
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1221,
+              "prime": 11,
+              "rejected": 6338,
+              "tested": 15223
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1516,
+              "prime": 13,
+              "rejected": 68974,
+              "tested": 137900
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1369,
+              "prime": 17,
+              "rejected": 2776,
+              "tested": 6395
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 932,
+              "prime": 19,
+              "rejected": 766,
+              "tested": 2634
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1458,
+              "prime": 23,
+              "rejected": 36361,
+              "tested": 79239
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1629,
+              "prime": 31,
+              "rejected": 536539,
+              "tested": 1022791
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1555,
+              "prime": 37,
+              "rejected": 154326,
+              "tested": 300562
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1466,
+              "prime": 41,
+              "rejected": 21039,
+              "tested": 44085
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1557,
+              "prime": 43,
+              "rejected": 131227,
+              "tested": 256375
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1513,
+              "prime": 47,
+              "rejected": 99089,
+              "tested": 205978
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1475,
+              "prime": 53,
+              "rejected": 17924,
+              "tested": 37109
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1474,
+              "prime": 59,
+              "rejected": 15147,
+              "tested": 31571
+            },
+            {
+              "calibrated": 3059,
+              "calibration_rejected": 1292,
+              "prime": 61,
+              "rejected": 605,
+              "tested": 1402
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            43,
+            37,
+            47,
+            13,
+            53,
+            59,
+            41,
+            23,
+            17,
+            61,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 1430835,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 107387,
+          "norm_evaluations": 6201458,
+          "outside_shell": 19707445,
+          "permutation_offset": 41178774819621,
+          "permutation_seed": 1142,
+          "permutation_stride": 131872606362056,
+          "policy": "adaptive",
+          "quotient_points": 103801767,
+          "radius": 6000000,
+          "ratio": 64,
+          "recurrence_steps": 3716097,
+          "rejected_mod243": 98675414,
+          "rejected_parity": 2050579,
+          "rejected_signed": 1122682,
+          "rejected_signed361": 49657,
+          "rejected_signed8": 1073025,
+          "reorders": 47,
+          "rows": 1000000,
+          "start": 5969529711,
+          "symmetry_rejected": 0,
+          "thi": 31,
+          "tlo": 8,
+          "total": 144000024000001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 0.905977,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89678,
+        "context": "offset:25:2:0:64:256",
+        "start": 1184724,
+        "count": 3939,
+        "strategy": "explore",
+        "elapsed": 1.1381909579940839,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 9042,
+          "candidates": 24201216,
+          "complete": true,
+          "count": 3939,
+          "covered": 0,
+          "cpu_seconds": 0.99941,
+          "curves": 1626588,
+          "direct_curves": 1626588,
+          "eligible_inputs": 4263859,
+          "ell": 25,
+          "empty_rows": 1650,
+          "end": 1188663,
+          "exact_tests": 610,
+          "exposure_sum": 1150867.7902648472,
+          "filters": [
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 2956,
+              "prime": 5,
+              "rejected": 22127,
+              "tested": 69232
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 5759,
+              "prime": 7,
+              "rejected": 5935852,
+              "tested": 9233876
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 3809,
+              "prime": 11,
+              "rejected": 7767,
+              "tested": 19163
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4531,
+              "prime": 13,
+              "rejected": 366160,
+              "tested": 732455
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 3917,
+              "prime": 17,
+              "rejected": 4162,
+              "tested": 9241
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 2821,
+              "prime": 19,
+              "rejected": 1108,
+              "tested": 3604
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4182,
+              "prime": 23,
+              "rejected": 10188,
+              "tested": 22489
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4795,
+              "prime": 31,
+              "rejected": 1298525,
+              "tested": 2467643
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4670,
+              "prime": 37,
+              "rejected": 1131431,
+              "tested": 2204619
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4294,
+              "prime": 41,
+              "rejected": 24731,
+              "tested": 51673
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4568,
+              "prime": 43,
+              "rejected": 289797,
+              "tested": 566267
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4365,
+              "prime": 47,
+              "rejected": 52638,
+              "tested": 110037
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4235,
+              "prime": 53,
+              "rejected": 23474,
+              "tested": 48575
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 4416,
+              "prime": 59,
+              "rejected": 83782,
+              "tested": 172303
+            },
+            {
+              "calibrated": 9042,
+              "calibration_rejected": 3968,
+              "prime": 61,
+              "rejected": 3234,
+              "tested": 7321
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            37,
+            43,
+            13,
+            59,
+            47,
+            41,
+            53,
+            23,
+            61,
+            17,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 1421268,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 64,
+          "mode": "row_tile",
+          "noninvertible_C": 100079,
+          "norm_evaluations": 48610,
+          "outside_shell": 19937357,
+          "permutation_offset": 332026926536,
+          "permutation_seed": 1142,
+          "permutation_stride": 241977762500,
+          "policy": "adaptive",
+          "quotient_points": 312304896,
+          "radius": 375000,
+          "ratio": 256,
+          "recurrence_steps": 4261570,
+          "rejected_mod243": 296882317,
+          "rejected_parity": 6166993,
+          "rejected_signed": 1115924,
+          "rejected_signed361": 49084,
+          "rejected_signed8": 1066840,
+          "reorders": 141,
+          "rows": 3939,
+          "start": 1184724,
+          "symmetry_rejected": 0,
+          "thi": 8191,
+          "tlo": 2048,
+          "total": 562501500001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.131742,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89677,
+        "context": "offset:5:1:0:0:64",
+        "start": 570531314,
+        "count": 89183,
+        "strategy": "model",
+        "elapsed": 1.095956874996773,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 4217,
+          "candidates": 34246272,
+          "complete": true,
+          "count": 89183,
+          "covered": 0,
+          "cpu_seconds": 0.957526,
+          "curves": 2295563,
+          "direct_curves": 2295563,
+          "eligible_inputs": 6038420,
+          "ell": 5,
+          "empty_rows": 37373,
+          "end": 570620497,
+          "exact_tests": 306,
+          "exposure_sum": 1624809.5703793683,
+          "filters": [
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1328,
+              "prime": 5,
+              "rejected": 23487,
+              "tested": 73199
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2718,
+              "prime": 7,
+              "rejected": 2766274,
+              "tested": 4302354
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1804,
+              "prime": 11,
+              "rejected": 8802,
+              "tested": 21104
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2166,
+              "prime": 13,
+              "rejected": 429572,
+              "tested": 858873
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1927,
+              "prime": 17,
+              "rejected": 3652,
+              "tested": 8332
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1344,
+              "prime": 19,
+              "rejected": 1024,
+              "tested": 3493
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1953,
+              "prime": 23,
+              "rejected": 18479,
+              "tested": 40280
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2226,
+              "prime": 31,
+              "rejected": 548579,
+              "tested": 1042963
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2185,
+              "prime": 37,
+              "rejected": 153345,
+              "tested": 299141
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1988,
+              "prime": 41,
+              "rejected": 8295,
+              "tested": 17371
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2163,
+              "prime": 43,
+              "rejected": 297589,
+              "tested": 583258
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1989,
+              "prime": 47,
+              "rejected": 5465,
+              "tested": 11457
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2020,
+              "prime": 53,
+              "rejected": 16794,
+              "tested": 34937
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 2076,
+              "prime": 59,
+              "rejected": 43378,
+              "tested": 89983
+            },
+            {
+              "calibrated": 4217,
+              "calibration_rejected": 1840,
+              "prime": 61,
+              "rejected": 642,
+              "tested": 1481
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            37,
+            13,
+            43,
+            59,
+            53,
+            41,
+            47,
+            23,
+            17,
+            61,
+            11,
+            19,
+            5
+          ],
+          "hits": 0,
+          "invalid_d": 2012841,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 150743,
+          "norm_evaluations": 823330,
+          "outside_shell": 28207852,
+          "permutation_offset": 3255794392041,
+          "permutation_seed": 1142,
+          "permutation_stride": 7725995079125,
+          "policy": "adaptive",
+          "quotient_points": 146039045,
+          "radius": 1500000,
+          "ratio": 64,
+          "recurrence_steps": 5986610,
+          "rejected_mod243": 138827604,
+          "rejected_parity": 2885758,
+          "rejected_signed": 1579273,
+          "rejected_signed361": 69689,
+          "rejected_signed8": 1509584,
+          "reorders": 65,
+          "rows": 89183,
+          "start": 570531314,
+          "symmetry_rejected": 0,
+          "thi": 511,
+          "tlo": 128,
+          "total": 9000006000001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.089463,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89676,
+        "context": "offset:25:0:1:0:64",
+        "start": 1059173476,
+        "count": 1000000,
+        "strategy": "explore",
+        "elapsed": 1.131031291995896,
+        "stats": {
+          "Dhi": 740740740740740740,
+          "Dlo": 370370370370370370,
+          "calibration_samples": 3736,
+          "candidates": 24000000,
+          "complete": true,
+          "count": 1000000,
+          "covered": 0,
+          "cpu_seconds": 0.988138,
+          "curves": 2039109,
+          "direct_curves": 2039109,
+          "eligible_inputs": 5363552,
+          "ell": 25,
+          "empty_rows": 435152,
+          "end": 1060173476,
+          "exact_tests": 249,
+          "exposure_sum": 734492.7475850281,
+          "filters": [
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1174,
+              "prime": 5,
+              "rejected": 19789,
+              "tested": 61433
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 2439,
+              "prime": 7,
+              "rejected": 2466436,
+              "tested": 3836297
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1601,
+              "prime": 11,
+              "rejected": 6610,
+              "tested": 16039
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1844,
+              "prime": 13,
+              "rejected": 80223,
+              "tested": 160258
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1652,
+              "prime": 17,
+              "rejected": 3242,
+              "tested": 7311
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1137,
+              "prime": 19,
+              "rejected": 919,
+              "tested": 2865
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1690,
+              "prime": 23,
+              "rejected": 21679,
+              "tested": 47003
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1936,
+              "prime": 31,
+              "rejected": 379686,
+              "tested": 721884
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1953,
+              "prime": 37,
+              "rejected": 230359,
+              "tested": 449454
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1764,
+              "prime": 41,
+              "rejected": 5261,
+              "tested": 10899
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1947,
+              "prime": 43,
+              "rejected": 576536,
+              "tested": 1127435
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1794,
+              "prime": 47,
+              "rejected": 12654,
+              "tested": 26459
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1771,
+              "prime": 53,
+              "rejected": 33408,
+              "tested": 69123
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1785,
+              "prime": 59,
+              "rejected": 17979,
+              "tested": 37276
+            },
+            {
+              "calibrated": 3736,
+              "calibration_rejected": 1632,
+              "prime": 61,
+              "rejected": 901,
+              "tested": 2059
+            }
+          ],
+          "final_order": [
+            7,
+            37,
+            43,
+            31,
+            13,
+            47,
+            59,
+            53,
+            41,
+            23,
+            17,
+            61,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 1787772,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 133806,
+          "norm_evaluations": 6439322,
+          "outside_shell": 18636448,
+          "permutation_offset": 60413094287627,
+          "permutation_seed": 1142,
+          "permutation_stride": 135883896275070,
+          "policy": "adaptive",
+          "quotient_points": 130106575,
+          "radius": 6000000,
+          "ratio": 64,
+          "recurrence_steps": 4798704,
+          "rejected_mod243": 123682001,
+          "rejected_parity": 2568643,
+          "rejected_signed": 1402865,
+          "rejected_signed361": 61988,
+          "rejected_signed8": 1340877,
+          "reorders": 58,
+          "rows": 1000000,
+          "start": 1059173476,
+          "symmetry_rejected": 0,
+          "thi": 31,
+          "tlo": 8,
+          "total": 144000024000001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.123994,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89675,
+        "context": "offset:25:1:0:0:64",
+        "start": 555947071,
+        "count": 89179,
+        "strategy": "model",
+        "elapsed": 1.1101400000043213,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 4277,
+          "candidates": 34244736,
+          "complete": true,
+          "count": 89179,
+          "covered": 0,
+          "cpu_seconds": 0.956374,
+          "curves": 2295420,
+          "direct_curves": 2295420,
+          "eligible_inputs": 6038135,
+          "ell": 25,
+          "empty_rows": 37379,
+          "end": 556036250,
+          "exact_tests": 308,
+          "exposure_sum": 1624777.445651796,
+          "filters": [
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 1354,
+              "prime": 5,
+              "rejected": 19749,
+              "tested": 61544
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2745,
+              "prime": 7,
+              "rejected": 2768513,
+              "tested": 4307873
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 1834,
+              "prime": 11,
+              "rejected": 6942,
+              "tested": 16933
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2198,
+              "prime": 13,
+              "rejected": 267146,
+              "tested": 534569
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 1943,
+              "prime": 17,
+              "rejected": 4522,
+              "tested": 10282
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 1337,
+              "prime": 19,
+              "rejected": 941,
+              "tested": 2927
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 1922,
+              "prime": 23,
+              "rejected": 2225,
+              "tested": 4937
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2267,
+              "prime": 31,
+              "rejected": 802877,
+              "tested": 1525520
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2172,
+              "prime": 37,
+              "rejected": 120551,
+              "tested": 234397
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2093,
+              "prime": 41,
+              "rejected": 23137,
+              "tested": 48644
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2178,
+              "prime": 43,
+              "rejected": 226138,
+              "tested": 442125
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2070,
+              "prime": 47,
+              "rejected": 13721,
+              "tested": 28215
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2083,
+              "prime": 53,
+              "rejected": 44636,
+              "tested": 92715
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 2037,
+              "prime": 59,
+              "rejected": 24296,
+              "tested": 50217
+            },
+            {
+              "calibrated": 4277,
+              "calibration_rejected": 1856,
+              "prime": 61,
+              "rejected": 1723,
+              "tested": 3953
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            13,
+            43,
+            37,
+            41,
+            53,
+            47,
+            59,
+            17,
+            23,
+            61,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2012692,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 150795,
+          "norm_evaluations": 823317,
+          "outside_shell": 28206601,
+          "permutation_offset": 4033744467991,
+          "permutation_seed": 1142,
+          "permutation_stride": 5934180666150,
+          "policy": "adaptive",
+          "quotient_points": 146030105,
+          "radius": 1500000,
+          "ratio": 64,
+          "recurrence_steps": 5986335,
+          "rejected_mod243": 138818378,
+          "rejected_parity": 2884302,
+          "rejected_signed": 1579228,
+          "rejected_signed361": 69718,
+          "rejected_signed8": 1509510,
+          "reorders": 66,
+          "rows": 89179,
+          "start": 555947071,
+          "symmetry_rejected": 0,
+          "thi": 511,
+          "tlo": 128,
+          "total": 9000006000001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.104214,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      },
+      {
+        "id": 89674,
+        "context": "offset:1:1:0:0:64",
+        "start": 577634394,
+        "count": 89645,
+        "strategy": "model",
+        "elapsed": 1.1204866250045598,
+        "stats": {
+          "Dhi": 370370370370370370,
+          "Dlo": 185185185185185185,
+          "calibration_samples": 4315,
+          "candidates": 34423680,
+          "complete": true,
+          "count": 89645,
+          "covered": 0,
+          "cpu_seconds": 0.95548,
+          "curves": 2307509,
+          "direct_curves": 2307509,
+          "eligible_inputs": 6068604,
+          "ell": 1,
+          "empty_rows": 37658,
+          "end": 577724039,
+          "exact_tests": 292,
+          "exposure_sum": 1633319.4879242238,
+          "filters": [
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 1407,
+              "prime": 5,
+              "rejected": 21809,
+              "tested": 68198
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2788,
+              "prime": 7,
+              "rejected": 2783270,
+              "tested": 4328304
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 1727,
+              "prime": 11,
+              "rejected": 7425,
+              "tested": 17814
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2151,
+              "prime": 13,
+              "rejected": 176245,
+              "tested": 352406
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 1853,
+              "prime": 17,
+              "rejected": 2978,
+              "tested": 6599
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 1341,
+              "prime": 19,
+              "rejected": 911,
+              "tested": 3048
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 1967,
+              "prime": 23,
+              "rejected": 3798,
+              "tested": 8435
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2249,
+              "prime": 31,
+              "rejected": 774609,
+              "tested": 1472289
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2203,
+              "prime": 37,
+              "rejected": 186940,
+              "tested": 363754
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2049,
+              "prime": 41,
+              "rejected": 64168,
+              "tested": 135097
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2237,
+              "prime": 43,
+              "rejected": 277856,
+              "tested": 544113
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2030,
+              "prime": 47,
+              "rejected": 9665,
+              "tested": 20344
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2111,
+              "prime": 53,
+              "rejected": 17832,
+              "tested": 36860
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 2043,
+              "prime": 59,
+              "rejected": 19069,
+              "tested": 39693
+            },
+            {
+              "calibrated": 4315,
+              "calibration_rejected": 1943,
+              "prime": 61,
+              "rejected": 3041,
+              "tested": 7015
+            }
+          ],
+          "final_order": [
+            7,
+            31,
+            43,
+            37,
+            13,
+            53,
+            59,
+            41,
+            47,
+            23,
+            61,
+            17,
+            11,
+            5,
+            19
+          ],
+          "hits": 0,
+          "invalid_d": 2022907,
+          "k": 114,
+          "kind": "offset",
+          "method": "inversion",
+          "min_ratio": 0,
+          "mode": "row_tile",
+          "noninvertible_C": 150955,
+          "norm_evaluations": 828105,
+          "outside_shell": 28355076,
+          "permutation_offset": 7487573022120,
+          "permutation_seed": 1142,
+          "permutation_stride": 407904674067,
+          "policy": "adaptive",
+          "quotient_points": 146799904,
+          "radius": 1500000,
+          "ratio": 64,
+          "recurrence_steps": 6016617,
+          "rejected_mod243": 139550752,
+          "rejected_parity": 2899244,
+          "rejected_signed": 1587233,
+          "rejected_signed361": 70117,
+          "rejected_signed8": 1517116,
+          "reorders": 67,
+          "rows": 89645,
+          "start": 577634394,
+          "symmetry_rejected": 0,
+          "thi": 511,
+          "tlo": 128,
+          "total": 9000006000001,
+          "type": "stats",
+          "unsupported_D": 0,
+          "version": 2,
+          "wall_seconds": 1.112871,
+          "wheel_curves": 0,
+          "zero_norm": 0
+        }
+      }
+    ],
+    "pairs": [
+      {
+        "phase3": {
+          "wall_seconds": 0.5911572500044713,
+          "native_cpu_seconds": 6.058698,
+          "native_wall_seconds": 6.155514,
+          "subprocess_elapsed_sum": 6.225198083018768,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.5521749580075266,
+              "native_wall_seconds": 0.545591,
+              "native_cpu_seconds": 0.533643
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.5168366249999963,
+              "native_wall_seconds": 0.512311,
+              "native_cpu_seconds": 0.504077
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.4388191669859225,
+              "native_wall_seconds": 0.426871,
+              "native_cpu_seconds": 0.423193
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.5258982499944977,
+              "native_wall_seconds": 0.520473,
+              "native_cpu_seconds": 0.51093
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.5166339580027852,
+              "native_wall_seconds": 0.510332,
+              "native_cpu_seconds": 0.501668
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.5195980830030749,
+              "native_wall_seconds": 0.512926,
+              "native_cpu_seconds": 0.502248
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.4741685830085771,
+              "native_wall_seconds": 0.468281,
+              "native_cpu_seconds": 0.462109
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.5266943750029895,
+              "native_wall_seconds": 0.521986,
+              "native_cpu_seconds": 0.513593
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.5223570829984965,
+              "native_wall_seconds": 0.518975,
+              "native_cpu_seconds": 0.511245
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.5838577920076204,
+              "native_wall_seconds": 0.579656,
+              "native_cpu_seconds": 0.573883
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.5195559590065386,
+              "native_wall_seconds": 0.51545,
+              "native_cpu_seconds": 0.507359
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.5286032500007423,
+              "native_wall_seconds": 0.522662,
+              "native_cpu_seconds": 0.51475
+            }
+          ]
+        },
+        "phase2": {
+          "wall_seconds": 0.9798269169987179,
+          "native_cpu_seconds": 10.086962,
+          "native_wall_seconds": 10.431686,
+          "subprocess_elapsed_sum": 10.905309376044897,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.9734583329991437,
+              "native_wall_seconds": 0.922554,
+              "native_cpu_seconds": 0.898209
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.8881904169975314,
+              "native_wall_seconds": 0.881876,
+              "native_cpu_seconds": 0.851982
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.6972961669962388,
+              "native_wall_seconds": 0.689504,
+              "native_cpu_seconds": 0.657221
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.9579505420115311,
+              "native_wall_seconds": 0.911368,
+              "native_cpu_seconds": 0.882297
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.8940599580091657,
+              "native_wall_seconds": 0.887073,
+              "native_cpu_seconds": 0.853613
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.9490988330071559,
+              "native_wall_seconds": 0.895564,
+              "native_cpu_seconds": 0.865474
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.7880316249938915,
+              "native_wall_seconds": 0.737174,
+              "native_cpu_seconds": 0.709216
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.9776987500081304,
+              "native_wall_seconds": 0.922194,
+              "native_cpu_seconds": 0.890536
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.9400934580044122,
+              "native_wall_seconds": 0.891944,
+              "native_cpu_seconds": 0.857403
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.9671062090055784,
+              "native_wall_seconds": 0.915383,
+              "native_cpu_seconds": 0.893944
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.9354946670064237,
+              "native_wall_seconds": 0.890578,
+              "native_cpu_seconds": 0.859668
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.9368304170056945,
+              "native_wall_seconds": 0.886474,
+              "native_cpu_seconds": 0.867399
+            }
+          ]
+        },
+        "pair": 0,
+        "order": [
+          "phase3",
+          "phase2"
+        ],
+        "job_order": [
+          89681,
+          89683,
+          89684,
+          89678,
+          89680,
+          89685,
+          89679,
+          89676,
+          89674,
+          89677,
+          89675,
+          89682
+        ],
+        "speed_ratio": 1.6574725540307709
+      },
+      {
+        "phase3": {
+          "wall_seconds": 0.6186826250050217,
+          "native_cpu_seconds": 6.059965,
+          "native_wall_seconds": 6.3444970000000005,
+          "subprocess_elapsed_sum": 6.419347374961944,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.5652591249963734,
+              "native_wall_seconds": 0.55923,
+              "native_cpu_seconds": 0.525314
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.5239559170004213,
+              "native_wall_seconds": 0.519371,
+              "native_cpu_seconds": 0.500787
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.46371175000967924,
+              "native_wall_seconds": 0.457407,
+              "native_cpu_seconds": 0.426068
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.5440057499945397,
+              "native_wall_seconds": 0.539887,
+              "native_cpu_seconds": 0.51822
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.5255404999916209,
+              "native_wall_seconds": 0.51753,
+              "native_cpu_seconds": 0.499621
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.5313254999928176,
+              "native_wall_seconds": 0.526553,
+              "native_cpu_seconds": 0.504172
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.49606433299777564,
+              "native_wall_seconds": 0.488236,
+              "native_cpu_seconds": 0.462834
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.5444935409905156,
+              "native_wall_seconds": 0.53987,
+              "native_cpu_seconds": 0.514247
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.5433081249939278,
+              "native_wall_seconds": 0.535737,
+              "native_cpu_seconds": 0.511644
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.6042129590059631,
+              "native_wall_seconds": 0.59708,
+              "native_cpu_seconds": 0.571786
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.5389609999983804,
+              "native_wall_seconds": 0.530928,
+              "native_cpu_seconds": 0.512849
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.5385088749899296,
+              "native_wall_seconds": 0.532668,
+              "native_cpu_seconds": 0.512423
+            }
+          ]
+        },
+        "phase2": {
+          "wall_seconds": 0.925336915999651,
+          "native_cpu_seconds": 10.102335,
+          "native_wall_seconds": 10.232565,
+          "subprocess_elapsed_sum": 10.306309207022423,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.9161460410105065,
+              "native_wall_seconds": 0.9076,
+              "native_cpu_seconds": 0.898077
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.8708027079992462,
+              "native_wall_seconds": 0.864243,
+              "native_cpu_seconds": 0.857351
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.6743399999977555,
+              "native_wall_seconds": 0.668975,
+              "native_cpu_seconds": 0.65768
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.8902357500046492,
+              "native_wall_seconds": 0.884137,
+              "native_cpu_seconds": 0.88045
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.8864388750080252,
+              "native_wall_seconds": 0.88252,
+              "native_cpu_seconds": 0.867163
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.8772806250053691,
+              "native_wall_seconds": 0.871814,
+              "native_cpu_seconds": 0.858675
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.7168450000026496,
+              "native_wall_seconds": 0.708756,
+              "native_cpu_seconds": 0.702041
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.9195415419962956,
+              "native_wall_seconds": 0.914118,
+              "native_cpu_seconds": 0.897294
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.8850030830071773,
+              "native_wall_seconds": 0.876801,
+              "native_cpu_seconds": 0.860877
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.900084249995416,
+              "native_wall_seconds": 0.894739,
+              "native_cpu_seconds": 0.88528
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.8808452079974813,
+              "native_wall_seconds": 0.876234,
+              "native_cpu_seconds": 0.867452
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.8887461249978514,
+              "native_wall_seconds": 0.882628,
+              "native_cpu_seconds": 0.869995
+            }
+          ]
+        },
+        "pair": 1,
+        "order": [
+          "phase3",
+          "phase2"
+        ],
+        "job_order": [
+          89682,
+          89685,
+          89680,
+          89681,
+          89678,
+          89674,
+          89683,
+          89684,
+          89675,
+          89677,
+          89679,
+          89676
+        ],
+        "speed_ratio": 1.495656866058167
+      },
+      {
+        "phase3": {
+          "wall_seconds": 0.5934342910040868,
+          "native_cpu_seconds": 6.044749,
+          "native_wall_seconds": 6.134306,
+          "subprocess_elapsed_sum": 6.208567958994536,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.5567309580073925,
+              "native_wall_seconds": 0.549421,
+              "native_cpu_seconds": 0.531684
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.5141495829884661,
+              "native_wall_seconds": 0.51016,
+              "native_cpu_seconds": 0.501428
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.445081083002151,
+              "native_wall_seconds": 0.4326,
+              "native_cpu_seconds": 0.425854
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.5198617080022814,
+              "native_wall_seconds": 0.513652,
+              "native_cpu_seconds": 0.509193
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.5100654590060003,
+              "native_wall_seconds": 0.504389,
+              "native_cpu_seconds": 0.499961
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.5161202500021318,
+              "native_wall_seconds": 0.510582,
+              "native_cpu_seconds": 0.501308
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.4708875420037657,
+              "native_wall_seconds": 0.463357,
+              "native_cpu_seconds": 0.45715
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.5316324169980362,
+              "native_wall_seconds": 0.526321,
+              "native_cpu_seconds": 0.515819
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.5175671250035521,
+              "native_wall_seconds": 0.511172,
+              "native_cpu_seconds": 0.506778
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.5819737080018967,
+              "native_wall_seconds": 0.578092,
+              "native_cpu_seconds": 0.572701
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.5205512919928879,
+              "native_wall_seconds": 0.516041,
+              "native_cpu_seconds": 0.507834
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.5239468339859741,
+              "native_wall_seconds": 0.518519,
+              "native_cpu_seconds": 0.515039
+            }
+          ]
+        },
+        "phase2": {
+          "wall_seconds": 0.9471129169978667,
+          "native_cpu_seconds": 10.108454,
+          "native_wall_seconds": 10.183883999999999,
+          "subprocess_elapsed_sum": 10.25283779099118,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.9411851659970125,
+              "native_wall_seconds": 0.936397,
+              "native_cpu_seconds": 0.928644
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.8605272919958225,
+              "native_wall_seconds": 0.855337,
+              "native_cpu_seconds": 0.853118
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.6774483750050422,
+              "native_wall_seconds": 0.672264,
+              "native_cpu_seconds": 0.661056
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.896159166994039,
+              "native_wall_seconds": 0.891748,
+              "native_cpu_seconds": 0.880754
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.8688593749975553,
+              "native_wall_seconds": 0.862227,
+              "native_cpu_seconds": 0.850774
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.8758680410101078,
+              "native_wall_seconds": 0.87049,
+              "native_cpu_seconds": 0.867113
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.7179414580023149,
+              "native_wall_seconds": 0.709994,
+              "native_cpu_seconds": 0.706728
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.8992944579949835,
+              "native_wall_seconds": 0.894465,
+              "native_cpu_seconds": 0.890203
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.8728603750059847,
+              "native_wall_seconds": 0.866843,
+              "native_cpu_seconds": 0.861719
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.898051416996168,
+              "native_wall_seconds": 0.893762,
+              "native_cpu_seconds": 0.889001
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.8761349999986123,
+              "native_wall_seconds": 0.867014,
+              "native_cpu_seconds": 0.862674
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.868507666993537,
+              "native_wall_seconds": 0.863343,
+              "native_cpu_seconds": 0.85667
+            }
+          ]
+        },
+        "pair": 2,
+        "order": [
+          "phase3",
+          "phase2"
+        ],
+        "job_order": [
+          89680,
+          89683,
+          89677,
+          89679,
+          89678,
+          89681,
+          89685,
+          89682,
+          89675,
+          89676,
+          89674,
+          89684
+        ],
+        "speed_ratio": 1.5959861628409744
+      },
+      {
+        "phase2": {
+          "wall_seconds": 0.9215430409967666,
+          "native_cpu_seconds": 10.066447,
+          "native_wall_seconds": 10.178801,
+          "subprocess_elapsed_sum": 10.237357418998727,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.9125354580028215,
+              "native_wall_seconds": 0.908698,
+              "native_cpu_seconds": 0.896623
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.8610550419980427,
+              "native_wall_seconds": 0.856995,
+              "native_cpu_seconds": 0.846224
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.6625765839999076,
+              "native_wall_seconds": 0.657024,
+              "native_cpu_seconds": 0.654223
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.8865532089985209,
+              "native_wall_seconds": 0.878347,
+              "native_cpu_seconds": 0.869959
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.8722929999930784,
+              "native_wall_seconds": 0.868482,
+              "native_cpu_seconds": 0.853959
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.8789425840077456,
+              "native_wall_seconds": 0.874699,
+              "native_cpu_seconds": 0.865575
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.7283092919969931,
+              "native_wall_seconds": 0.722145,
+              "native_cpu_seconds": 0.713178
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.9173937089944957,
+              "native_wall_seconds": 0.91299,
+              "native_cpu_seconds": 0.898416
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.8781072499987204,
+              "native_wall_seconds": 0.874116,
+              "native_cpu_seconds": 0.863754
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.8997495410003467,
+              "native_wall_seconds": 0.895472,
+              "native_cpu_seconds": 0.888443
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.864243333999184,
+              "native_wall_seconds": 0.86034,
+              "native_cpu_seconds": 0.853123
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.8755984160088701,
+              "native_wall_seconds": 0.869493,
+              "native_cpu_seconds": 0.86297
+            }
+          ]
+        },
+        "phase3": {
+          "wall_seconds": 0.597118749996298,
+          "native_cpu_seconds": 6.040806,
+          "native_wall_seconds": 6.0933399999999995,
+          "subprocess_elapsed_sum": 6.2213560819946,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.5401975829881849,
+              "native_wall_seconds": 0.532262,
+              "native_cpu_seconds": 0.530375
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.5121776669984683,
+              "native_wall_seconds": 0.50225,
+              "native_cpu_seconds": 0.499097
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.4383207499922719,
+              "native_wall_seconds": 0.429428,
+              "native_cpu_seconds": 0.424412
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.5264192499889759,
+              "native_wall_seconds": 0.51866,
+              "native_cpu_seconds": 0.51444
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.5110944159969222,
+              "native_wall_seconds": 0.503072,
+              "native_cpu_seconds": 0.498942
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.523567667012685,
+              "native_wall_seconds": 0.514142,
+              "native_cpu_seconds": 0.503616
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.47695987499901094,
+              "native_wall_seconds": 0.463009,
+              "native_cpu_seconds": 0.458197
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.531367333009257,
+              "native_wall_seconds": 0.515026,
+              "native_cpu_seconds": 0.512757
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.5233995839953423,
+              "native_wall_seconds": 0.513752,
+              "native_cpu_seconds": 0.507065
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.5926625410065753,
+              "native_wall_seconds": 0.578225,
+              "native_cpu_seconds": 0.573562
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.5208328330045333,
+              "native_wall_seconds": 0.51088,
+              "native_cpu_seconds": 0.509298
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.5243565830023726,
+              "native_wall_seconds": 0.512634,
+              "native_cpu_seconds": 0.509045
+            }
+          ]
+        },
+        "pair": 3,
+        "order": [
+          "phase2",
+          "phase3"
+        ],
+        "job_order": [
+          89674,
+          89684,
+          89678,
+          89679,
+          89677,
+          89675,
+          89676,
+          89685,
+          89682,
+          89681,
+          89683,
+          89680
+        ],
+        "speed_ratio": 1.5433162013460138
+      },
+      {
+        "phase2": {
+          "wall_seconds": 0.9219895410060417,
+          "native_cpu_seconds": 10.066395,
+          "native_wall_seconds": 10.144986,
+          "subprocess_elapsed_sum": 10.21905841496482,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.9069425829948159,
+              "native_wall_seconds": 0.903339,
+              "native_cpu_seconds": 0.893556
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.8817251659929752,
+              "native_wall_seconds": 0.871743,
+              "native_cpu_seconds": 0.862964
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.6749220409983536,
+              "native_wall_seconds": 0.668466,
+              "native_cpu_seconds": 0.664287
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.8816602500010049,
+              "native_wall_seconds": 0.87759,
+              "native_cpu_seconds": 0.867484
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.8675416669866536,
+              "native_wall_seconds": 0.86245,
+              "native_cpu_seconds": 0.857507
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.8776706250064308,
+              "native_wall_seconds": 0.87169,
+              "native_cpu_seconds": 0.861643
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.710984000004828,
+              "native_wall_seconds": 0.704851,
+              "native_cpu_seconds": 0.700618
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.9083197919972008,
+              "native_wall_seconds": 0.90059,
+              "native_cpu_seconds": 0.895456
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.8659862499916926,
+              "native_wall_seconds": 0.859416,
+              "native_cpu_seconds": 0.854267
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.9043872920010472,
+              "native_wall_seconds": 0.898059,
+              "native_cpu_seconds": 0.890915
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.8696451659925515,
+              "native_wall_seconds": 0.864641,
+              "native_cpu_seconds": 0.860305
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.8692735829972662,
+              "native_wall_seconds": 0.862151,
+              "native_cpu_seconds": 0.857393
+            }
+          ]
+        },
+        "phase3": {
+          "wall_seconds": 0.5879714170005172,
+          "native_cpu_seconds": 6.042586,
+          "native_wall_seconds": 6.094142,
+          "subprocess_elapsed_sum": 6.173287374971551,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.5382095410022885,
+              "native_wall_seconds": 0.528338,
+              "native_cpu_seconds": 0.52485
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.5094700829940848,
+              "native_wall_seconds": 0.500936,
+              "native_cpu_seconds": 0.495978
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.42489970799942967,
+              "native_wall_seconds": 0.420462,
+              "native_cpu_seconds": 0.417194
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.5250041249964852,
+              "native_wall_seconds": 0.518549,
+              "native_cpu_seconds": 0.516015
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.518358375004027,
+              "native_wall_seconds": 0.5053,
+              "native_cpu_seconds": 0.499871
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.5219106249860488,
+              "native_wall_seconds": 0.515817,
+              "native_cpu_seconds": 0.507205
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.4663469590013847,
+              "native_wall_seconds": 0.462335,
+              "native_cpu_seconds": 0.459863
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.5248787919990718,
+              "native_wall_seconds": 0.519622,
+              "native_cpu_seconds": 0.514044
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.5129068339883815,
+              "native_wall_seconds": 0.507996,
+              "native_cpu_seconds": 0.505783
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.5875493329949677,
+              "native_wall_seconds": 0.58299,
+              "native_cpu_seconds": 0.578926
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.517600292005227,
+              "native_wall_seconds": 0.51299,
+              "native_cpu_seconds": 0.509135
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.5261527080001542,
+              "native_wall_seconds": 0.518807,
+              "native_cpu_seconds": 0.513722
+            }
+          ]
+        },
+        "pair": 4,
+        "order": [
+          "phase2",
+          "phase3"
+        ],
+        "job_order": [
+          89676,
+          89682,
+          89675,
+          89678,
+          89680,
+          89683,
+          89679,
+          89677,
+          89684,
+          89674,
+          89681,
+          89685
+        ],
+        "speed_ratio": 1.5680856489750599
+      },
+      {
+        "phase2": {
+          "wall_seconds": 0.9493047500000102,
+          "native_cpu_seconds": 10.104751,
+          "native_wall_seconds": 10.398254,
+          "subprocess_elapsed_sum": 10.465526792017044,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.9461290839972207,
+              "native_wall_seconds": 0.938732,
+              "native_cpu_seconds": 0.906487
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.891790250010672,
+              "native_wall_seconds": 0.886096,
+              "native_cpu_seconds": 0.861048
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.692505250000977,
+              "native_wall_seconds": 0.687086,
+              "native_cpu_seconds": 0.660579
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.9067727500078036,
+              "native_wall_seconds": 0.899814,
+              "native_cpu_seconds": 0.873613
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.881573374994332,
+              "native_wall_seconds": 0.876852,
+              "native_cpu_seconds": 0.856119
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.8930071659997338,
+              "native_wall_seconds": 0.8864,
+              "native_cpu_seconds": 0.865908
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.7335982090007747,
+              "native_wall_seconds": 0.729585,
+              "native_cpu_seconds": 0.716781
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.9267363749968354,
+              "native_wall_seconds": 0.922712,
+              "native_cpu_seconds": 0.898435
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.8857271669985494,
+              "native_wall_seconds": 0.882012,
+              "native_cpu_seconds": 0.859954
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.907525083006476,
+              "native_wall_seconds": 0.90149,
+              "native_cpu_seconds": 0.875944
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.9021929580048891,
+              "native_wall_seconds": 0.893781,
+              "native_cpu_seconds": 0.866842
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.8979691249987809,
+              "native_wall_seconds": 0.893694,
+              "native_cpu_seconds": 0.863041
+            }
+          ]
+        },
+        "phase3": {
+          "wall_seconds": 0.588549874999444,
+          "native_cpu_seconds": 6.049844,
+          "native_wall_seconds": 6.103938,
+          "subprocess_elapsed_sum": 6.169978041973081,
+          "job_timings": [
+            {
+              "job_id": 89685,
+              "subprocess_elapsed": 0.5429694579943316,
+              "native_wall_seconds": 0.538138,
+              "native_cpu_seconds": 0.530684
+            },
+            {
+              "job_id": 89684,
+              "subprocess_elapsed": 0.5108709589985665,
+              "native_wall_seconds": 0.501572,
+              "native_cpu_seconds": 0.498452
+            },
+            {
+              "job_id": 89683,
+              "subprocess_elapsed": 0.42959866700402927,
+              "native_wall_seconds": 0.425433,
+              "native_cpu_seconds": 0.421298
+            },
+            {
+              "job_id": 89682,
+              "subprocess_elapsed": 0.5245751670008758,
+              "native_wall_seconds": 0.520583,
+              "native_cpu_seconds": 0.514591
+            },
+            {
+              "job_id": 89681,
+              "subprocess_elapsed": 0.5079039589909371,
+              "native_wall_seconds": 0.503989,
+              "native_cpu_seconds": 0.499601
+            },
+            {
+              "job_id": 89680,
+              "subprocess_elapsed": 0.5136332080001011,
+              "native_wall_seconds": 0.507783,
+              "native_cpu_seconds": 0.504734
+            },
+            {
+              "job_id": 89679,
+              "subprocess_elapsed": 0.47476404199551325,
+              "native_wall_seconds": 0.468952,
+              "native_cpu_seconds": 0.460396
+            },
+            {
+              "job_id": 89678,
+              "subprocess_elapsed": 0.5203938749909867,
+              "native_wall_seconds": 0.515982,
+              "native_cpu_seconds": 0.512516
+            },
+            {
+              "job_id": 89677,
+              "subprocess_elapsed": 0.5152345420065103,
+              "native_wall_seconds": 0.510702,
+              "native_cpu_seconds": 0.507495
+            },
+            {
+              "job_id": 89676,
+              "subprocess_elapsed": 0.5881142909929622,
+              "native_wall_seconds": 0.583765,
+              "native_cpu_seconds": 0.578191
+            },
+            {
+              "job_id": 89675,
+              "subprocess_elapsed": 0.5205154159921221,
+              "native_wall_seconds": 0.513409,
+              "native_cpu_seconds": 0.510791
+            },
+            {
+              "job_id": 89674,
+              "subprocess_elapsed": 0.5214044580061454,
+              "native_wall_seconds": 0.51363,
+              "native_cpu_seconds": 0.511095
+            }
+          ]
+        },
+        "pair": 5,
+        "order": [
+          "phase2",
+          "phase3"
+        ],
+        "job_order": [
+          89676,
+          89680,
+          89683,
+          89685,
+          89675,
+          89678,
+          89682,
+          89684,
+          89681,
+          89677,
+          89674,
+          89679
+        ],
+        "speed_ratio": 1.6129554865692683
+      }
+    ],
+    "ratio_total_elapsed": 1.5782078500395293,
+    "median_pair_speed_ratio": 1.5820359059080171,
+    "ratio_total_native_cpu": 1.6677943373724209,
+    "every_mathematical_counter_matches_original_ledger": true
+  },
+  "freeze_hashes_unchanged": true,
+  "elapsed_seconds": 9.262126540997997
+}

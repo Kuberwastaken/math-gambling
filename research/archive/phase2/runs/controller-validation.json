@@ -1,0 +1,1861 @@
+{
+  "schema": 1,
+  "started_utc": "2026-09-08T21:18:25Z",
+  "hashes_before": {
+    "validate_controller.py": "0083128352f4d58ec7dac1f5e2ae8ae03d9421c2caffe8263e73a559a0224839",
+    "campaign.py": "3911464a136962cf6cef62b90105dab61f2273de333bec0fb35a987b50ffe2a7",
+    "offset_worker.c": "087de923d2ba242633774ad9db0285d960c01acc0e8b1d4a2d36808e72de7a12",
+    "online_model.py": "7a867a3a5ef0b6721e616b02c46c139776f171cdb5276646b68005f8297b05ad",
+    "verify_domain.py": "731144d387529c933d0096a52843f659c6dc3638e686782e731e7c965224d147",
+    "bin/offset_worker": "4a2d9639bfb69cf33e3520aec03fc66b2c8237df82d4b914076cc3b29e4e4ffa",
+    "../bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "../campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34"
+  },
+  "tests": {
+    "protocol": {
+      "real_worker_passed": true,
+      "mutations": {
+        "complete": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "k": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "mode": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "version": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "policy": {
+          "rejected": true,
+          "error": "Unexpected or incomplete worker protocol"
+        },
+        "candidates": {
+          "rejected": true,
+          "error": "Worker coverage metadata mismatch"
+        },
+        "curves": {
+          "rejected": true,
+          "error": "Invalid integer counter: curves"
+        },
+        "start": {
+          "rejected": true,
+          "error": "Invalid integer counter: start"
+        },
+        "permutation_stride": {
+          "rejected": true,
+          "error": "Worker coverage metadata mismatch"
+        },
+        "quotient_points": {
+          "rejected": true,
+          "error": "Quotient filters do not account for all positions"
+        },
+        "duplicate_stats": {
+          "rejected": true,
+          "error": "Missing, duplicated, or unknown worker records"
+        },
+        "unknown_record": {
+          "rejected": true,
+          "error": "Missing, duplicated, or unknown worker records"
+        },
+        "malformed_record": {
+          "rejected": true,
+          "error": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+        },
+        "wrong_json_type": {
+          "rejected": true,
+          "error": "'list' object has no attribute 'get'"
+        }
+      },
+      "actual_discoveries": []
+    },
+    "reservations": {
+      "interrupted_range_preserved": true,
+      "timeout_split": [
+        [
+          0,
+          500
+        ],
+        [
+          500,
+          500
+        ]
+      ],
+      "split_audit": {
+        "database_integrity": "ok",
+        "model_observations_reconcile": true,
+        "allocation_accounting_reconciles": true,
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 0,
+        "unfinished_tiles": 2
+      },
+      "pending_second_half_selected": true,
+      "changed_identity_rejected": true,
+      "final_audit": {
+        "database_integrity": "ok",
+        "model_observations_reconcile": true,
+        "allocation_accounting_reconciles": true,
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 1,
+        "unfinished_tiles": 1
+      },
+      "actual_discoveries": []
+    },
+    "hit_rescue": {
+      "warning": "Injected positive routing tests are not solutions of 114.",
+      "scenarios": {
+        "reject_false_identity": {
+          "passed": true,
+          "injected_verifier": false,
+          "routed_records": 0,
+          "timed_out": false
+        },
+        "nonzero_exit": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": false
+        },
+        "timeout_bytes": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": true
+        },
+        "bad_json_type_after_hit": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": false
+        },
+        "truncated_last_line": {
+          "passed": true,
+          "injected_verifier": true,
+          "routed_records": 1,
+          "timed_out": true
+        }
+      }
+    },
+    "hit_attribution": {
+      "passed": true,
+      "warning": "Synthetic arithmetic acceptance tests attribution only; not a solution of114."
+    },
+    "scheduling": {
+      "bootstrap_contexts": 81,
+      "observations_per_context": 3,
+      "unit_time_strategy_counts": {
+        "explore": 40,
+        "model": 60
+      },
+      "failed_gate_falls_back": true,
+      "note": "Synthetic scheduling only; no coverage or discoveries claimed."
+    },
+    "exclusive_writer_lock": {
+      "second_writer_rejected": true,
+      "blocked_writer_created_no_database": true,
+      "lock_release_allows_run": true,
+      "audit": {
+        "database_integrity": "ok",
+        "model_observations_reconcile": true,
+        "allocation_accounting_reconciles": true,
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 1,
+        "unfinished_tiles": 0
+      }
+    },
+    "real_cli_resume": {
+      "audit": {
+        "database_integrity": "ok",
+        "model_observations_reconcile": true,
+        "allocation_accounting_reconciles": true,
+        "reserved_tiles_disjoint_and_gapless": true,
+        "complete_tiles": 8,
+        "unfinished_tiles": 0
+      },
+      "totals": {
+        "generator_inputs": 799872,
+        "curve_checks": 58561,
+        "quotient_points": 87443254,
+        "exact_tests": 205,
+        "excluded_mod243": 83125061,
+        "excluded_parity": 1727261,
+        "unsupported_D": 0,
+        "noninvertible_C": 3883,
+        "outside_norm_shell": 645556,
+        "signed_congruence_exclusions": 40353
+      },
+      "actual_discoveries": []
+    },
+    "real_offset_integration": [
+      {
+        "ell": 1,
+        "shape": 0,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 1,
+          "radius": 6000000,
+          "tlo": 8,
+          "thi": 31,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 144000024000001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 42953055902795,
+          "permutation_offset": 10331100636978,
+          "rows": 4,
+          "empty_rows": 1,
+          "candidates": 96,
+          "eligible_inputs": 16,
+          "outside_shell": 80,
+          "rejected_signed": 3,
+          "rejected_signed8": 2,
+          "rejected_signed361": 1,
+          "invalid_d": 6,
+          "noninvertible_C": 0,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 7,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 444,
+          "rejected_mod243": 423,
+          "rejected_parity": 7,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 7,
+          "wheel_curves": 0,
+          "norm_evaluations": 25,
+          "recurrence_steps": 13,
+          "exposure_sum": 4.997009990876828,
+          "cpu_seconds": 0.00759,
+          "wall_seconds": 0.007977,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 14,
+              "rejected": 3,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 11,
+              "rejected": 8,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 3,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 2,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 1,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 1,
+        "shape": 1,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 1,
+          "radius": 1500000,
+          "tlo": 128,
+          "thi": 511,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 9000006000001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 407904674067,
+          "permutation_offset": 7487573022120,
+          "rows": 4,
+          "empty_rows": 1,
+          "candidates": 1536,
+          "eligible_inputs": 171,
+          "outside_shell": 1365,
+          "rejected_signed": 55,
+          "rejected_signed8": 52,
+          "rejected_signed361": 3,
+          "invalid_d": 58,
+          "noninvertible_C": 6,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 52,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 3308,
+          "rejected_mod243": 3143,
+          "rejected_parity": 74,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 52,
+          "wheel_curves": 0,
+          "norm_evaluations": 37,
+          "recurrence_steps": 168,
+          "exposure_sum": 31.90331083300834,
+          "cpu_seconds": 0.00768,
+          "wall_seconds": 0.008314,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 91,
+              "rejected": 24,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 67,
+              "rejected": 40,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 27,
+              "rejected": 13,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 14,
+              "rejected": 9,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 5,
+              "rejected": 5,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 1,
+        "shape": 2,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 1,
+          "radius": 375000,
+          "tlo": 2048,
+          "thi": 8191,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 562501500001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 313696975916,
+          "permutation_offset": 203690996248,
+          "rows": 4,
+          "empty_rows": 3,
+          "candidates": 24576,
+          "eligible_inputs": 77,
+          "outside_shell": 24499,
+          "rejected_signed": 13,
+          "rejected_signed8": 12,
+          "rejected_signed361": 1,
+          "invalid_d": 25,
+          "noninvertible_C": 0,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 39,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 2485,
+          "rejected_mod243": 2357,
+          "rejected_parity": 46,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 39,
+          "wheel_curves": 0,
+          "norm_evaluations": 22,
+          "recurrence_steps": 76,
+          "exposure_sum": 19.865436612252545,
+          "cpu_seconds": 0.007623,
+          "wall_seconds": 0.008201,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 82,
+              "rejected": 23,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 59,
+              "rejected": 38,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 21,
+              "rejected": 10,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 11,
+              "rejected": 4,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 7,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 5,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 4,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 2,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 5,
+        "shape": 0,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 5,
+          "radius": 6000000,
+          "tlo": 8,
+          "thi": 31,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 144000024000001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 131872606362056,
+          "permutation_offset": 41178774819621,
+          "rows": 4,
+          "empty_rows": 1,
+          "candidates": 96,
+          "eligible_inputs": 21,
+          "outside_shell": 75,
+          "rejected_signed": 6,
+          "rejected_signed8": 5,
+          "rejected_signed361": 1,
+          "invalid_d": 7,
+          "noninvertible_C": 1,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 7,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 446,
+          "rejected_mod243": 424,
+          "rejected_parity": 9,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 7,
+          "wheel_curves": 0,
+          "norm_evaluations": 30,
+          "recurrence_steps": 18,
+          "exposure_sum": 4.963715079957781,
+          "cpu_seconds": 0.00758,
+          "wall_seconds": 0.008079,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 13,
+              "rejected": 5,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 8,
+              "rejected": 4,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 4,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 3,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 1,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 1,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 5,
+        "shape": 1,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 5,
+          "radius": 1500000,
+          "tlo": 128,
+          "thi": 511,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 9000006000001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 7725995079125,
+          "permutation_offset": 3255794392041,
+          "rows": 4,
+          "empty_rows": 3,
+          "candidates": 1536,
+          "eligible_inputs": 132,
+          "outside_shell": 1404,
+          "rejected_signed": 23,
+          "rejected_signed8": 22,
+          "rejected_signed361": 1,
+          "invalid_d": 44,
+          "noninvertible_C": 1,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 64,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 4075,
+          "rejected_mod243": 3879,
+          "rejected_parity": 68,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 64,
+          "wheel_curves": 0,
+          "norm_evaluations": 27,
+          "recurrence_steps": 131,
+          "exposure_sum": 44.56564046082796,
+          "cpu_seconds": 0.007797,
+          "wall_seconds": 0.008311,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 128,
+              "rejected": 33,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 95,
+              "rejected": 68,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 27,
+              "rejected": 8,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 19,
+              "rejected": 10,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 9,
+              "rejected": 4,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 5,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 3,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 2,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 2,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 5,
+        "shape": 2,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 5,
+          "radius": 375000,
+          "tlo": 2048,
+          "thi": 8191,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 562501500001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 771562590,
+          "permutation_offset": 19443211880,
+          "rows": 4,
+          "empty_rows": 2,
+          "candidates": 24576,
+          "eligible_inputs": 181,
+          "outside_shell": 24395,
+          "rejected_signed": 61,
+          "rejected_signed8": 60,
+          "rejected_signed361": 1,
+          "invalid_d": 59,
+          "noninvertible_C": 0,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 61,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 3888,
+          "rejected_mod243": 3695,
+          "rejected_parity": 94,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 61,
+          "wheel_curves": 0,
+          "norm_evaluations": 36,
+          "recurrence_steps": 179,
+          "exposure_sum": 31.723030612263624,
+          "cpu_seconds": 0.007672,
+          "wall_seconds": 0.00815,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 99,
+              "rejected": 36,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 63,
+              "rejected": 44,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 19,
+              "rejected": 8,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 11,
+              "rejected": 5,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 6,
+              "rejected": 4,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 2,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 1,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 25,
+        "shape": 0,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 25,
+          "radius": 6000000,
+          "tlo": 8,
+          "thi": 31,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 144000024000001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 135883896275070,
+          "permutation_offset": 60413094287627,
+          "rows": 4,
+          "empty_rows": 1,
+          "candidates": 96,
+          "eligible_inputs": 34,
+          "outside_shell": 62,
+          "rejected_signed": 9,
+          "rejected_signed8": 9,
+          "rejected_signed361": 0,
+          "invalid_d": 10,
+          "noninvertible_C": 2,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 13,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 825,
+          "rejected_mod243": 785,
+          "rejected_parity": 17,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 13,
+          "wheel_curves": 0,
+          "norm_evaluations": 31,
+          "recurrence_steps": 31,
+          "exposure_sum": 9.559546731328972,
+          "cpu_seconds": 0.007629,
+          "wall_seconds": 0.007985,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 23,
+              "rejected": 7,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 16,
+              "rejected": 10,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 6,
+              "rejected": 4,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 2,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 1,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 1,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 1,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 1,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 25,
+        "shape": 1,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 25,
+          "radius": 1500000,
+          "tlo": 128,
+          "thi": 511,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 9000006000001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 5934180666150,
+          "permutation_offset": 4033744467991,
+          "rows": 4,
+          "empty_rows": 2,
+          "candidates": 1536,
+          "eligible_inputs": 258,
+          "outside_shell": 1278,
+          "rejected_signed": 47,
+          "rejected_signed8": 43,
+          "rejected_signed361": 4,
+          "invalid_d": 86,
+          "noninvertible_C": 0,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 125,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 7968,
+          "rejected_mod243": 7575,
+          "rejected_parity": 133,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 125,
+          "wheel_curves": 0,
+          "norm_evaluations": 36,
+          "recurrence_steps": 256,
+          "exposure_sum": 84.21726116162188,
+          "cpu_seconds": 0.007853,
+          "wall_seconds": 0.00831,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 260,
+              "rejected": 69,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 191,
+              "rejected": 119,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 72,
+              "rejected": 31,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 41,
+              "rejected": 19,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 22,
+              "rejected": 7,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 15,
+              "rejected": 4,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 11,
+              "rejected": 6,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 5,
+              "rejected": 3,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 2,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 1,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      },
+      {
+        "ell": 25,
+        "shape": 2,
+        "passed": true,
+        "stats": {
+          "type": "stats",
+          "version": 2,
+          "complete": true,
+          "kind": "offset",
+          "mode": "row_tile",
+          "k": 114,
+          "ell": 25,
+          "radius": 375000,
+          "tlo": 2048,
+          "thi": 8191,
+          "Dlo": 185185185185185185,
+          "Dhi": 370370370370370370,
+          "start": 0,
+          "count": 4,
+          "end": 4,
+          "total": 562501500001,
+          "ratio": 64,
+          "min_ratio": 0,
+          "policy": "fixed",
+          "method": "inversion",
+          "permutation_seed": 1142,
+          "permutation_stride": 241977762500,
+          "permutation_offset": 332026926536,
+          "rows": 4,
+          "empty_rows": 2,
+          "candidates": 24576,
+          "eligible_inputs": 512,
+          "outside_shell": 24064,
+          "rejected_signed": 90,
+          "rejected_signed8": 85,
+          "rejected_signed361": 5,
+          "invalid_d": 170,
+          "noninvertible_C": 180,
+          "unsupported_D": 0,
+          "covered": 0,
+          "curves": 72,
+          "zero_norm": 0,
+          "symmetry_rejected": 0,
+          "quotient_points": 4567,
+          "rejected_mod243": 4341,
+          "rejected_parity": 71,
+          "exact_tests": 0,
+          "hits": 0,
+          "reorders": 0,
+          "calibration_samples": 0,
+          "direct_curves": 72,
+          "wheel_curves": 0,
+          "norm_evaluations": 36,
+          "recurrence_steps": 510,
+          "exposure_sum": 71.40042924708781,
+          "cpu_seconds": 0.007687,
+          "wall_seconds": 0.008272,
+          "final_order": [
+            5,
+            7,
+            11,
+            13,
+            17,
+            19,
+            23,
+            31,
+            37,
+            41,
+            43,
+            47,
+            53,
+            59,
+            61
+          ],
+          "filters": [
+            {
+              "prime": 5,
+              "tested": 155,
+              "rejected": 52,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 7,
+              "tested": 103,
+              "rejected": 66,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 11,
+              "tested": 37,
+              "rejected": 15,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 13,
+              "tested": 22,
+              "rejected": 9,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 17,
+              "tested": 13,
+              "rejected": 7,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 19,
+              "tested": 6,
+              "rejected": 3,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 23,
+              "tested": 3,
+              "rejected": 2,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 31,
+              "tested": 1,
+              "rejected": 1,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 37,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 41,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 43,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 47,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 53,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 59,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            },
+            {
+              "prime": 61,
+              "tested": 0,
+              "rejected": 0,
+              "calibrated": 0,
+              "calibration_rejected": 0
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "failures": [],
+  "limitations": [
+    "Finite fault tests, not a formal verification.",
+    "Positive rescue routing uses an explicitly injected verifier; no synthetic solution is asserted."
+  ],
+  "hashes_after": {
+    "validate_controller.py": "0083128352f4d58ec7dac1f5e2ae8ae03d9421c2caffe8263e73a559a0224839",
+    "campaign.py": "3911464a136962cf6cef62b90105dab61f2273de333bec0fb35a987b50ffe2a7",
+    "offset_worker.c": "087de923d2ba242633774ad9db0285d960c01acc0e8b1d4a2d36808e72de7a12",
+    "online_model.py": "7a867a3a5ef0b6721e616b02c46c139776f171cdb5276646b68005f8297b05ad",
+    "verify_domain.py": "731144d387529c933d0096a52843f659c6dc3638e686782e731e7c965224d147",
+    "bin/offset_worker": "4a2d9639bfb69cf33e3520aec03fc66b2c8237df82d4b914076cc3b29e4e4ffa",
+    "../bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "../campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34"
+  },
+  "elapsed_seconds": 0.9740902090052259,
+  "passed": true
+}

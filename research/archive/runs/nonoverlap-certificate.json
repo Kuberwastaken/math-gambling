@@ -1,0 +1,84 @@
+{
+  "passed": true,
+  "scope": "No repeated (D,r,z) positions among completed tiles of this exact campaign; same (D,r) can occur in disjoint z bands.",
+  "ledger_audit": {
+    "database_integrity": "ok",
+    "reserved_tiles_disjoint_and_gapless": true,
+    "complete_tiles": 76714,
+    "unfinished_tiles": 0
+  },
+  "interrupted_or_failed_events": 0,
+  "maximum_job_attempts": 1,
+  "exact_d_min": 2441406250000001,
+  "beta_lower_bound": 4133238949,
+  "bounds": [
+    {
+      "ell": 1,
+      "box_embedding_upper": 1550000,
+      "plane_real_upper": 3,
+      "plane_complex_upper": 1000000000,
+      "exact_ratios": {
+        "within_box_max": "3723875000000000000/2441406250000001",
+        "within_plane_max": "3000000000000000000/2441406250000001",
+        "box_over_plane_min": "2441406250000001/7207500000000",
+        "box_over_plane_max": "1550000000000000000000000/2441406250000001"
+      },
+      "approximate_ratios": {
+        "within_box_max": 1525.2991999999995,
+        "within_plane_max": 1228.7999999999995,
+        "box_over_plane_min": 338.7313562261534,
+        "box_over_plane_max": 634879999.9999998
+      }
+    },
+    {
+      "ell": 5,
+      "box_embedding_upper": 2650473,
+      "plane_real_upper": 15,
+      "plane_complex_upper": 1000000000,
+      "exact_ratios": {
+        "within_box_max": "18619591706251373817/12207031250000005",
+        "within_plane_max": "3000000000000000000/2441406250000001",
+        "box_over_plane_min": "2441406250000001/21075021371187",
+        "box_over_plane_max": "530094600000000000000000/2441406250000001"
+      },
+      "approximate_ratios": {
+        "within_box_max": 1525.3169525761118,
+        "within_plane_max": 1228.7999999999995,
+        "box_over_plane_min": 115.84359545835633,
+        "box_over_plane_max": 217126748.1599999
+      }
+    },
+    {
+      "ell": 25,
+      "box_embedding_upper": 4532255,
+      "plane_real_upper": 75,
+      "plane_complex_upper": 1000000000,
+      "exact_ratios": {
+        "within_box_max": "2616966128052185/1715675509487",
+        "within_plane_max": "3000000000000000000/2441406250000001",
+        "box_over_plane_min": "1715675509487/43305696525",
+        "box_over_plane_max": "127400000000000000000/1715675509487"
+      },
+      "approximate_ratios": {
+        "within_box_max": 1525.3269709693984,
+        "within_plane_max": 1228.7999999999995,
+        "box_over_plane_min": 39.617778887277694,
+        "box_over_plane_max": 74256465.91999997
+      }
+    }
+  ],
+  "field_certificate": "FIELD_CERTIFIED=1\nCLASS_GROUP=[3]\nBETA_UNIT_EXPONENTS=[-1, 0]~\nROOTS_OF_UNITY=2\nNORM_BETA=1\n",
+  "field_certificate_gp": "K=bnfinit(t^3-114,1); if(bnfcertify(K)!=1,error(\"field certification failed\")); if(K.zk!=[1,t,t^2],error(\"basis mismatch\")); if(K.cyc!=[3],error(\"class group mismatch\")); J=idealhnf(K,5,t-4); if(bnfisprincipal(K,J,0)[1]%3==0,error(\"J is principal\")); if(idealpow(K,J,2)!=idealhnf(K,25,t-4),error(\"J squared mismatch\")); beta=Mod(4133238949+852423792*t+175800705*t^2,t^3-114); U=bnfisunit(K,beta); if(abs(U[1])!=1 || K.tu[1]!=2,error(\"unit group mismatch\")); print(\"FIELD_CERTIFIED=1\"); print(\"CLASS_GROUP=\",K.cyc); print(\"BETA_UNIT_EXPONENTS=\",U); print(\"ROOTS_OF_UNITY=\",K.tu[1]); print(\"NORM_BETA=\",nfeltnorm(K,beta)); quit;\n",
+  "sources": {
+    "bin/campaign_worker": "a41963799ebb83d9d94de4e5fc119791cc8f91d192299f35e4fee03eece66e76",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "bin/plane_worker": "d91341e30b0cbfabb5f8f37e4cc75e45cf466c153fa144c95ee882c563b49fde",
+    "campaign.py": "6962b53ed50d105f4494cbcc46fbff34b5f4b041828177678389e836a69c63a9",
+    "campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "plane_worker.c": "ccc0ed4746dab6dbb699bfca1de1d2047fd6eac10e6aa337c325906513a38914"
+  },
+  "certificate_script_sha256": "3a36c9bfb8fe409ee5d36b25b56873bd7f2398cf6c01d4632a059337af6421c7",
+  "assumptions": "The mathematical argument is in NONOVERLAP.md; this is not a formal proof of the entire implementation. Existing finite symmetry and band validators remain prerequisites.",
+  "retries_can_repeat_partial_work": false,
+  "other_campaigns_and_calibration_runs_not_covered": true
+}

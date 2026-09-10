@@ -1,0 +1,6779 @@
+{
+  "comparisons": [
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "pairs": 3,
+      "direct_cpu_median": 0.083742,
+      "inversion_cpu_median": 0.069968,
+      "speedup": 1.1968614223645093,
+      "outside_shell_fraction": 0.8653954606287271,
+      "empty_row_fraction": 0.8541666666666666,
+      "matched_checker_and_candidate_counts": true
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "pairs": 3,
+      "direct_cpu_median": 0.608586,
+      "inversion_cpu_median": 0.590625,
+      "speedup": 1.0304101587301588,
+      "outside_shell_fraction": 0.8653954606287271,
+      "empty_row_fraction": 0.8541666666666666,
+      "matched_checker_and_candidate_counts": true
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "pairs": 3,
+      "direct_cpu_median": 0.030698,
+      "inversion_cpu_median": 0.026086,
+      "speedup": 1.176799815993253,
+      "outside_shell_fraction": 0.8817020417263662,
+      "empty_row_fraction": 0.8697916666666666,
+      "matched_checker_and_candidate_counts": true
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "pairs": 3,
+      "direct_cpu_median": 0.205269,
+      "inversion_cpu_median": 0.201404,
+      "speedup": 1.0191902842048817,
+      "outside_shell_fraction": 0.8817020417263662,
+      "empty_row_fraction": 0.8697916666666666,
+      "matched_checker_and_candidate_counts": true
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "pairs": 3,
+      "direct_cpu_median": 0.017231,
+      "inversion_cpu_median": 0.015743,
+      "speedup": 1.0945181985644412,
+      "outside_shell_fraction": 0.8722259624975065,
+      "empty_row_fraction": 0.8489583333333334,
+      "matched_checker_and_candidate_counts": true
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "pairs": 3,
+      "direct_cpu_median": 0.082262,
+      "inversion_cpu_median": 0.078372,
+      "speedup": 1.0496350737508295,
+      "outside_shell_fraction": 0.8722259624975065,
+      "empty_row_fraction": 0.8489583333333334,
+      "matched_checker_and_candidate_counts": true
+    }
+  ],
+  "benchmark_cpu_seconds": 6.0754399999999995,
+  "requested_cpu_budget": 12,
+  "caveat": "May exceed budget by one matched pair. Local short CPU-time tests while production runs; no discovery probability inferred.",
+  "source_sha256": "ec60dd63c801b1e00e1f47be8d7b762c792b94703e74d7d9715dbfa449bc30e1",
+  "frozen_common_sha256": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+  "raw": [
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "repeat": 0,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 10000200001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 865000,
+        "curves": 228338,
+        "quotient_points": 14525532,
+        "exact_tests": 40,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 121662,
+        "unsupported_D": 0,
+        "noninvertible_C": 14995,
+        "covered": 0,
+        "rejected_mod243": 13807856,
+        "rejected_parity": 179324,
+        "reorders": 0,
+        "calibration_samples": 506,
+        "wall_seconds": 0.080593,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 538352,
+            "rejected": 172132,
+            "calibrated": 506,
+            "calibration_rejected": 167
+          },
+          {
+            "prime": 7,
+            "tested": 366220,
+            "rejected": 235727,
+            "calibrated": 506,
+            "calibration_rejected": 331
+          },
+          {
+            "prime": 11,
+            "tested": 130493,
+            "rejected": 53660,
+            "calibrated": 506,
+            "calibration_rejected": 213
+          },
+          {
+            "prime": 13,
+            "tested": 76833,
+            "rejected": 39391,
+            "calibrated": 506,
+            "calibration_rejected": 265
+          },
+          {
+            "prime": 17,
+            "tested": 37442,
+            "rejected": 16580,
+            "calibrated": 506,
+            "calibration_rejected": 237
+          },
+          {
+            "prime": 19,
+            "tested": 20862,
+            "rejected": 6137,
+            "calibrated": 506,
+            "calibration_rejected": 135
+          },
+          {
+            "prime": 23,
+            "tested": 14725,
+            "rejected": 6696,
+            "calibrated": 506,
+            "calibration_rejected": 243
+          },
+          {
+            "prime": 31,
+            "tested": 8029,
+            "rejected": 4231,
+            "calibrated": 506,
+            "calibration_rejected": 261
+          },
+          {
+            "prime": 37,
+            "tested": 3798,
+            "rejected": 1927,
+            "calibrated": 506,
+            "calibration_rejected": 264
+          },
+          {
+            "prime": 41,
+            "tested": 1871,
+            "rejected": 899,
+            "calibrated": 506,
+            "calibration_rejected": 245
+          },
+          {
+            "prime": 43,
+            "tested": 972,
+            "rejected": 480,
+            "calibrated": 506,
+            "calibration_rejected": 248
+          },
+          {
+            "prime": 47,
+            "tested": 492,
+            "rejected": 240,
+            "calibrated": 506,
+            "calibration_rejected": 249
+          },
+          {
+            "prime": 53,
+            "tested": 252,
+            "rejected": 99,
+            "calibrated": 506,
+            "calibration_rejected": 230
+          },
+          {
+            "prime": 59,
+            "tested": 153,
+            "rejected": 81,
+            "calibrated": 506,
+            "calibration_rejected": 251
+          },
+          {
+            "prime": 61,
+            "tested": 72,
+            "rejected": 32,
+            "calibrated": 506,
+            "calibration_rejected": 227
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 228338,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 865000,
+        "outside_shell": 5535064,
+        "norm_evaluations": 190,
+        "recurrence_steps": 364990,
+        "cpu_seconds": 0.07986,
+        "wall_seconds": 0.080593
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "repeat": 0,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 10000200001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 865000,
+        "curves": 228338,
+        "quotient_points": 14525532,
+        "exact_tests": 40,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 121662,
+        "unsupported_D": 0,
+        "noninvertible_C": 14995,
+        "covered": 0,
+        "rejected_mod243": 13807856,
+        "rejected_parity": 179324,
+        "reorders": 0,
+        "calibration_samples": 506,
+        "wall_seconds": 0.095514,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 538352,
+            "rejected": 172132,
+            "calibrated": 506,
+            "calibration_rejected": 167
+          },
+          {
+            "prime": 7,
+            "tested": 366220,
+            "rejected": 235727,
+            "calibrated": 506,
+            "calibration_rejected": 331
+          },
+          {
+            "prime": 11,
+            "tested": 130493,
+            "rejected": 53660,
+            "calibrated": 506,
+            "calibration_rejected": 213
+          },
+          {
+            "prime": 13,
+            "tested": 76833,
+            "rejected": 39391,
+            "calibrated": 506,
+            "calibration_rejected": 265
+          },
+          {
+            "prime": 17,
+            "tested": 37442,
+            "rejected": 16580,
+            "calibrated": 506,
+            "calibration_rejected": 237
+          },
+          {
+            "prime": 19,
+            "tested": 20862,
+            "rejected": 6137,
+            "calibrated": 506,
+            "calibration_rejected": 135
+          },
+          {
+            "prime": 23,
+            "tested": 14725,
+            "rejected": 6696,
+            "calibrated": 506,
+            "calibration_rejected": 243
+          },
+          {
+            "prime": 31,
+            "tested": 8029,
+            "rejected": 4231,
+            "calibrated": 506,
+            "calibration_rejected": 261
+          },
+          {
+            "prime": 37,
+            "tested": 3798,
+            "rejected": 1927,
+            "calibrated": 506,
+            "calibration_rejected": 264
+          },
+          {
+            "prime": 41,
+            "tested": 1871,
+            "rejected": 899,
+            "calibrated": 506,
+            "calibration_rejected": 245
+          },
+          {
+            "prime": 43,
+            "tested": 972,
+            "rejected": 480,
+            "calibrated": 506,
+            "calibration_rejected": 248
+          },
+          {
+            "prime": 47,
+            "tested": 492,
+            "rejected": 240,
+            "calibrated": 506,
+            "calibration_rejected": 249
+          },
+          {
+            "prime": 53,
+            "tested": 252,
+            "rejected": 99,
+            "calibrated": 506,
+            "calibration_rejected": 230
+          },
+          {
+            "prime": 59,
+            "tested": 153,
+            "rejected": 81,
+            "calibrated": 506,
+            "calibration_rejected": 251
+          },
+          {
+            "prime": 61,
+            "tested": 72,
+            "rejected": 32,
+            "calibrated": 506,
+            "calibration_rejected": 227
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 228338,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 865000,
+        "outside_shell": 5535064,
+        "norm_evaluations": 64,
+        "recurrence_steps": 6400000,
+        "cpu_seconds": 0.094593,
+        "wall_seconds": 0.095514
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "repeat": 1,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 10000200001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 1000010,
+        "curves": 156298,
+        "quotient_points": 9941352,
+        "exact_tests": 13,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 166665,
+        "unsupported_D": 0,
+        "noninvertible_C": 177042,
+        "covered": 0,
+        "rejected_mod243": 9450671,
+        "rejected_parity": 245053,
+        "reorders": 0,
+        "calibration_samples": 279,
+        "wall_seconds": 0.070632,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 245628,
+            "rejected": 77937,
+            "calibrated": 279,
+            "calibration_rejected": 105
+          },
+          {
+            "prime": 7,
+            "tested": 167691,
+            "rejected": 107754,
+            "calibrated": 279,
+            "calibration_rejected": 184
+          },
+          {
+            "prime": 11,
+            "tested": 59937,
+            "rejected": 24887,
+            "calibrated": 279,
+            "calibration_rejected": 127
+          },
+          {
+            "prime": 13,
+            "tested": 35050,
+            "rejected": 17401,
+            "calibrated": 279,
+            "calibration_rejected": 134
+          },
+          {
+            "prime": 17,
+            "tested": 17649,
+            "rejected": 7890,
+            "calibrated": 279,
+            "calibration_rejected": 128
+          },
+          {
+            "prime": 19,
+            "tested": 9759,
+            "rejected": 2961,
+            "calibrated": 279,
+            "calibration_rejected": 81
+          },
+          {
+            "prime": 23,
+            "tested": 6798,
+            "rejected": 3054,
+            "calibrated": 279,
+            "calibration_rejected": 133
+          },
+          {
+            "prime": 31,
+            "tested": 3744,
+            "rejected": 1919,
+            "calibrated": 279,
+            "calibration_rejected": 140
+          },
+          {
+            "prime": 37,
+            "tested": 1825,
+            "rejected": 952,
+            "calibrated": 279,
+            "calibration_rejected": 144
+          },
+          {
+            "prime": 41,
+            "tested": 873,
+            "rejected": 414,
+            "calibrated": 279,
+            "calibration_rejected": 150
+          },
+          {
+            "prime": 43,
+            "tested": 459,
+            "rejected": 233,
+            "calibrated": 279,
+            "calibration_rejected": 144
+          },
+          {
+            "prime": 47,
+            "tested": 226,
+            "rejected": 116,
+            "calibrated": 279,
+            "calibration_rejected": 133
+          },
+          {
+            "prime": 53,
+            "tested": 110,
+            "rejected": 58,
+            "calibrated": 279,
+            "calibration_rejected": 139
+          },
+          {
+            "prime": 59,
+            "tested": 52,
+            "rejected": 24,
+            "calibrated": 279,
+            "calibration_rejected": 110
+          },
+          {
+            "prime": 61,
+            "tested": 28,
+            "rejected": 15,
+            "calibrated": 279,
+            "calibration_rejected": 130
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 156298,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 1000010,
+        "outside_shell": 5400054,
+        "norm_evaluations": 133,
+        "recurrence_steps": 500000,
+        "cpu_seconds": 0.069188,
+        "wall_seconds": 0.070632
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "repeat": 1,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 10000200001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 1000010,
+        "curves": 156298,
+        "quotient_points": 9941352,
+        "exact_tests": 13,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 166665,
+        "unsupported_D": 0,
+        "noninvertible_C": 177042,
+        "covered": 0,
+        "rejected_mod243": 9450671,
+        "rejected_parity": 245053,
+        "reorders": 0,
+        "calibration_samples": 279,
+        "wall_seconds": 0.083493,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 245628,
+            "rejected": 77937,
+            "calibrated": 279,
+            "calibration_rejected": 105
+          },
+          {
+            "prime": 7,
+            "tested": 167691,
+            "rejected": 107754,
+            "calibrated": 279,
+            "calibration_rejected": 184
+          },
+          {
+            "prime": 11,
+            "tested": 59937,
+            "rejected": 24887,
+            "calibrated": 279,
+            "calibration_rejected": 127
+          },
+          {
+            "prime": 13,
+            "tested": 35050,
+            "rejected": 17401,
+            "calibrated": 279,
+            "calibration_rejected": 134
+          },
+          {
+            "prime": 17,
+            "tested": 17649,
+            "rejected": 7890,
+            "calibrated": 279,
+            "calibration_rejected": 128
+          },
+          {
+            "prime": 19,
+            "tested": 9759,
+            "rejected": 2961,
+            "calibrated": 279,
+            "calibration_rejected": 81
+          },
+          {
+            "prime": 23,
+            "tested": 6798,
+            "rejected": 3054,
+            "calibrated": 279,
+            "calibration_rejected": 133
+          },
+          {
+            "prime": 31,
+            "tested": 3744,
+            "rejected": 1919,
+            "calibrated": 279,
+            "calibration_rejected": 140
+          },
+          {
+            "prime": 37,
+            "tested": 1825,
+            "rejected": 952,
+            "calibrated": 279,
+            "calibration_rejected": 144
+          },
+          {
+            "prime": 41,
+            "tested": 873,
+            "rejected": 414,
+            "calibrated": 279,
+            "calibration_rejected": 150
+          },
+          {
+            "prime": 43,
+            "tested": 459,
+            "rejected": 233,
+            "calibrated": 279,
+            "calibration_rejected": 144
+          },
+          {
+            "prime": 47,
+            "tested": 226,
+            "rejected": 116,
+            "calibrated": 279,
+            "calibration_rejected": 133
+          },
+          {
+            "prime": 53,
+            "tested": 110,
+            "rejected": 58,
+            "calibrated": 279,
+            "calibration_rejected": 139
+          },
+          {
+            "prime": 59,
+            "tested": 52,
+            "rejected": 24,
+            "calibrated": 279,
+            "calibration_rejected": 110
+          },
+          {
+            "prime": 61,
+            "tested": 28,
+            "rejected": 15,
+            "calibrated": 279,
+            "calibration_rejected": 130
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 156298,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 1000010,
+        "outside_shell": 5400054,
+        "norm_evaluations": 64,
+        "recurrence_steps": 6400000,
+        "cpu_seconds": 0.082371,
+        "wall_seconds": 0.083493
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "repeat": 2,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 10000200001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 719423,
+        "curves": 177191,
+        "quotient_points": 11276520,
+        "exact_tests": 19,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 133332,
+        "unsupported_D": 0,
+        "noninvertible_C": 89481,
+        "covered": 0,
+        "rejected_mod243": 10719683,
+        "rejected_parity": 184989,
+        "reorders": 0,
+        "calibration_samples": 366,
+        "wall_seconds": 0.085081,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 371848,
+            "rejected": 115356,
+            "calibrated": 366,
+            "calibration_rejected": 120
+          },
+          {
+            "prime": 7,
+            "tested": 256492,
+            "rejected": 164762,
+            "calibrated": 366,
+            "calibration_rejected": 241
+          },
+          {
+            "prime": 11,
+            "tested": 91730,
+            "rejected": 37908,
+            "calibrated": 366,
+            "calibration_rejected": 155
+          },
+          {
+            "prime": 13,
+            "tested": 53822,
+            "rejected": 27379,
+            "calibrated": 366,
+            "calibration_rejected": 185
+          },
+          {
+            "prime": 17,
+            "tested": 26443,
+            "rejected": 11771,
+            "calibrated": 366,
+            "calibration_rejected": 169
+          },
+          {
+            "prime": 19,
+            "tested": 14672,
+            "rejected": 4369,
+            "calibrated": 366,
+            "calibration_rejected": 107
+          },
+          {
+            "prime": 23,
+            "tested": 10303,
+            "rejected": 4769,
+            "calibrated": 366,
+            "calibration_rejected": 178
+          },
+          {
+            "prime": 31,
+            "tested": 5534,
+            "rejected": 2924,
+            "calibrated": 366,
+            "calibration_rejected": 201
+          },
+          {
+            "prime": 37,
+            "tested": 2610,
+            "rejected": 1321,
+            "calibrated": 366,
+            "calibration_rejected": 188
+          },
+          {
+            "prime": 41,
+            "tested": 1289,
+            "rejected": 626,
+            "calibrated": 366,
+            "calibration_rejected": 168
+          },
+          {
+            "prime": 43,
+            "tested": 663,
+            "rejected": 336,
+            "calibrated": 366,
+            "calibration_rejected": 185
+          },
+          {
+            "prime": 47,
+            "tested": 327,
+            "rejected": 171,
+            "calibrated": 366,
+            "calibration_rejected": 168
+          },
+          {
+            "prime": 53,
+            "tested": 156,
+            "rejected": 76,
+            "calibrated": 366,
+            "calibration_rejected": 163
+          },
+          {
+            "prime": 59,
+            "tested": 80,
+            "rejected": 38,
+            "calibrated": 366,
+            "calibration_rejected": 173
+          },
+          {
+            "prime": 61,
+            "tested": 42,
+            "rejected": 23,
+            "calibrated": 366,
+            "calibration_rejected": 170
+          }
+        ],
+        "symmetry_rejected": 319419,
+        "direct_curves": 177191,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 719423,
+        "outside_shell": 5680641,
+        "norm_evaluations": 64,
+        "recurrence_steps": 6400000,
+        "cpu_seconds": 0.083742,
+        "wall_seconds": 0.085081
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 64,
+      "repeat": 2,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 10000200001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 719423,
+        "curves": 177191,
+        "quotient_points": 11276520,
+        "exact_tests": 19,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 133332,
+        "unsupported_D": 0,
+        "noninvertible_C": 89481,
+        "covered": 0,
+        "rejected_mod243": 10719683,
+        "rejected_parity": 184989,
+        "reorders": 0,
+        "calibration_samples": 366,
+        "wall_seconds": 0.071126,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 371848,
+            "rejected": 115356,
+            "calibrated": 366,
+            "calibration_rejected": 120
+          },
+          {
+            "prime": 7,
+            "tested": 256492,
+            "rejected": 164762,
+            "calibrated": 366,
+            "calibration_rejected": 241
+          },
+          {
+            "prime": 11,
+            "tested": 91730,
+            "rejected": 37908,
+            "calibrated": 366,
+            "calibration_rejected": 155
+          },
+          {
+            "prime": 13,
+            "tested": 53822,
+            "rejected": 27379,
+            "calibrated": 366,
+            "calibration_rejected": 185
+          },
+          {
+            "prime": 17,
+            "tested": 26443,
+            "rejected": 11771,
+            "calibrated": 366,
+            "calibration_rejected": 169
+          },
+          {
+            "prime": 19,
+            "tested": 14672,
+            "rejected": 4369,
+            "calibrated": 366,
+            "calibration_rejected": 107
+          },
+          {
+            "prime": 23,
+            "tested": 10303,
+            "rejected": 4769,
+            "calibrated": 366,
+            "calibration_rejected": 178
+          },
+          {
+            "prime": 31,
+            "tested": 5534,
+            "rejected": 2924,
+            "calibrated": 366,
+            "calibration_rejected": 201
+          },
+          {
+            "prime": 37,
+            "tested": 2610,
+            "rejected": 1321,
+            "calibrated": 366,
+            "calibration_rejected": 188
+          },
+          {
+            "prime": 41,
+            "tested": 1289,
+            "rejected": 626,
+            "calibrated": 366,
+            "calibration_rejected": 168
+          },
+          {
+            "prime": 43,
+            "tested": 663,
+            "rejected": 336,
+            "calibrated": 366,
+            "calibration_rejected": 185
+          },
+          {
+            "prime": 47,
+            "tested": 327,
+            "rejected": 171,
+            "calibrated": 366,
+            "calibration_rejected": 168
+          },
+          {
+            "prime": 53,
+            "tested": 156,
+            "rejected": 76,
+            "calibrated": 366,
+            "calibration_rejected": 163
+          },
+          {
+            "prime": 59,
+            "tested": 80,
+            "rejected": 38,
+            "calibrated": 366,
+            "calibration_rejected": 173
+          },
+          {
+            "prime": 61,
+            "tested": 42,
+            "rejected": 23,
+            "calibrated": 366,
+            "calibration_rejected": 170
+          }
+        ],
+        "symmetry_rejected": 319419,
+        "direct_curves": 177191,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 719423,
+        "outside_shell": 5680641,
+        "norm_evaluations": 153,
+        "recurrence_steps": 400000,
+        "cpu_seconds": 0.069968,
+        "wall_seconds": 0.071126
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "repeat": 0,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 10000200001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 865000,
+        "curves": 228338,
+        "quotient_points": 935184348,
+        "exact_tests": 2491,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 121662,
+        "unsupported_D": 0,
+        "noninvertible_C": 14995,
+        "covered": 0,
+        "rejected_mod243": 889002324,
+        "rejected_parity": 11545532,
+        "reorders": 0,
+        "calibration_samples": 33713,
+        "wall_seconds": 0.809035,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 34636492,
+            "rejected": 11083632,
+            "calibrated": 33713,
+            "calibration_rejected": 10867
+          },
+          {
+            "prime": 7,
+            "tested": 23552860,
+            "rejected": 15140798,
+            "calibrated": 33713,
+            "calibration_rejected": 21666
+          },
+          {
+            "prime": 11,
+            "tested": 8412062,
+            "rejected": 3471438,
+            "calibrated": 33713,
+            "calibration_rejected": 13963
+          },
+          {
+            "prime": 13,
+            "tested": 4940624,
+            "rejected": 2535369,
+            "calibrated": 33713,
+            "calibration_rejected": 17062
+          },
+          {
+            "prime": 17,
+            "tested": 2405255,
+            "rejected": 1065393,
+            "calibrated": 33713,
+            "calibration_rejected": 15038
+          },
+          {
+            "prime": 19,
+            "tested": 1339862,
+            "rejected": 401306,
+            "calibrated": 33713,
+            "calibration_rejected": 10064
+          },
+          {
+            "prime": 23,
+            "tested": 938556,
+            "rejected": 428745,
+            "calibrated": 33713,
+            "calibration_rejected": 15446
+          },
+          {
+            "prime": 31,
+            "tested": 509811,
+            "rejected": 268646,
+            "calibrated": 33713,
+            "calibration_rejected": 17662
+          },
+          {
+            "prime": 37,
+            "tested": 241165,
+            "rejected": 122446,
+            "calibrated": 33713,
+            "calibration_rejected": 17145
+          },
+          {
+            "prime": 41,
+            "tested": 118719,
+            "rejected": 56541,
+            "calibrated": 33713,
+            "calibration_rejected": 16170
+          },
+          {
+            "prime": 43,
+            "tested": 62178,
+            "rejected": 31505,
+            "calibrated": 33713,
+            "calibration_rejected": 16974
+          },
+          {
+            "prime": 47,
+            "tested": 30673,
+            "rejected": 14691,
+            "calibrated": 33713,
+            "calibration_rejected": 16168
+          },
+          {
+            "prime": 53,
+            "tested": 15982,
+            "rejected": 7602,
+            "calibrated": 33713,
+            "calibration_rejected": 16210
+          },
+          {
+            "prime": 59,
+            "tested": 8380,
+            "rejected": 3992,
+            "calibrated": 33713,
+            "calibration_rejected": 16188
+          },
+          {
+            "prime": 61,
+            "tested": 4388,
+            "rejected": 1897,
+            "calibrated": 33713,
+            "calibration_rejected": 14743
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 0,
+        "wheel_curves": 228338
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 865000,
+        "outside_shell": 5535064,
+        "norm_evaluations": 190,
+        "recurrence_steps": 364990,
+        "cpu_seconds": 0.80785,
+        "wall_seconds": 0.809035
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "repeat": 0,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 10000200001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 865000,
+        "curves": 228338,
+        "quotient_points": 935184348,
+        "exact_tests": 2491,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 121662,
+        "unsupported_D": 0,
+        "noninvertible_C": 14995,
+        "covered": 0,
+        "rejected_mod243": 889002324,
+        "rejected_parity": 11545532,
+        "reorders": 0,
+        "calibration_samples": 33713,
+        "wall_seconds": 0.852961,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 34636492,
+            "rejected": 11083632,
+            "calibrated": 33713,
+            "calibration_rejected": 10867
+          },
+          {
+            "prime": 7,
+            "tested": 23552860,
+            "rejected": 15140798,
+            "calibrated": 33713,
+            "calibration_rejected": 21666
+          },
+          {
+            "prime": 11,
+            "tested": 8412062,
+            "rejected": 3471438,
+            "calibrated": 33713,
+            "calibration_rejected": 13963
+          },
+          {
+            "prime": 13,
+            "tested": 4940624,
+            "rejected": 2535369,
+            "calibrated": 33713,
+            "calibration_rejected": 17062
+          },
+          {
+            "prime": 17,
+            "tested": 2405255,
+            "rejected": 1065393,
+            "calibrated": 33713,
+            "calibration_rejected": 15038
+          },
+          {
+            "prime": 19,
+            "tested": 1339862,
+            "rejected": 401306,
+            "calibrated": 33713,
+            "calibration_rejected": 10064
+          },
+          {
+            "prime": 23,
+            "tested": 938556,
+            "rejected": 428745,
+            "calibrated": 33713,
+            "calibration_rejected": 15446
+          },
+          {
+            "prime": 31,
+            "tested": 509811,
+            "rejected": 268646,
+            "calibrated": 33713,
+            "calibration_rejected": 17662
+          },
+          {
+            "prime": 37,
+            "tested": 241165,
+            "rejected": 122446,
+            "calibrated": 33713,
+            "calibration_rejected": 17145
+          },
+          {
+            "prime": 41,
+            "tested": 118719,
+            "rejected": 56541,
+            "calibrated": 33713,
+            "calibration_rejected": 16170
+          },
+          {
+            "prime": 43,
+            "tested": 62178,
+            "rejected": 31505,
+            "calibrated": 33713,
+            "calibration_rejected": 16974
+          },
+          {
+            "prime": 47,
+            "tested": 30673,
+            "rejected": 14691,
+            "calibrated": 33713,
+            "calibration_rejected": 16168
+          },
+          {
+            "prime": 53,
+            "tested": 15982,
+            "rejected": 7602,
+            "calibrated": 33713,
+            "calibration_rejected": 16210
+          },
+          {
+            "prime": 59,
+            "tested": 8380,
+            "rejected": 3992,
+            "calibrated": 33713,
+            "calibration_rejected": 16188
+          },
+          {
+            "prime": 61,
+            "tested": 4388,
+            "rejected": 1897,
+            "calibrated": 33713,
+            "calibration_rejected": 14743
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 0,
+        "wheel_curves": 228338
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 865000,
+        "outside_shell": 5535064,
+        "norm_evaluations": 64,
+        "recurrence_steps": 6400000,
+        "cpu_seconds": 0.851515,
+        "wall_seconds": 0.852961
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "repeat": 1,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 10000200001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 1000010,
+        "curves": 156298,
+        "quotient_points": 640134888,
+        "exact_tests": 1072,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 166665,
+        "unsupported_D": 0,
+        "noninvertible_C": 177042,
+        "covered": 0,
+        "rejected_mod243": 608523382,
+        "rejected_parity": 15805646,
+        "reorders": 0,
+        "calibration_samples": 15436,
+        "wall_seconds": 0.42293,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 15805860,
+            "rejected": 5004265,
+            "calibrated": 15436,
+            "calibration_rejected": 4956
+          },
+          {
+            "prime": 7,
+            "tested": 10801595,
+            "rejected": 6943683,
+            "calibrated": 15436,
+            "calibration_rejected": 9945
+          },
+          {
+            "prime": 11,
+            "tested": 3857912,
+            "rejected": 1591144,
+            "calibrated": 15436,
+            "calibration_rejected": 6453
+          },
+          {
+            "prime": 13,
+            "tested": 2266768,
+            "rejected": 1122894,
+            "calibrated": 15436,
+            "calibration_rejected": 7602
+          },
+          {
+            "prime": 17,
+            "tested": 1143874,
+            "rejected": 506181,
+            "calibrated": 15436,
+            "calibration_rejected": 6970
+          },
+          {
+            "prime": 19,
+            "tested": 637693,
+            "rejected": 190987,
+            "calibrated": 15436,
+            "calibration_rejected": 4587
+          },
+          {
+            "prime": 23,
+            "tested": 446706,
+            "rejected": 203423,
+            "calibrated": 15436,
+            "calibration_rejected": 7088
+          },
+          {
+            "prime": 31,
+            "tested": 243283,
+            "rejected": 127101,
+            "calibrated": 15436,
+            "calibration_rejected": 7956
+          },
+          {
+            "prime": 37,
+            "tested": 116182,
+            "rejected": 60037,
+            "calibrated": 15436,
+            "calibration_rejected": 7890
+          },
+          {
+            "prime": 41,
+            "tested": 56145,
+            "rejected": 26607,
+            "calibrated": 15436,
+            "calibration_rejected": 7361
+          },
+          {
+            "prime": 43,
+            "tested": 29538,
+            "rejected": 15111,
+            "calibrated": 15436,
+            "calibration_rejected": 7728
+          },
+          {
+            "prime": 47,
+            "tested": 14427,
+            "rejected": 6955,
+            "calibrated": 15436,
+            "calibration_rejected": 7296
+          },
+          {
+            "prime": 53,
+            "tested": 7472,
+            "rejected": 3617,
+            "calibrated": 15436,
+            "calibration_rejected": 7472
+          },
+          {
+            "prime": 59,
+            "tested": 3855,
+            "rejected": 1888,
+            "calibrated": 15436,
+            "calibration_rejected": 7493
+          },
+          {
+            "prime": 61,
+            "tested": 1967,
+            "rejected": 895,
+            "calibrated": 15436,
+            "calibration_rejected": 6711
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 0,
+        "wheel_curves": 156298
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 1000010,
+        "outside_shell": 5400054,
+        "norm_evaluations": 133,
+        "recurrence_steps": 500000,
+        "cpu_seconds": 0.420864,
+        "wall_seconds": 0.42293
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "repeat": 1,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 10000200001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 1000010,
+        "curves": 156298,
+        "quotient_points": 640134888,
+        "exact_tests": 1072,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 166665,
+        "unsupported_D": 0,
+        "noninvertible_C": 177042,
+        "covered": 0,
+        "rejected_mod243": 608523382,
+        "rejected_parity": 15805646,
+        "reorders": 0,
+        "calibration_samples": 15436,
+        "wall_seconds": 0.439659,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 15805860,
+            "rejected": 5004265,
+            "calibrated": 15436,
+            "calibration_rejected": 4956
+          },
+          {
+            "prime": 7,
+            "tested": 10801595,
+            "rejected": 6943683,
+            "calibrated": 15436,
+            "calibration_rejected": 9945
+          },
+          {
+            "prime": 11,
+            "tested": 3857912,
+            "rejected": 1591144,
+            "calibrated": 15436,
+            "calibration_rejected": 6453
+          },
+          {
+            "prime": 13,
+            "tested": 2266768,
+            "rejected": 1122894,
+            "calibrated": 15436,
+            "calibration_rejected": 7602
+          },
+          {
+            "prime": 17,
+            "tested": 1143874,
+            "rejected": 506181,
+            "calibrated": 15436,
+            "calibration_rejected": 6970
+          },
+          {
+            "prime": 19,
+            "tested": 637693,
+            "rejected": 190987,
+            "calibrated": 15436,
+            "calibration_rejected": 4587
+          },
+          {
+            "prime": 23,
+            "tested": 446706,
+            "rejected": 203423,
+            "calibrated": 15436,
+            "calibration_rejected": 7088
+          },
+          {
+            "prime": 31,
+            "tested": 243283,
+            "rejected": 127101,
+            "calibrated": 15436,
+            "calibration_rejected": 7956
+          },
+          {
+            "prime": 37,
+            "tested": 116182,
+            "rejected": 60037,
+            "calibrated": 15436,
+            "calibration_rejected": 7890
+          },
+          {
+            "prime": 41,
+            "tested": 56145,
+            "rejected": 26607,
+            "calibrated": 15436,
+            "calibration_rejected": 7361
+          },
+          {
+            "prime": 43,
+            "tested": 29538,
+            "rejected": 15111,
+            "calibrated": 15436,
+            "calibration_rejected": 7728
+          },
+          {
+            "prime": 47,
+            "tested": 14427,
+            "rejected": 6955,
+            "calibrated": 15436,
+            "calibration_rejected": 7296
+          },
+          {
+            "prime": 53,
+            "tested": 7472,
+            "rejected": 3617,
+            "calibrated": 15436,
+            "calibration_rejected": 7472
+          },
+          {
+            "prime": 59,
+            "tested": 3855,
+            "rejected": 1888,
+            "calibrated": 15436,
+            "calibration_rejected": 7493
+          },
+          {
+            "prime": 61,
+            "tested": 1967,
+            "rejected": 895,
+            "calibrated": 15436,
+            "calibration_rejected": 6711
+          }
+        ],
+        "symmetry_rejected": 500005,
+        "direct_curves": 0,
+        "wheel_curves": 156298
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 1000010,
+        "outside_shell": 5400054,
+        "norm_evaluations": 64,
+        "recurrence_steps": 6400000,
+        "cpu_seconds": 0.438571,
+        "wall_seconds": 0.439659
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "repeat": 2,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 10000200001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 719423,
+        "curves": 177191,
+        "quotient_points": 725710632,
+        "exact_tests": 1602,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 133332,
+        "unsupported_D": 0,
+        "noninvertible_C": 89481,
+        "covered": 0,
+        "rejected_mod243": 689873142,
+        "rejected_parity": 11907385,
+        "reorders": 0,
+        "calibration_samples": 23758,
+        "wall_seconds": 0.592642,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 23930105,
+            "rejected": 7445007,
+            "calibrated": 23758,
+            "calibration_rejected": 7368
+          },
+          {
+            "prime": 7,
+            "tested": 16485098,
+            "rejected": 10597779,
+            "calibrated": 23758,
+            "calibration_rejected": 15299
+          },
+          {
+            "prime": 11,
+            "tested": 5887319,
+            "rejected": 2432766,
+            "calibrated": 23758,
+            "calibration_rejected": 9727
+          },
+          {
+            "prime": 13,
+            "tested": 3454553,
+            "rejected": 1758128,
+            "calibrated": 23758,
+            "calibration_rejected": 12138
+          },
+          {
+            "prime": 17,
+            "tested": 1696425,
+            "rejected": 756755,
+            "calibrated": 23758,
+            "calibration_rejected": 10637
+          },
+          {
+            "prime": 19,
+            "tested": 939670,
+            "rejected": 281238,
+            "calibrated": 23758,
+            "calibration_rejected": 7198
+          },
+          {
+            "prime": 23,
+            "tested": 658432,
+            "rejected": 301122,
+            "calibrated": 23758,
+            "calibration_rejected": 11028
+          },
+          {
+            "prime": 31,
+            "tested": 357310,
+            "rejected": 193312,
+            "calibrated": 23758,
+            "calibration_rejected": 12660
+          },
+          {
+            "prime": 37,
+            "tested": 163998,
+            "rejected": 84041,
+            "calibrated": 23758,
+            "calibration_rejected": 12252
+          },
+          {
+            "prime": 41,
+            "tested": 79957,
+            "rejected": 38088,
+            "calibrated": 23758,
+            "calibration_rejected": 11309
+          },
+          {
+            "prime": 43,
+            "tested": 41869,
+            "rejected": 21410,
+            "calibrated": 23758,
+            "calibration_rejected": 12243
+          },
+          {
+            "prime": 47,
+            "tested": 20459,
+            "rejected": 9770,
+            "calibrated": 23758,
+            "calibration_rejected": 11421
+          },
+          {
+            "prime": 53,
+            "tested": 10689,
+            "rejected": 5189,
+            "calibrated": 23758,
+            "calibration_rejected": 11384
+          },
+          {
+            "prime": 59,
+            "tested": 5500,
+            "rejected": 2628,
+            "calibrated": 23758,
+            "calibration_rejected": 11348
+          },
+          {
+            "prime": 61,
+            "tested": 2872,
+            "rejected": 1270,
+            "calibrated": 23758,
+            "calibration_rejected": 10609
+          }
+        ],
+        "symmetry_rejected": 319419,
+        "direct_curves": 0,
+        "wheel_curves": 177191
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 719423,
+        "outside_shell": 5680641,
+        "norm_evaluations": 153,
+        "recurrence_steps": 400000,
+        "cpu_seconds": 0.590625,
+        "wall_seconds": 0.592642
+      }
+    },
+    {
+      "ell": 1,
+      "radius": 50000,
+      "ratio": 4096,
+      "repeat": 2,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 1,
+        "radius": 50000,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 10000200001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 7403422152,
+        "permutation_offset": 3134617,
+        "candidates": 719423,
+        "curves": 177191,
+        "quotient_points": 725710632,
+        "exact_tests": 1602,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 133332,
+        "unsupported_D": 0,
+        "noninvertible_C": 89481,
+        "covered": 0,
+        "rejected_mod243": 689873142,
+        "rejected_parity": 11907385,
+        "reorders": 0,
+        "calibration_samples": 23758,
+        "wall_seconds": 0.609339,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 23930105,
+            "rejected": 7445007,
+            "calibrated": 23758,
+            "calibration_rejected": 7368
+          },
+          {
+            "prime": 7,
+            "tested": 16485098,
+            "rejected": 10597779,
+            "calibrated": 23758,
+            "calibration_rejected": 15299
+          },
+          {
+            "prime": 11,
+            "tested": 5887319,
+            "rejected": 2432766,
+            "calibrated": 23758,
+            "calibration_rejected": 9727
+          },
+          {
+            "prime": 13,
+            "tested": 3454553,
+            "rejected": 1758128,
+            "calibrated": 23758,
+            "calibration_rejected": 12138
+          },
+          {
+            "prime": 17,
+            "tested": 1696425,
+            "rejected": 756755,
+            "calibrated": 23758,
+            "calibration_rejected": 10637
+          },
+          {
+            "prime": 19,
+            "tested": 939670,
+            "rejected": 281238,
+            "calibrated": 23758,
+            "calibration_rejected": 7198
+          },
+          {
+            "prime": 23,
+            "tested": 658432,
+            "rejected": 301122,
+            "calibrated": 23758,
+            "calibration_rejected": 11028
+          },
+          {
+            "prime": 31,
+            "tested": 357310,
+            "rejected": 193312,
+            "calibrated": 23758,
+            "calibration_rejected": 12660
+          },
+          {
+            "prime": 37,
+            "tested": 163998,
+            "rejected": 84041,
+            "calibrated": 23758,
+            "calibration_rejected": 12252
+          },
+          {
+            "prime": 41,
+            "tested": 79957,
+            "rejected": 38088,
+            "calibrated": 23758,
+            "calibration_rejected": 11309
+          },
+          {
+            "prime": 43,
+            "tested": 41869,
+            "rejected": 21410,
+            "calibrated": 23758,
+            "calibration_rejected": 12243
+          },
+          {
+            "prime": 47,
+            "tested": 20459,
+            "rejected": 9770,
+            "calibrated": 23758,
+            "calibration_rejected": 11421
+          },
+          {
+            "prime": 53,
+            "tested": 10689,
+            "rejected": 5189,
+            "calibrated": 23758,
+            "calibration_rejected": 11384
+          },
+          {
+            "prime": 59,
+            "tested": 5500,
+            "rejected": 2628,
+            "calibrated": 23758,
+            "calibration_rejected": 11348
+          },
+          {
+            "prime": 61,
+            "tested": 2872,
+            "rejected": 1270,
+            "calibrated": 23758,
+            "calibration_rejected": 10609
+          }
+        ],
+        "symmetry_rejected": 319419,
+        "direct_curves": 0,
+        "wheel_curves": 177191
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 6400064,
+        "eligible_inputs": 719423,
+        "outside_shell": 5680641,
+        "norm_evaluations": 64,
+        "recurrence_steps": 6400000,
+        "cpu_seconds": 0.608586,
+        "wall_seconds": 0.609339
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "repeat": 0,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 29240658001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 283122,
+        "curves": 64491,
+        "quotient_points": 4103967,
+        "exact_tests": 10,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 45600,
+        "unsupported_D": 0,
+        "noninvertible_C": 26709,
+        "covered": 0,
+        "rejected_mod243": 3901329,
+        "rejected_parity": 67253,
+        "reorders": 0,
+        "calibration_samples": 136,
+        "wall_seconds": 0.035311,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 135385,
+            "rejected": 43295,
+            "calibrated": 136,
+            "calibration_rejected": 48
+          },
+          {
+            "prime": 7,
+            "tested": 92090,
+            "rejected": 59189,
+            "calibrated": 136,
+            "calibration_rejected": 88
+          },
+          {
+            "prime": 11,
+            "tested": 32901,
+            "rejected": 13494,
+            "calibrated": 136,
+            "calibration_rejected": 60
+          },
+          {
+            "prime": 13,
+            "tested": 19407,
+            "rejected": 9726,
+            "calibrated": 136,
+            "calibration_rejected": 60
+          },
+          {
+            "prime": 17,
+            "tested": 9681,
+            "rejected": 4252,
+            "calibrated": 136,
+            "calibration_rejected": 64
+          },
+          {
+            "prime": 19,
+            "tested": 5429,
+            "rejected": 1631,
+            "calibrated": 136,
+            "calibration_rejected": 44
+          },
+          {
+            "prime": 23,
+            "tested": 3798,
+            "rejected": 1719,
+            "calibrated": 136,
+            "calibration_rejected": 64
+          },
+          {
+            "prime": 31,
+            "tested": 2079,
+            "rejected": 1149,
+            "calibrated": 136,
+            "calibration_rejected": 62
+          },
+          {
+            "prime": 37,
+            "tested": 930,
+            "rejected": 472,
+            "calibrated": 136,
+            "calibration_rejected": 67
+          },
+          {
+            "prime": 41,
+            "tested": 458,
+            "rejected": 196,
+            "calibrated": 136,
+            "calibration_rejected": 60
+          },
+          {
+            "prime": 43,
+            "tested": 262,
+            "rejected": 137,
+            "calibrated": 136,
+            "calibration_rejected": 67
+          },
+          {
+            "prime": 47,
+            "tested": 125,
+            "rejected": 65,
+            "calibrated": 136,
+            "calibration_rejected": 59
+          },
+          {
+            "prime": 53,
+            "tested": 60,
+            "rejected": 20,
+            "calibrated": 136,
+            "calibration_rejected": 58
+          },
+          {
+            "prime": 59,
+            "tested": 40,
+            "rejected": 22,
+            "calibrated": 136,
+            "calibration_rejected": 63
+          },
+          {
+            "prime": 61,
+            "tested": 18,
+            "rejected": 8,
+            "calibrated": 136,
+            "calibration_rejected": 57
+          }
+        ],
+        "symmetry_rejected": 146322,
+        "direct_curves": 64491,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 55,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 283122,
+        "outside_shell": 1905614,
+        "norm_evaluations": 64,
+        "recurrence_steps": 2188672,
+        "cpu_seconds": 0.034384,
+        "wall_seconds": 0.035311
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "repeat": 0,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 29240658001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 283122,
+        "curves": 64491,
+        "quotient_points": 4103967,
+        "exact_tests": 10,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 45600,
+        "unsupported_D": 0,
+        "noninvertible_C": 26709,
+        "covered": 0,
+        "rejected_mod243": 3901329,
+        "rejected_parity": 67253,
+        "reorders": 0,
+        "calibration_samples": 136,
+        "wall_seconds": 0.031089,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 135385,
+            "rejected": 43295,
+            "calibrated": 136,
+            "calibration_rejected": 48
+          },
+          {
+            "prime": 7,
+            "tested": 92090,
+            "rejected": 59189,
+            "calibrated": 136,
+            "calibration_rejected": 88
+          },
+          {
+            "prime": 11,
+            "tested": 32901,
+            "rejected": 13494,
+            "calibrated": 136,
+            "calibration_rejected": 60
+          },
+          {
+            "prime": 13,
+            "tested": 19407,
+            "rejected": 9726,
+            "calibrated": 136,
+            "calibration_rejected": 60
+          },
+          {
+            "prime": 17,
+            "tested": 9681,
+            "rejected": 4252,
+            "calibrated": 136,
+            "calibration_rejected": 64
+          },
+          {
+            "prime": 19,
+            "tested": 5429,
+            "rejected": 1631,
+            "calibrated": 136,
+            "calibration_rejected": 44
+          },
+          {
+            "prime": 23,
+            "tested": 3798,
+            "rejected": 1719,
+            "calibrated": 136,
+            "calibration_rejected": 64
+          },
+          {
+            "prime": 31,
+            "tested": 2079,
+            "rejected": 1149,
+            "calibrated": 136,
+            "calibration_rejected": 62
+          },
+          {
+            "prime": 37,
+            "tested": 930,
+            "rejected": 472,
+            "calibrated": 136,
+            "calibration_rejected": 67
+          },
+          {
+            "prime": 41,
+            "tested": 458,
+            "rejected": 196,
+            "calibrated": 136,
+            "calibration_rejected": 60
+          },
+          {
+            "prime": 43,
+            "tested": 262,
+            "rejected": 137,
+            "calibrated": 136,
+            "calibration_rejected": 67
+          },
+          {
+            "prime": 47,
+            "tested": 125,
+            "rejected": 65,
+            "calibrated": 136,
+            "calibration_rejected": 59
+          },
+          {
+            "prime": 53,
+            "tested": 60,
+            "rejected": 20,
+            "calibrated": 136,
+            "calibration_rejected": 58
+          },
+          {
+            "prime": 59,
+            "tested": 40,
+            "rejected": 22,
+            "calibrated": 136,
+            "calibration_rejected": 63
+          },
+          {
+            "prime": 61,
+            "tested": 18,
+            "rejected": 8,
+            "calibrated": 136,
+            "calibration_rejected": 57
+          }
+        ],
+        "symmetry_rejected": 146322,
+        "direct_curves": 64491,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 55,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 283122,
+        "outside_shell": 1905614,
+        "norm_evaluations": 155,
+        "recurrence_steps": 136792,
+        "cpu_seconds": 0.030455,
+        "wall_seconds": 0.031089
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "repeat": 1,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 29240658001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 251834,
+        "curves": 43971,
+        "quotient_points": 2796487,
+        "exact_tests": 11,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 34201,
+        "unsupported_D": 0,
+        "noninvertible_C": 24429,
+        "covered": 0,
+        "rejected_mod243": 2658413,
+        "rejected_parity": 51272,
+        "reorders": 0,
+        "calibration_samples": 83,
+        "wall_seconds": 0.02405,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 86802,
+            "rejected": 27834,
+            "calibrated": 83,
+            "calibration_rejected": 26
+          },
+          {
+            "prime": 7,
+            "tested": 58968,
+            "rejected": 37851,
+            "calibrated": 83,
+            "calibration_rejected": 53
+          },
+          {
+            "prime": 11,
+            "tested": 21117,
+            "rejected": 8661,
+            "calibrated": 83,
+            "calibration_rejected": 35
+          },
+          {
+            "prime": 13,
+            "tested": 12456,
+            "rejected": 5740,
+            "calibrated": 83,
+            "calibration_rejected": 38
+          },
+          {
+            "prime": 17,
+            "tested": 6716,
+            "rejected": 2918,
+            "calibrated": 83,
+            "calibration_rejected": 36
+          },
+          {
+            "prime": 19,
+            "tested": 3798,
+            "rejected": 1144,
+            "calibrated": 83,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 23,
+            "tested": 2654,
+            "rejected": 1191,
+            "calibrated": 83,
+            "calibration_rejected": 41
+          },
+          {
+            "prime": 31,
+            "tested": 1463,
+            "rejected": 733,
+            "calibrated": 83,
+            "calibration_rejected": 45
+          },
+          {
+            "prime": 37,
+            "tested": 730,
+            "rejected": 353,
+            "calibrated": 83,
+            "calibration_rejected": 47
+          },
+          {
+            "prime": 41,
+            "tested": 377,
+            "rejected": 155,
+            "calibrated": 83,
+            "calibration_rejected": 44
+          },
+          {
+            "prime": 43,
+            "tested": 222,
+            "rejected": 109,
+            "calibrated": 83,
+            "calibration_rejected": 38
+          },
+          {
+            "prime": 47,
+            "tested": 113,
+            "rejected": 54,
+            "calibrated": 83,
+            "calibration_rejected": 35
+          },
+          {
+            "prime": 53,
+            "tested": 59,
+            "rejected": 22,
+            "calibrated": 83,
+            "calibration_rejected": 38
+          },
+          {
+            "prime": 59,
+            "tested": 37,
+            "rejected": 16,
+            "calibrated": 83,
+            "calibration_rejected": 44
+          },
+          {
+            "prime": 61,
+            "tested": 21,
+            "rejected": 10,
+            "calibrated": 83,
+            "calibration_rejected": 34
+          }
+        ],
+        "symmetry_rejected": 149233,
+        "direct_curves": 43971,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 251834,
+        "outside_shell": 1936902,
+        "norm_evaluations": 154,
+        "recurrence_steps": 102594,
+        "cpu_seconds": 0.02351,
+        "wall_seconds": 0.02405
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "repeat": 1,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 29240658001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 251834,
+        "curves": 43971,
+        "quotient_points": 2796487,
+        "exact_tests": 11,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 34201,
+        "unsupported_D": 0,
+        "noninvertible_C": 24429,
+        "covered": 0,
+        "rejected_mod243": 2658413,
+        "rejected_parity": 51272,
+        "reorders": 0,
+        "calibration_samples": 83,
+        "wall_seconds": 0.028009,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 86802,
+            "rejected": 27834,
+            "calibrated": 83,
+            "calibration_rejected": 26
+          },
+          {
+            "prime": 7,
+            "tested": 58968,
+            "rejected": 37851,
+            "calibrated": 83,
+            "calibration_rejected": 53
+          },
+          {
+            "prime": 11,
+            "tested": 21117,
+            "rejected": 8661,
+            "calibrated": 83,
+            "calibration_rejected": 35
+          },
+          {
+            "prime": 13,
+            "tested": 12456,
+            "rejected": 5740,
+            "calibrated": 83,
+            "calibration_rejected": 38
+          },
+          {
+            "prime": 17,
+            "tested": 6716,
+            "rejected": 2918,
+            "calibrated": 83,
+            "calibration_rejected": 36
+          },
+          {
+            "prime": 19,
+            "tested": 3798,
+            "rejected": 1144,
+            "calibrated": 83,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 23,
+            "tested": 2654,
+            "rejected": 1191,
+            "calibrated": 83,
+            "calibration_rejected": 41
+          },
+          {
+            "prime": 31,
+            "tested": 1463,
+            "rejected": 733,
+            "calibrated": 83,
+            "calibration_rejected": 45
+          },
+          {
+            "prime": 37,
+            "tested": 730,
+            "rejected": 353,
+            "calibrated": 83,
+            "calibration_rejected": 47
+          },
+          {
+            "prime": 41,
+            "tested": 377,
+            "rejected": 155,
+            "calibrated": 83,
+            "calibration_rejected": 44
+          },
+          {
+            "prime": 43,
+            "tested": 222,
+            "rejected": 109,
+            "calibrated": 83,
+            "calibration_rejected": 38
+          },
+          {
+            "prime": 47,
+            "tested": 113,
+            "rejected": 54,
+            "calibrated": 83,
+            "calibration_rejected": 35
+          },
+          {
+            "prime": 53,
+            "tested": 59,
+            "rejected": 22,
+            "calibrated": 83,
+            "calibration_rejected": 38
+          },
+          {
+            "prime": 59,
+            "tested": 37,
+            "rejected": 16,
+            "calibrated": 83,
+            "calibration_rejected": 44
+          },
+          {
+            "prime": 61,
+            "tested": 21,
+            "rejected": 10,
+            "calibrated": 83,
+            "calibration_rejected": 34
+          }
+        ],
+        "symmetry_rejected": 149233,
+        "direct_curves": 43971,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 251834,
+        "outside_shell": 1936902,
+        "norm_evaluations": 64,
+        "recurrence_steps": 2188672,
+        "cpu_seconds": 0.027501,
+        "wall_seconds": 0.028009
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "repeat": 2,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 29240658001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 241813,
+        "curves": 56083,
+        "quotient_points": 3569532,
+        "exact_tests": 8,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 35006,
+        "unsupported_D": 0,
+        "noninvertible_C": 13932,
+        "covered": 0,
+        "rejected_mod243": 3393308,
+        "rejected_parity": 52374,
+        "reorders": 0,
+        "calibration_samples": 135,
+        "wall_seconds": 0.031234,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 123850,
+            "rejected": 39505,
+            "calibrated": 135,
+            "calibration_rejected": 47
+          },
+          {
+            "prime": 7,
+            "tested": 84345,
+            "rejected": 54299,
+            "calibrated": 135,
+            "calibration_rejected": 75
+          },
+          {
+            "prime": 11,
+            "tested": 30046,
+            "rejected": 12435,
+            "calibrated": 135,
+            "calibration_rejected": 55
+          },
+          {
+            "prime": 13,
+            "tested": 17611,
+            "rejected": 8799,
+            "calibrated": 135,
+            "calibration_rejected": 62
+          },
+          {
+            "prime": 17,
+            "tested": 8812,
+            "rejected": 3902,
+            "calibrated": 135,
+            "calibration_rejected": 57
+          },
+          {
+            "prime": 19,
+            "tested": 4910,
+            "rejected": 1490,
+            "calibrated": 135,
+            "calibration_rejected": 37
+          },
+          {
+            "prime": 23,
+            "tested": 3420,
+            "rejected": 1570,
+            "calibrated": 135,
+            "calibration_rejected": 65
+          },
+          {
+            "prime": 31,
+            "tested": 1850,
+            "rejected": 964,
+            "calibrated": 135,
+            "calibration_rejected": 68
+          },
+          {
+            "prime": 37,
+            "tested": 886,
+            "rejected": 452,
+            "calibrated": 135,
+            "calibration_rejected": 68
+          },
+          {
+            "prime": 41,
+            "tested": 434,
+            "rejected": 203,
+            "calibrated": 135,
+            "calibration_rejected": 61
+          },
+          {
+            "prime": 43,
+            "tested": 231,
+            "rejected": 113,
+            "calibrated": 135,
+            "calibration_rejected": 61
+          },
+          {
+            "prime": 47,
+            "tested": 118,
+            "rejected": 54,
+            "calibrated": 135,
+            "calibration_rejected": 59
+          },
+          {
+            "prime": 53,
+            "tested": 64,
+            "rejected": 31,
+            "calibrated": 135,
+            "calibration_rejected": 71
+          },
+          {
+            "prime": 59,
+            "tested": 33,
+            "rejected": 16,
+            "calibrated": 135,
+            "calibration_rejected": 72
+          },
+          {
+            "prime": 61,
+            "tested": 17,
+            "rejected": 9,
+            "calibrated": 135,
+            "calibration_rejected": 64
+          }
+        ],
+        "symmetry_rejected": 136792,
+        "direct_curves": 56083,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 241813,
+        "outside_shell": 1946923,
+        "norm_evaluations": 64,
+        "recurrence_steps": 2188672,
+        "cpu_seconds": 0.030698,
+        "wall_seconds": 0.031234
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 64,
+      "repeat": 2,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 29240658001,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 241813,
+        "curves": 56083,
+        "quotient_points": 3569532,
+        "exact_tests": 8,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 35006,
+        "unsupported_D": 0,
+        "noninvertible_C": 13932,
+        "covered": 0,
+        "rejected_mod243": 3393308,
+        "rejected_parity": 52374,
+        "reorders": 0,
+        "calibration_samples": 135,
+        "wall_seconds": 0.026642,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 123850,
+            "rejected": 39505,
+            "calibrated": 135,
+            "calibration_rejected": 47
+          },
+          {
+            "prime": 7,
+            "tested": 84345,
+            "rejected": 54299,
+            "calibrated": 135,
+            "calibration_rejected": 75
+          },
+          {
+            "prime": 11,
+            "tested": 30046,
+            "rejected": 12435,
+            "calibrated": 135,
+            "calibration_rejected": 55
+          },
+          {
+            "prime": 13,
+            "tested": 17611,
+            "rejected": 8799,
+            "calibrated": 135,
+            "calibration_rejected": 62
+          },
+          {
+            "prime": 17,
+            "tested": 8812,
+            "rejected": 3902,
+            "calibrated": 135,
+            "calibration_rejected": 57
+          },
+          {
+            "prime": 19,
+            "tested": 4910,
+            "rejected": 1490,
+            "calibrated": 135,
+            "calibration_rejected": 37
+          },
+          {
+            "prime": 23,
+            "tested": 3420,
+            "rejected": 1570,
+            "calibrated": 135,
+            "calibration_rejected": 65
+          },
+          {
+            "prime": 31,
+            "tested": 1850,
+            "rejected": 964,
+            "calibrated": 135,
+            "calibration_rejected": 68
+          },
+          {
+            "prime": 37,
+            "tested": 886,
+            "rejected": 452,
+            "calibrated": 135,
+            "calibration_rejected": 68
+          },
+          {
+            "prime": 41,
+            "tested": 434,
+            "rejected": 203,
+            "calibrated": 135,
+            "calibration_rejected": 61
+          },
+          {
+            "prime": 43,
+            "tested": 231,
+            "rejected": 113,
+            "calibrated": 135,
+            "calibration_rejected": 61
+          },
+          {
+            "prime": 47,
+            "tested": 118,
+            "rejected": 54,
+            "calibrated": 135,
+            "calibration_rejected": 59
+          },
+          {
+            "prime": 53,
+            "tested": 64,
+            "rejected": 31,
+            "calibrated": 135,
+            "calibration_rejected": 71
+          },
+          {
+            "prime": 59,
+            "tested": 33,
+            "rejected": 16,
+            "calibrated": 135,
+            "calibration_rejected": 72
+          },
+          {
+            "prime": 61,
+            "tested": 17,
+            "rejected": 9,
+            "calibrated": 135,
+            "calibration_rejected": 64
+          }
+        ],
+        "symmetry_rejected": 136792,
+        "direct_curves": 56083,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 241813,
+        "outside_shell": 1946923,
+        "norm_evaluations": 167,
+        "recurrence_steps": 105013,
+        "cpu_seconds": 0.026086,
+        "wall_seconds": 0.026642
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "repeat": 0,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 29240658001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 283122,
+        "curves": 64491,
+        "quotient_points": 264131679,
+        "exact_tests": 615,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 45600,
+        "unsupported_D": 0,
+        "noninvertible_C": 26709,
+        "covered": 0,
+        "rejected_mod243": 251088255,
+        "rejected_parity": 4331023,
+        "reorders": 0,
+        "calibration_samples": 8511,
+        "wall_seconds": 0.228468,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 8712401,
+            "rejected": 2787958,
+            "calibrated": 8511,
+            "calibration_rejected": 2717
+          },
+          {
+            "prime": 7,
+            "tested": 5924443,
+            "rejected": 3808759,
+            "calibrated": 8511,
+            "calibration_rejected": 5511
+          },
+          {
+            "prime": 11,
+            "tested": 2115684,
+            "rejected": 873618,
+            "calibrated": 8511,
+            "calibration_rejected": 3558
+          },
+          {
+            "prime": 13,
+            "tested": 1242066,
+            "rejected": 617087,
+            "calibrated": 8511,
+            "calibration_rejected": 4247
+          },
+          {
+            "prime": 17,
+            "tested": 624979,
+            "rejected": 276901,
+            "calibrated": 8511,
+            "calibration_rejected": 3732
+          },
+          {
+            "prime": 19,
+            "tested": 348078,
+            "rejected": 104128,
+            "calibrated": 8511,
+            "calibration_rejected": 2555
+          },
+          {
+            "prime": 23,
+            "tested": 243950,
+            "rejected": 111889,
+            "calibrated": 8511,
+            "calibration_rejected": 3929
+          },
+          {
+            "prime": 31,
+            "tested": 132061,
+            "rejected": 69712,
+            "calibrated": 8511,
+            "calibration_rejected": 4444
+          },
+          {
+            "prime": 37,
+            "tested": 62349,
+            "rejected": 32080,
+            "calibrated": 8511,
+            "calibration_rejected": 4419
+          },
+          {
+            "prime": 41,
+            "tested": 30269,
+            "rejected": 14255,
+            "calibrated": 8511,
+            "calibration_rejected": 3972
+          },
+          {
+            "prime": 43,
+            "tested": 16014,
+            "rejected": 8169,
+            "calibrated": 8511,
+            "calibration_rejected": 4320
+          },
+          {
+            "prime": 47,
+            "tested": 7845,
+            "rejected": 3691,
+            "calibrated": 8511,
+            "calibration_rejected": 4083
+          },
+          {
+            "prime": 53,
+            "tested": 4154,
+            "rejected": 1985,
+            "calibrated": 8511,
+            "calibration_rejected": 4164
+          },
+          {
+            "prime": 59,
+            "tested": 2169,
+            "rejected": 1059,
+            "calibrated": 8511,
+            "calibration_rejected": 4107
+          },
+          {
+            "prime": 61,
+            "tested": 1110,
+            "rejected": 495,
+            "calibrated": 8511,
+            "calibration_rejected": 3653
+          }
+        ],
+        "symmetry_rejected": 146322,
+        "direct_curves": 0,
+        "wheel_curves": 64491
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 55,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 283122,
+        "outside_shell": 1905614,
+        "norm_evaluations": 64,
+        "recurrence_steps": 2188672,
+        "cpu_seconds": 0.226475,
+        "wall_seconds": 0.228468
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "repeat": 0,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 29240658001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 283122,
+        "curves": 64491,
+        "quotient_points": 264131679,
+        "exact_tests": 615,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 45600,
+        "unsupported_D": 0,
+        "noninvertible_C": 26709,
+        "covered": 0,
+        "rejected_mod243": 251088255,
+        "rejected_parity": 4331023,
+        "reorders": 0,
+        "calibration_samples": 8511,
+        "wall_seconds": 0.22798,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 8712401,
+            "rejected": 2787958,
+            "calibrated": 8511,
+            "calibration_rejected": 2717
+          },
+          {
+            "prime": 7,
+            "tested": 5924443,
+            "rejected": 3808759,
+            "calibrated": 8511,
+            "calibration_rejected": 5511
+          },
+          {
+            "prime": 11,
+            "tested": 2115684,
+            "rejected": 873618,
+            "calibrated": 8511,
+            "calibration_rejected": 3558
+          },
+          {
+            "prime": 13,
+            "tested": 1242066,
+            "rejected": 617087,
+            "calibrated": 8511,
+            "calibration_rejected": 4247
+          },
+          {
+            "prime": 17,
+            "tested": 624979,
+            "rejected": 276901,
+            "calibrated": 8511,
+            "calibration_rejected": 3732
+          },
+          {
+            "prime": 19,
+            "tested": 348078,
+            "rejected": 104128,
+            "calibrated": 8511,
+            "calibration_rejected": 2555
+          },
+          {
+            "prime": 23,
+            "tested": 243950,
+            "rejected": 111889,
+            "calibrated": 8511,
+            "calibration_rejected": 3929
+          },
+          {
+            "prime": 31,
+            "tested": 132061,
+            "rejected": 69712,
+            "calibrated": 8511,
+            "calibration_rejected": 4444
+          },
+          {
+            "prime": 37,
+            "tested": 62349,
+            "rejected": 32080,
+            "calibrated": 8511,
+            "calibration_rejected": 4419
+          },
+          {
+            "prime": 41,
+            "tested": 30269,
+            "rejected": 14255,
+            "calibrated": 8511,
+            "calibration_rejected": 3972
+          },
+          {
+            "prime": 43,
+            "tested": 16014,
+            "rejected": 8169,
+            "calibrated": 8511,
+            "calibration_rejected": 4320
+          },
+          {
+            "prime": 47,
+            "tested": 7845,
+            "rejected": 3691,
+            "calibrated": 8511,
+            "calibration_rejected": 4083
+          },
+          {
+            "prime": 53,
+            "tested": 4154,
+            "rejected": 1985,
+            "calibrated": 8511,
+            "calibration_rejected": 4164
+          },
+          {
+            "prime": 59,
+            "tested": 2169,
+            "rejected": 1059,
+            "calibrated": 8511,
+            "calibration_rejected": 4107
+          },
+          {
+            "prime": 61,
+            "tested": 1110,
+            "rejected": 495,
+            "calibrated": 8511,
+            "calibration_rejected": 3653
+          }
+        ],
+        "symmetry_rejected": 146322,
+        "direct_curves": 0,
+        "wheel_curves": 64491
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 55,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 283122,
+        "outside_shell": 1905614,
+        "norm_evaluations": 155,
+        "recurrence_steps": 136792,
+        "cpu_seconds": 0.225639,
+        "wall_seconds": 0.22798
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "repeat": 1,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 29240658001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 251834,
+        "curves": 43971,
+        "quotient_points": 180087559,
+        "exact_tests": 408,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 34201,
+        "unsupported_D": 0,
+        "noninvertible_C": 24429,
+        "covered": 0,
+        "rejected_mod243": 171194358,
+        "rejected_parity": 3293895,
+        "reorders": 0,
+        "calibration_samples": 5521,
+        "wall_seconds": 0.150408,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 5599306,
+            "rejected": 1791836,
+            "calibrated": 5521,
+            "calibration_rejected": 1771
+          },
+          {
+            "prime": 7,
+            "tested": 3807470,
+            "rejected": 2447746,
+            "calibrated": 5521,
+            "calibration_rejected": 3535
+          },
+          {
+            "prime": 11,
+            "tested": 1359724,
+            "rejected": 561427,
+            "calibrated": 5521,
+            "calibration_rejected": 2294
+          },
+          {
+            "prime": 13,
+            "tested": 798297,
+            "rejected": 365145,
+            "calibrated": 5521,
+            "calibration_rejected": 2641
+          },
+          {
+            "prime": 17,
+            "tested": 433152,
+            "rejected": 191990,
+            "calibrated": 5521,
+            "calibration_rejected": 2397
+          },
+          {
+            "prime": 19,
+            "tested": 241162,
+            "rejected": 72107,
+            "calibrated": 5521,
+            "calibration_rejected": 1625
+          },
+          {
+            "prime": 23,
+            "tested": 169055,
+            "rejected": 77436,
+            "calibrated": 5521,
+            "calibration_rejected": 2508
+          },
+          {
+            "prime": 31,
+            "tested": 91619,
+            "rejected": 47900,
+            "calibrated": 5521,
+            "calibration_rejected": 2839
+          },
+          {
+            "prime": 37,
+            "tested": 43719,
+            "rejected": 21971,
+            "calibrated": 5521,
+            "calibration_rejected": 2807
+          },
+          {
+            "prime": 41,
+            "tested": 21748,
+            "rejected": 10411,
+            "calibrated": 5521,
+            "calibration_rejected": 2679
+          },
+          {
+            "prime": 43,
+            "tested": 11337,
+            "rejected": 5780,
+            "calibrated": 5521,
+            "calibration_rejected": 2867
+          },
+          {
+            "prime": 47,
+            "tested": 5557,
+            "rejected": 2628,
+            "calibrated": 5521,
+            "calibration_rejected": 2615
+          },
+          {
+            "prime": 53,
+            "tested": 2929,
+            "rejected": 1413,
+            "calibrated": 5521,
+            "calibration_rejected": 2694
+          },
+          {
+            "prime": 59,
+            "tested": 1516,
+            "rejected": 752,
+            "calibrated": 5521,
+            "calibration_rejected": 2641
+          },
+          {
+            "prime": 61,
+            "tested": 764,
+            "rejected": 356,
+            "calibrated": 5521,
+            "calibration_rejected": 2470
+          }
+        ],
+        "symmetry_rejected": 149233,
+        "direct_curves": 0,
+        "wheel_curves": 43971
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 251834,
+        "outside_shell": 1936902,
+        "norm_evaluations": 154,
+        "recurrence_steps": 102594,
+        "cpu_seconds": 0.14977,
+        "wall_seconds": 0.150408
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "repeat": 1,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 29240658001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 251834,
+        "curves": 43971,
+        "quotient_points": 180087559,
+        "exact_tests": 408,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 34201,
+        "unsupported_D": 0,
+        "noninvertible_C": 24429,
+        "covered": 0,
+        "rejected_mod243": 171194358,
+        "rejected_parity": 3293895,
+        "reorders": 0,
+        "calibration_samples": 5521,
+        "wall_seconds": 0.154016,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 5599306,
+            "rejected": 1791836,
+            "calibrated": 5521,
+            "calibration_rejected": 1771
+          },
+          {
+            "prime": 7,
+            "tested": 3807470,
+            "rejected": 2447746,
+            "calibrated": 5521,
+            "calibration_rejected": 3535
+          },
+          {
+            "prime": 11,
+            "tested": 1359724,
+            "rejected": 561427,
+            "calibrated": 5521,
+            "calibration_rejected": 2294
+          },
+          {
+            "prime": 13,
+            "tested": 798297,
+            "rejected": 365145,
+            "calibrated": 5521,
+            "calibration_rejected": 2641
+          },
+          {
+            "prime": 17,
+            "tested": 433152,
+            "rejected": 191990,
+            "calibrated": 5521,
+            "calibration_rejected": 2397
+          },
+          {
+            "prime": 19,
+            "tested": 241162,
+            "rejected": 72107,
+            "calibrated": 5521,
+            "calibration_rejected": 1625
+          },
+          {
+            "prime": 23,
+            "tested": 169055,
+            "rejected": 77436,
+            "calibrated": 5521,
+            "calibration_rejected": 2508
+          },
+          {
+            "prime": 31,
+            "tested": 91619,
+            "rejected": 47900,
+            "calibrated": 5521,
+            "calibration_rejected": 2839
+          },
+          {
+            "prime": 37,
+            "tested": 43719,
+            "rejected": 21971,
+            "calibrated": 5521,
+            "calibration_rejected": 2807
+          },
+          {
+            "prime": 41,
+            "tested": 21748,
+            "rejected": 10411,
+            "calibrated": 5521,
+            "calibration_rejected": 2679
+          },
+          {
+            "prime": 43,
+            "tested": 11337,
+            "rejected": 5780,
+            "calibrated": 5521,
+            "calibration_rejected": 2867
+          },
+          {
+            "prime": 47,
+            "tested": 5557,
+            "rejected": 2628,
+            "calibrated": 5521,
+            "calibration_rejected": 2615
+          },
+          {
+            "prime": 53,
+            "tested": 2929,
+            "rejected": 1413,
+            "calibrated": 5521,
+            "calibration_rejected": 2694
+          },
+          {
+            "prime": 59,
+            "tested": 1516,
+            "rejected": 752,
+            "calibrated": 5521,
+            "calibration_rejected": 2641
+          },
+          {
+            "prime": 61,
+            "tested": 764,
+            "rejected": 356,
+            "calibrated": 5521,
+            "calibration_rejected": 2470
+          }
+        ],
+        "symmetry_rejected": 149233,
+        "direct_curves": 0,
+        "wheel_curves": 43971
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 251834,
+        "outside_shell": 1936902,
+        "norm_evaluations": 64,
+        "recurrence_steps": 2188672,
+        "cpu_seconds": 0.153168,
+        "wall_seconds": 0.154016
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "repeat": 2,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 29240658001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 241813,
+        "curves": 56083,
+        "quotient_points": 229696188,
+        "exact_tests": 585,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 35006,
+        "unsupported_D": 0,
+        "noninvertible_C": 13932,
+        "covered": 0,
+        "rejected_mod243": 218353108,
+        "rejected_parity": 3370583,
+        "reorders": 0,
+        "calibration_samples": 7776,
+        "wall_seconds": 0.202646,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 7972497,
+            "rejected": 2551226,
+            "calibrated": 7776,
+            "calibration_rejected": 2483
+          },
+          {
+            "prime": 7,
+            "tested": 5421271,
+            "rejected": 3485471,
+            "calibrated": 7776,
+            "calibration_rejected": 4998
+          },
+          {
+            "prime": 11,
+            "tested": 1935800,
+            "rejected": 799784,
+            "calibrated": 7776,
+            "calibration_rejected": 3163
+          },
+          {
+            "prime": 13,
+            "tested": 1136016,
+            "rejected": 564558,
+            "calibrated": 7776,
+            "calibration_rejected": 3777
+          },
+          {
+            "prime": 17,
+            "tested": 571458,
+            "rejected": 253234,
+            "calibrated": 7776,
+            "calibration_rejected": 3461
+          },
+          {
+            "prime": 19,
+            "tested": 318224,
+            "rejected": 95183,
+            "calibrated": 7776,
+            "calibration_rejected": 2340
+          },
+          {
+            "prime": 23,
+            "tested": 223041,
+            "rejected": 101939,
+            "calibrated": 7776,
+            "calibration_rejected": 3555
+          },
+          {
+            "prime": 31,
+            "tested": 121102,
+            "rejected": 63690,
+            "calibrated": 7776,
+            "calibration_rejected": 4005
+          },
+          {
+            "prime": 37,
+            "tested": 57412,
+            "rejected": 29766,
+            "calibrated": 7776,
+            "calibration_rejected": 4035
+          },
+          {
+            "prime": 41,
+            "tested": 27646,
+            "rejected": 13073,
+            "calibrated": 7776,
+            "calibration_rejected": 3711
+          },
+          {
+            "prime": 43,
+            "tested": 14573,
+            "rejected": 7346,
+            "calibrated": 7776,
+            "calibration_rejected": 3946
+          },
+          {
+            "prime": 47,
+            "tested": 7227,
+            "rejected": 3403,
+            "calibrated": 7776,
+            "calibration_rejected": 3704
+          },
+          {
+            "prime": 53,
+            "tested": 3824,
+            "rejected": 1886,
+            "calibrated": 7776,
+            "calibration_rejected": 3776
+          },
+          {
+            "prime": 59,
+            "tested": 1938,
+            "rejected": 924,
+            "calibrated": 7776,
+            "calibration_rejected": 3794
+          },
+          {
+            "prime": 61,
+            "tested": 1014,
+            "rejected": 429,
+            "calibrated": 7776,
+            "calibration_rejected": 3458
+          }
+        ],
+        "symmetry_rejected": 136792,
+        "direct_curves": 0,
+        "wheel_curves": 56083
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 241813,
+        "outside_shell": 1946923,
+        "norm_evaluations": 167,
+        "recurrence_steps": 105013,
+        "cpu_seconds": 0.201404,
+        "wall_seconds": 0.202646
+      }
+    },
+    {
+      "ell": 5,
+      "radius": 85499,
+      "ratio": 4096,
+      "repeat": 2,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 5,
+        "radius": 85499,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 29240658001,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 19784872942,
+        "permutation_offset": 25428698670,
+        "candidates": 241813,
+        "curves": 56083,
+        "quotient_points": 229696188,
+        "exact_tests": 585,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 35006,
+        "unsupported_D": 0,
+        "noninvertible_C": 13932,
+        "covered": 0,
+        "rejected_mod243": 218353108,
+        "rejected_parity": 3370583,
+        "reorders": 0,
+        "calibration_samples": 7776,
+        "wall_seconds": 0.208812,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 7972497,
+            "rejected": 2551226,
+            "calibrated": 7776,
+            "calibration_rejected": 2483
+          },
+          {
+            "prime": 7,
+            "tested": 5421271,
+            "rejected": 3485471,
+            "calibrated": 7776,
+            "calibration_rejected": 4998
+          },
+          {
+            "prime": 11,
+            "tested": 1935800,
+            "rejected": 799784,
+            "calibrated": 7776,
+            "calibration_rejected": 3163
+          },
+          {
+            "prime": 13,
+            "tested": 1136016,
+            "rejected": 564558,
+            "calibrated": 7776,
+            "calibration_rejected": 3777
+          },
+          {
+            "prime": 17,
+            "tested": 571458,
+            "rejected": 253234,
+            "calibrated": 7776,
+            "calibration_rejected": 3461
+          },
+          {
+            "prime": 19,
+            "tested": 318224,
+            "rejected": 95183,
+            "calibrated": 7776,
+            "calibration_rejected": 2340
+          },
+          {
+            "prime": 23,
+            "tested": 223041,
+            "rejected": 101939,
+            "calibrated": 7776,
+            "calibration_rejected": 3555
+          },
+          {
+            "prime": 31,
+            "tested": 121102,
+            "rejected": 63690,
+            "calibrated": 7776,
+            "calibration_rejected": 4005
+          },
+          {
+            "prime": 37,
+            "tested": 57412,
+            "rejected": 29766,
+            "calibrated": 7776,
+            "calibration_rejected": 4035
+          },
+          {
+            "prime": 41,
+            "tested": 27646,
+            "rejected": 13073,
+            "calibrated": 7776,
+            "calibration_rejected": 3711
+          },
+          {
+            "prime": 43,
+            "tested": 14573,
+            "rejected": 7346,
+            "calibrated": 7776,
+            "calibration_rejected": 3946
+          },
+          {
+            "prime": 47,
+            "tested": 7227,
+            "rejected": 3403,
+            "calibrated": 7776,
+            "calibration_rejected": 3704
+          },
+          {
+            "prime": 53,
+            "tested": 3824,
+            "rejected": 1886,
+            "calibrated": 7776,
+            "calibration_rejected": 3776
+          },
+          {
+            "prime": 59,
+            "tested": 1938,
+            "rejected": 924,
+            "calibrated": 7776,
+            "calibration_rejected": 3794
+          },
+          {
+            "prime": 61,
+            "tested": 1014,
+            "rejected": 429,
+            "calibrated": 7776,
+            "calibration_rejected": 3458
+          }
+        ],
+        "symmetry_rejected": 136792,
+        "direct_curves": 0,
+        "wheel_curves": 56083
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 2188736,
+        "eligible_inputs": 241813,
+        "outside_shell": 1946923,
+        "norm_evaluations": 64,
+        "recurrence_steps": 2188672,
+        "cpu_seconds": 0.205269,
+        "wall_seconds": 0.208812
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "repeat": 0,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 85499514409,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96668,
+        "curves": 16194,
+        "quotient_points": 1030273,
+        "exact_tests": 0,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 14782,
+        "unsupported_D": 0,
+        "noninvertible_C": 13372,
+        "covered": 0,
+        "rejected_mod243": 979449,
+        "rejected_parity": 22996,
+        "reorders": 0,
+        "calibration_samples": 40,
+        "wall_seconds": 0.016433,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 27828,
+            "rejected": 8939,
+            "calibrated": 40,
+            "calibration_rejected": 8
+          },
+          {
+            "prime": 7,
+            "tested": 18889,
+            "rejected": 12018,
+            "calibrated": 40,
+            "calibration_rejected": 28
+          },
+          {
+            "prime": 11,
+            "tested": 6871,
+            "rejected": 2785,
+            "calibrated": 40,
+            "calibration_rejected": 15
+          },
+          {
+            "prime": 13,
+            "tested": 4086,
+            "rejected": 2111,
+            "calibrated": 40,
+            "calibration_rejected": 19
+          },
+          {
+            "prime": 17,
+            "tested": 1975,
+            "rejected": 901,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 19,
+            "tested": 1074,
+            "rejected": 318,
+            "calibrated": 40,
+            "calibration_rejected": 8
+          },
+          {
+            "prime": 23,
+            "tested": 756,
+            "rejected": 353,
+            "calibrated": 40,
+            "calibration_rejected": 21
+          },
+          {
+            "prime": 31,
+            "tested": 403,
+            "rejected": 200,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          },
+          {
+            "prime": 37,
+            "tested": 203,
+            "rejected": 87,
+            "calibrated": 40,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 41,
+            "tested": 116,
+            "rejected": 62,
+            "calibrated": 40,
+            "calibration_rejected": 17
+          },
+          {
+            "prime": 43,
+            "tested": 54,
+            "rejected": 30,
+            "calibrated": 40,
+            "calibration_rejected": 27
+          },
+          {
+            "prime": 47,
+            "tested": 24,
+            "rejected": 19,
+            "calibrated": 40,
+            "calibration_rejected": 23
+          },
+          {
+            "prime": 53,
+            "tested": 5,
+            "rejected": 5,
+            "calibrated": 40,
+            "calibration_rejected": 21
+          },
+          {
+            "prime": 59,
+            "tested": 0,
+            "rejected": 0,
+            "calibrated": 40,
+            "calibration_rejected": 13
+          },
+          {
+            "prime": 61,
+            "tested": 0,
+            "rejected": 0,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          }
+        ],
+        "symmetry_rejected": 52320,
+        "direct_curves": 16194,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 53,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96668,
+        "outside_shell": 651940,
+        "norm_evaluations": 64,
+        "recurrence_steps": 748544,
+        "cpu_seconds": 0.015597,
+        "wall_seconds": 0.016433
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "repeat": 0,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 85499514409,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96668,
+        "curves": 16194,
+        "quotient_points": 1030273,
+        "exact_tests": 0,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 14782,
+        "unsupported_D": 0,
+        "noninvertible_C": 13372,
+        "covered": 0,
+        "rejected_mod243": 979449,
+        "rejected_parity": 22996,
+        "reorders": 0,
+        "calibration_samples": 40,
+        "wall_seconds": 0.014706,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 27828,
+            "rejected": 8939,
+            "calibrated": 40,
+            "calibration_rejected": 8
+          },
+          {
+            "prime": 7,
+            "tested": 18889,
+            "rejected": 12018,
+            "calibrated": 40,
+            "calibration_rejected": 28
+          },
+          {
+            "prime": 11,
+            "tested": 6871,
+            "rejected": 2785,
+            "calibrated": 40,
+            "calibration_rejected": 15
+          },
+          {
+            "prime": 13,
+            "tested": 4086,
+            "rejected": 2111,
+            "calibrated": 40,
+            "calibration_rejected": 19
+          },
+          {
+            "prime": 17,
+            "tested": 1975,
+            "rejected": 901,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 19,
+            "tested": 1074,
+            "rejected": 318,
+            "calibrated": 40,
+            "calibration_rejected": 8
+          },
+          {
+            "prime": 23,
+            "tested": 756,
+            "rejected": 353,
+            "calibrated": 40,
+            "calibration_rejected": 21
+          },
+          {
+            "prime": 31,
+            "tested": 403,
+            "rejected": 200,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          },
+          {
+            "prime": 37,
+            "tested": 203,
+            "rejected": 87,
+            "calibrated": 40,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 41,
+            "tested": 116,
+            "rejected": 62,
+            "calibrated": 40,
+            "calibration_rejected": 17
+          },
+          {
+            "prime": 43,
+            "tested": 54,
+            "rejected": 30,
+            "calibrated": 40,
+            "calibration_rejected": 27
+          },
+          {
+            "prime": 47,
+            "tested": 24,
+            "rejected": 19,
+            "calibrated": 40,
+            "calibration_rejected": 23
+          },
+          {
+            "prime": 53,
+            "tested": 5,
+            "rejected": 5,
+            "calibrated": 40,
+            "calibration_rejected": 21
+          },
+          {
+            "prime": 59,
+            "tested": 0,
+            "rejected": 0,
+            "calibrated": 40,
+            "calibration_rejected": 13
+          },
+          {
+            "prime": 61,
+            "tested": 0,
+            "rejected": 0,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          }
+        ],
+        "symmetry_rejected": 52320,
+        "direct_curves": 16194,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 53,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96668,
+        "outside_shell": 651940,
+        "norm_evaluations": 216,
+        "recurrence_steps": 44337,
+        "cpu_seconds": 0.014197,
+        "wall_seconds": 0.014706
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "repeat": 1,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 85499514409,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96714,
+        "curves": 21899,
+        "quotient_points": 1393570,
+        "exact_tests": 1,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15681,
+        "unsupported_D": 0,
+        "noninvertible_C": 9460,
+        "covered": 0,
+        "rejected_mod243": 1324767,
+        "rejected_parity": 23273,
+        "reorders": 0,
+        "calibration_samples": 40,
+        "wall_seconds": 0.017624,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 45530,
+            "rejected": 14573,
+            "calibrated": 40,
+            "calibration_rejected": 14
+          },
+          {
+            "prime": 7,
+            "tested": 30957,
+            "rejected": 19891,
+            "calibrated": 40,
+            "calibration_rejected": 29
+          },
+          {
+            "prime": 11,
+            "tested": 11066,
+            "rejected": 4483,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          },
+          {
+            "prime": 13,
+            "tested": 6583,
+            "rejected": 3347,
+            "calibrated": 40,
+            "calibration_rejected": 23
+          },
+          {
+            "prime": 17,
+            "tested": 3236,
+            "rejected": 1425,
+            "calibrated": 40,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 19,
+            "tested": 1811,
+            "rejected": 544,
+            "calibrated": 40,
+            "calibration_rejected": 11
+          },
+          {
+            "prime": 23,
+            "tested": 1267,
+            "rejected": 578,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 31,
+            "tested": 689,
+            "rejected": 355,
+            "calibrated": 40,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 37,
+            "tested": 334,
+            "rejected": 156,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          },
+          {
+            "prime": 41,
+            "tested": 178,
+            "rejected": 81,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 43,
+            "tested": 97,
+            "rejected": 56,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 47,
+            "tested": 41,
+            "rejected": 20,
+            "calibrated": 40,
+            "calibration_rejected": 20
+          },
+          {
+            "prime": 53,
+            "tested": 21,
+            "rejected": 11,
+            "calibrated": 40,
+            "calibration_rejected": 19
+          },
+          {
+            "prime": 59,
+            "tested": 10,
+            "rejected": 8,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 61,
+            "tested": 2,
+            "rejected": 1,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          }
+        ],
+        "symmetry_rejected": 49674,
+        "direct_curves": 21899,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96714,
+        "outside_shell": 651894,
+        "norm_evaluations": 64,
+        "recurrence_steps": 748544,
+        "cpu_seconds": 0.017231,
+        "wall_seconds": 0.017624
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "repeat": 1,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 85499514409,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96714,
+        "curves": 21899,
+        "quotient_points": 1393570,
+        "exact_tests": 1,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15681,
+        "unsupported_D": 0,
+        "noninvertible_C": 9460,
+        "covered": 0,
+        "rejected_mod243": 1324767,
+        "rejected_parity": 23273,
+        "reorders": 0,
+        "calibration_samples": 40,
+        "wall_seconds": 0.016157,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 45530,
+            "rejected": 14573,
+            "calibrated": 40,
+            "calibration_rejected": 14
+          },
+          {
+            "prime": 7,
+            "tested": 30957,
+            "rejected": 19891,
+            "calibrated": 40,
+            "calibration_rejected": 29
+          },
+          {
+            "prime": 11,
+            "tested": 11066,
+            "rejected": 4483,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          },
+          {
+            "prime": 13,
+            "tested": 6583,
+            "rejected": 3347,
+            "calibrated": 40,
+            "calibration_rejected": 23
+          },
+          {
+            "prime": 17,
+            "tested": 3236,
+            "rejected": 1425,
+            "calibrated": 40,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 19,
+            "tested": 1811,
+            "rejected": 544,
+            "calibrated": 40,
+            "calibration_rejected": 11
+          },
+          {
+            "prime": 23,
+            "tested": 1267,
+            "rejected": 578,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 31,
+            "tested": 689,
+            "rejected": 355,
+            "calibrated": 40,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 37,
+            "tested": 334,
+            "rejected": 156,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          },
+          {
+            "prime": 41,
+            "tested": 178,
+            "rejected": 81,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 43,
+            "tested": 97,
+            "rejected": 56,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 47,
+            "tested": 41,
+            "rejected": 20,
+            "calibrated": 40,
+            "calibration_rejected": 20
+          },
+          {
+            "prime": 53,
+            "tested": 21,
+            "rejected": 11,
+            "calibrated": 40,
+            "calibration_rejected": 19
+          },
+          {
+            "prime": 59,
+            "tested": 10,
+            "rejected": 8,
+            "calibrated": 40,
+            "calibration_rejected": 18
+          },
+          {
+            "prime": 61,
+            "tested": 2,
+            "rejected": 1,
+            "calibrated": 40,
+            "calibration_rejected": 16
+          }
+        ],
+        "symmetry_rejected": 49674,
+        "direct_curves": 21899,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96714,
+        "outside_shell": 651894,
+        "norm_evaluations": 173,
+        "recurrence_steps": 47030,
+        "cpu_seconds": 0.015743,
+        "wall_seconds": 0.016157
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "repeat": 2,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 85499514409,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 93576,
+        "curves": 23383,
+        "quotient_points": 1488392,
+        "exact_tests": 4,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15600,
+        "unsupported_D": 0,
+        "noninvertible_C": 7809,
+        "covered": 0,
+        "rejected_mod243": 1414839,
+        "rejected_parity": 24558,
+        "reorders": 0,
+        "calibration_samples": 53,
+        "wall_seconds": 0.016644,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 48995,
+            "rejected": 15702,
+            "calibrated": 53,
+            "calibration_rejected": 15
+          },
+          {
+            "prime": 7,
+            "tested": 33293,
+            "rejected": 21370,
+            "calibrated": 53,
+            "calibration_rejected": 32
+          },
+          {
+            "prime": 11,
+            "tested": 11923,
+            "rejected": 5003,
+            "calibrated": 53,
+            "calibration_rejected": 22
+          },
+          {
+            "prime": 13,
+            "tested": 6920,
+            "rejected": 3344,
+            "calibrated": 53,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 17,
+            "tested": 3576,
+            "rejected": 1654,
+            "calibrated": 53,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 19,
+            "tested": 1922,
+            "rejected": 616,
+            "calibrated": 53,
+            "calibration_rejected": 12
+          },
+          {
+            "prime": 23,
+            "tested": 1306,
+            "rejected": 564,
+            "calibrated": 53,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 31,
+            "tested": 742,
+            "rejected": 367,
+            "calibrated": 53,
+            "calibration_rejected": 31
+          },
+          {
+            "prime": 37,
+            "tested": 375,
+            "rejected": 183,
+            "calibrated": 53,
+            "calibration_rejected": 28
+          },
+          {
+            "prime": 41,
+            "tested": 192,
+            "rejected": 92,
+            "calibrated": 53,
+            "calibration_rejected": 32
+          },
+          {
+            "prime": 43,
+            "tested": 100,
+            "rejected": 51,
+            "calibrated": 53,
+            "calibration_rejected": 22
+          },
+          {
+            "prime": 47,
+            "tested": 49,
+            "rejected": 29,
+            "calibrated": 53,
+            "calibration_rejected": 23
+          },
+          {
+            "prime": 53,
+            "tested": 20,
+            "rejected": 11,
+            "calibrated": 53,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 59,
+            "tested": 9,
+            "rejected": 4,
+            "calibrated": 53,
+            "calibration_rejected": 27
+          },
+          {
+            "prime": 61,
+            "tested": 5,
+            "rejected": 1,
+            "calibrated": 53,
+            "calibration_rejected": 21
+          }
+        ],
+        "symmetry_rejected": 46784,
+        "direct_curves": 23383,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 748608,
+        "eligible_inputs": 93576,
+        "outside_shell": 655032,
+        "norm_evaluations": 140,
+        "recurrence_steps": 46784,
+        "cpu_seconds": 0.016183,
+        "wall_seconds": 0.016644
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 64,
+      "repeat": 2,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 85499514409,
+        "ratio": 64,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 93576,
+        "curves": 23383,
+        "quotient_points": 1488392,
+        "exact_tests": 4,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15600,
+        "unsupported_D": 0,
+        "noninvertible_C": 7809,
+        "covered": 0,
+        "rejected_mod243": 1414839,
+        "rejected_parity": 24558,
+        "reorders": 0,
+        "calibration_samples": 53,
+        "wall_seconds": 0.01816,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 48995,
+            "rejected": 15702,
+            "calibrated": 53,
+            "calibration_rejected": 15
+          },
+          {
+            "prime": 7,
+            "tested": 33293,
+            "rejected": 21370,
+            "calibrated": 53,
+            "calibration_rejected": 32
+          },
+          {
+            "prime": 11,
+            "tested": 11923,
+            "rejected": 5003,
+            "calibrated": 53,
+            "calibration_rejected": 22
+          },
+          {
+            "prime": 13,
+            "tested": 6920,
+            "rejected": 3344,
+            "calibrated": 53,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 17,
+            "tested": 3576,
+            "rejected": 1654,
+            "calibrated": 53,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 19,
+            "tested": 1922,
+            "rejected": 616,
+            "calibrated": 53,
+            "calibration_rejected": 12
+          },
+          {
+            "prime": 23,
+            "tested": 1306,
+            "rejected": 564,
+            "calibrated": 53,
+            "calibration_rejected": 25
+          },
+          {
+            "prime": 31,
+            "tested": 742,
+            "rejected": 367,
+            "calibrated": 53,
+            "calibration_rejected": 31
+          },
+          {
+            "prime": 37,
+            "tested": 375,
+            "rejected": 183,
+            "calibrated": 53,
+            "calibration_rejected": 28
+          },
+          {
+            "prime": 41,
+            "tested": 192,
+            "rejected": 92,
+            "calibrated": 53,
+            "calibration_rejected": 32
+          },
+          {
+            "prime": 43,
+            "tested": 100,
+            "rejected": 51,
+            "calibrated": 53,
+            "calibration_rejected": 22
+          },
+          {
+            "prime": 47,
+            "tested": 49,
+            "rejected": 29,
+            "calibrated": 53,
+            "calibration_rejected": 23
+          },
+          {
+            "prime": 53,
+            "tested": 20,
+            "rejected": 11,
+            "calibrated": 53,
+            "calibration_rejected": 24
+          },
+          {
+            "prime": 59,
+            "tested": 9,
+            "rejected": 4,
+            "calibrated": 53,
+            "calibration_rejected": 27
+          },
+          {
+            "prime": 61,
+            "tested": 5,
+            "rejected": 1,
+            "calibrated": 53,
+            "calibration_rejected": 21
+          }
+        ],
+        "symmetry_rejected": 46784,
+        "direct_curves": 23383,
+        "wheel_curves": 0
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 748608,
+        "eligible_inputs": 93576,
+        "outside_shell": 655032,
+        "norm_evaluations": 64,
+        "recurrence_steps": 748544,
+        "cpu_seconds": 0.017653,
+        "wall_seconds": 0.01816
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "repeat": 0,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 85499514409,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96668,
+        "curves": 16194,
+        "quotient_points": 66324481,
+        "exact_tests": 138,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 14782,
+        "unsupported_D": 0,
+        "noninvertible_C": 13372,
+        "covered": 0,
+        "rejected_mod243": 63049226,
+        "rejected_parity": 1478208,
+        "reorders": 0,
+        "calibration_samples": 1777,
+        "wall_seconds": 0.056641,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 1797047,
+            "rejected": 575010,
+            "calibrated": 1777,
+            "calibration_rejected": 539
+          },
+          {
+            "prime": 7,
+            "tested": 1222037,
+            "rejected": 785476,
+            "calibrated": 1777,
+            "calibration_rejected": 1107
+          },
+          {
+            "prime": 11,
+            "tested": 436561,
+            "rejected": 180040,
+            "calibrated": 1777,
+            "calibration_rejected": 711
+          },
+          {
+            "prime": 13,
+            "tested": 256521,
+            "rejected": 131446,
+            "calibrated": 1777,
+            "calibration_rejected": 923
+          },
+          {
+            "prime": 17,
+            "tested": 125075,
+            "rejected": 55517,
+            "calibrated": 1777,
+            "calibration_rejected": 765
+          },
+          {
+            "prime": 19,
+            "tested": 69558,
+            "rejected": 21032,
+            "calibrated": 1777,
+            "calibration_rejected": 544
+          },
+          {
+            "prime": 23,
+            "tested": 48526,
+            "rejected": 22191,
+            "calibrated": 1777,
+            "calibration_rejected": 820
+          },
+          {
+            "prime": 31,
+            "tested": 26335,
+            "rejected": 13942,
+            "calibrated": 1777,
+            "calibration_rejected": 899
+          },
+          {
+            "prime": 37,
+            "tested": 12393,
+            "rejected": 6284,
+            "calibrated": 1777,
+            "calibration_rejected": 903
+          },
+          {
+            "prime": 41,
+            "tested": 6109,
+            "rejected": 2890,
+            "calibrated": 1777,
+            "calibration_rejected": 821
+          },
+          {
+            "prime": 43,
+            "tested": 3219,
+            "rejected": 1652,
+            "calibrated": 1777,
+            "calibration_rejected": 885
+          },
+          {
+            "prime": 47,
+            "tested": 1567,
+            "rejected": 732,
+            "calibrated": 1777,
+            "calibration_rejected": 896
+          },
+          {
+            "prime": 53,
+            "tested": 835,
+            "rejected": 397,
+            "calibrated": 1777,
+            "calibration_rejected": 857
+          },
+          {
+            "prime": 59,
+            "tested": 438,
+            "rejected": 223,
+            "calibrated": 1777,
+            "calibration_rejected": 859
+          },
+          {
+            "prime": 61,
+            "tested": 215,
+            "rejected": 77,
+            "calibrated": 1777,
+            "calibration_rejected": 750
+          }
+        ],
+        "symmetry_rejected": 52320,
+        "direct_curves": 0,
+        "wheel_curves": 16194
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 53,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96668,
+        "outside_shell": 651940,
+        "norm_evaluations": 64,
+        "recurrence_steps": 748544,
+        "cpu_seconds": 0.056031,
+        "wall_seconds": 0.056641
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "repeat": 0,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 0,
+        "count": 64,
+        "end": 64,
+        "total": 85499514409,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96668,
+        "curves": 16194,
+        "quotient_points": 66324481,
+        "exact_tests": 138,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 14782,
+        "unsupported_D": 0,
+        "noninvertible_C": 13372,
+        "covered": 0,
+        "rejected_mod243": 63049226,
+        "rejected_parity": 1478208,
+        "reorders": 0,
+        "calibration_samples": 1777,
+        "wall_seconds": 0.055943,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 1797047,
+            "rejected": 575010,
+            "calibrated": 1777,
+            "calibration_rejected": 539
+          },
+          {
+            "prime": 7,
+            "tested": 1222037,
+            "rejected": 785476,
+            "calibrated": 1777,
+            "calibration_rejected": 1107
+          },
+          {
+            "prime": 11,
+            "tested": 436561,
+            "rejected": 180040,
+            "calibrated": 1777,
+            "calibration_rejected": 711
+          },
+          {
+            "prime": 13,
+            "tested": 256521,
+            "rejected": 131446,
+            "calibrated": 1777,
+            "calibration_rejected": 923
+          },
+          {
+            "prime": 17,
+            "tested": 125075,
+            "rejected": 55517,
+            "calibrated": 1777,
+            "calibration_rejected": 765
+          },
+          {
+            "prime": 19,
+            "tested": 69558,
+            "rejected": 21032,
+            "calibrated": 1777,
+            "calibration_rejected": 544
+          },
+          {
+            "prime": 23,
+            "tested": 48526,
+            "rejected": 22191,
+            "calibrated": 1777,
+            "calibration_rejected": 820
+          },
+          {
+            "prime": 31,
+            "tested": 26335,
+            "rejected": 13942,
+            "calibrated": 1777,
+            "calibration_rejected": 899
+          },
+          {
+            "prime": 37,
+            "tested": 12393,
+            "rejected": 6284,
+            "calibrated": 1777,
+            "calibration_rejected": 903
+          },
+          {
+            "prime": 41,
+            "tested": 6109,
+            "rejected": 2890,
+            "calibrated": 1777,
+            "calibration_rejected": 821
+          },
+          {
+            "prime": 43,
+            "tested": 3219,
+            "rejected": 1652,
+            "calibrated": 1777,
+            "calibration_rejected": 885
+          },
+          {
+            "prime": 47,
+            "tested": 1567,
+            "rejected": 732,
+            "calibrated": 1777,
+            "calibration_rejected": 896
+          },
+          {
+            "prime": 53,
+            "tested": 835,
+            "rejected": 397,
+            "calibrated": 1777,
+            "calibration_rejected": 857
+          },
+          {
+            "prime": 59,
+            "tested": 438,
+            "rejected": 223,
+            "calibrated": 1777,
+            "calibration_rejected": 859
+          },
+          {
+            "prime": 61,
+            "tested": 215,
+            "rejected": 77,
+            "calibrated": 1777,
+            "calibration_rejected": 750
+          }
+        ],
+        "symmetry_rejected": 52320,
+        "direct_curves": 0,
+        "wheel_curves": 16194
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 0,
+        "row_end": 64,
+        "rows": 64,
+        "empty_rows": 53,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96668,
+        "outside_shell": 651940,
+        "norm_evaluations": 216,
+        "recurrence_steps": 44337,
+        "cpu_seconds": 0.055324,
+        "wall_seconds": 0.055943
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "repeat": 1,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 85499514409,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96714,
+        "curves": 21899,
+        "quotient_points": 89690338,
+        "exact_tests": 192,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15681,
+        "unsupported_D": 0,
+        "noninvertible_C": 9460,
+        "covered": 0,
+        "rejected_mod243": 85261193,
+        "rejected_parity": 1496969,
+        "reorders": 0,
+        "calibration_samples": 2809,
+        "wall_seconds": 0.083807,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 2932176,
+            "rejected": 938310,
+            "calibrated": 2809,
+            "calibration_rejected": 908
+          },
+          {
+            "prime": 7,
+            "tested": 1993866,
+            "rejected": 1281823,
+            "calibrated": 2809,
+            "calibration_rejected": 1849
+          },
+          {
+            "prime": 11,
+            "tested": 712043,
+            "rejected": 292488,
+            "calibrated": 2809,
+            "calibration_rejected": 1184
+          },
+          {
+            "prime": 13,
+            "tested": 419555,
+            "rejected": 214199,
+            "calibrated": 2809,
+            "calibration_rejected": 1454
+          },
+          {
+            "prime": 17,
+            "tested": 205356,
+            "rejected": 91012,
+            "calibrated": 2809,
+            "calibration_rejected": 1256
+          },
+          {
+            "prime": 19,
+            "tested": 114344,
+            "rejected": 34118,
+            "calibrated": 2809,
+            "calibration_rejected": 841
+          },
+          {
+            "prime": 23,
+            "tested": 80226,
+            "rejected": 36630,
+            "calibrated": 2809,
+            "calibration_rejected": 1222
+          },
+          {
+            "prime": 31,
+            "tested": 43596,
+            "rejected": 23439,
+            "calibrated": 2809,
+            "calibration_rejected": 1541
+          },
+          {
+            "prime": 37,
+            "tested": 20157,
+            "rejected": 10365,
+            "calibrated": 2809,
+            "calibration_rejected": 1467
+          },
+          {
+            "prime": 41,
+            "tested": 9792,
+            "rejected": 4586,
+            "calibrated": 2809,
+            "calibration_rejected": 1338
+          },
+          {
+            "prime": 43,
+            "tested": 5206,
+            "rejected": 2707,
+            "calibrated": 2809,
+            "calibration_rejected": 1427
+          },
+          {
+            "prime": 47,
+            "tested": 2499,
+            "rejected": 1196,
+            "calibrated": 2809,
+            "calibration_rejected": 1330
+          },
+          {
+            "prime": 53,
+            "tested": 1303,
+            "rejected": 645,
+            "calibrated": 2809,
+            "calibration_rejected": 1344
+          },
+          {
+            "prime": 59,
+            "tested": 658,
+            "rejected": 324,
+            "calibrated": 2809,
+            "calibration_rejected": 1314
+          },
+          {
+            "prime": 61,
+            "tested": 334,
+            "rejected": 142,
+            "calibrated": 2809,
+            "calibration_rejected": 1196
+          }
+        ],
+        "symmetry_rejected": 49674,
+        "direct_curves": 0,
+        "wheel_curves": 21899
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96714,
+        "outside_shell": 651894,
+        "norm_evaluations": 64,
+        "recurrence_steps": 748544,
+        "cpu_seconds": 0.082262,
+        "wall_seconds": 0.083807
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "repeat": 1,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 1000,
+        "count": 64,
+        "end": 1064,
+        "total": 85499514409,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 96714,
+        "curves": 21899,
+        "quotient_points": 89690338,
+        "exact_tests": 192,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15681,
+        "unsupported_D": 0,
+        "noninvertible_C": 9460,
+        "covered": 0,
+        "rejected_mod243": 85261193,
+        "rejected_parity": 1496969,
+        "reorders": 0,
+        "calibration_samples": 2809,
+        "wall_seconds": 0.07889,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 2932176,
+            "rejected": 938310,
+            "calibrated": 2809,
+            "calibration_rejected": 908
+          },
+          {
+            "prime": 7,
+            "tested": 1993866,
+            "rejected": 1281823,
+            "calibrated": 2809,
+            "calibration_rejected": 1849
+          },
+          {
+            "prime": 11,
+            "tested": 712043,
+            "rejected": 292488,
+            "calibrated": 2809,
+            "calibration_rejected": 1184
+          },
+          {
+            "prime": 13,
+            "tested": 419555,
+            "rejected": 214199,
+            "calibrated": 2809,
+            "calibration_rejected": 1454
+          },
+          {
+            "prime": 17,
+            "tested": 205356,
+            "rejected": 91012,
+            "calibrated": 2809,
+            "calibration_rejected": 1256
+          },
+          {
+            "prime": 19,
+            "tested": 114344,
+            "rejected": 34118,
+            "calibrated": 2809,
+            "calibration_rejected": 841
+          },
+          {
+            "prime": 23,
+            "tested": 80226,
+            "rejected": 36630,
+            "calibrated": 2809,
+            "calibration_rejected": 1222
+          },
+          {
+            "prime": 31,
+            "tested": 43596,
+            "rejected": 23439,
+            "calibrated": 2809,
+            "calibration_rejected": 1541
+          },
+          {
+            "prime": 37,
+            "tested": 20157,
+            "rejected": 10365,
+            "calibrated": 2809,
+            "calibration_rejected": 1467
+          },
+          {
+            "prime": 41,
+            "tested": 9792,
+            "rejected": 4586,
+            "calibrated": 2809,
+            "calibration_rejected": 1338
+          },
+          {
+            "prime": 43,
+            "tested": 5206,
+            "rejected": 2707,
+            "calibrated": 2809,
+            "calibration_rejected": 1427
+          },
+          {
+            "prime": 47,
+            "tested": 2499,
+            "rejected": 1196,
+            "calibrated": 2809,
+            "calibration_rejected": 1330
+          },
+          {
+            "prime": 53,
+            "tested": 1303,
+            "rejected": 645,
+            "calibrated": 2809,
+            "calibration_rejected": 1344
+          },
+          {
+            "prime": 59,
+            "tested": 658,
+            "rejected": 324,
+            "calibrated": 2809,
+            "calibration_rejected": 1314
+          },
+          {
+            "prime": 61,
+            "tested": 334,
+            "rejected": 142,
+            "calibrated": 2809,
+            "calibration_rejected": 1196
+          }
+        ],
+        "symmetry_rejected": 49674,
+        "direct_curves": 0,
+        "wheel_curves": 21899
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 1000,
+        "row_end": 1064,
+        "rows": 64,
+        "empty_rows": 54,
+        "lattice_positions": 748608,
+        "eligible_inputs": 96714,
+        "outside_shell": 651894,
+        "norm_evaluations": 173,
+        "recurrence_steps": 47030,
+        "cpu_seconds": 0.078372,
+        "wall_seconds": 0.07889
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "repeat": 2,
+      "method": "direct",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 85499514409,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 93576,
+        "curves": 23383,
+        "quotient_points": 95768648,
+        "exact_tests": 243,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15600,
+        "unsupported_D": 0,
+        "noninvertible_C": 7809,
+        "covered": 0,
+        "rejected_mod243": 91039194,
+        "rejected_parity": 1576288,
+        "reorders": 0,
+        "calibration_samples": 3072,
+        "wall_seconds": 0.088746,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 3153166,
+            "rejected": 1009044,
+            "calibrated": 3072,
+            "calibration_rejected": 967
+          },
+          {
+            "prime": 7,
+            "tested": 2144122,
+            "rejected": 1378332,
+            "calibrated": 3072,
+            "calibration_rejected": 1978
+          },
+          {
+            "prime": 11,
+            "tested": 765790,
+            "rejected": 316652,
+            "calibrated": 3072,
+            "calibration_rejected": 1277
+          },
+          {
+            "prime": 13,
+            "tested": 449138,
+            "rejected": 217129,
+            "calibrated": 3072,
+            "calibration_rejected": 1472
+          },
+          {
+            "prime": 17,
+            "tested": 232009,
+            "rejected": 102767,
+            "calibrated": 3072,
+            "calibration_rejected": 1334
+          },
+          {
+            "prime": 19,
+            "tested": 129242,
+            "rejected": 38835,
+            "calibrated": 3072,
+            "calibration_rejected": 893
+          },
+          {
+            "prime": 23,
+            "tested": 90407,
+            "rejected": 41434,
+            "calibrated": 3072,
+            "calibration_rejected": 1394
+          },
+          {
+            "prime": 31,
+            "tested": 48973,
+            "rejected": 24964,
+            "calibrated": 3072,
+            "calibration_rejected": 1594
+          },
+          {
+            "prime": 37,
+            "tested": 24009,
+            "rejected": 12114,
+            "calibrated": 3072,
+            "calibration_rejected": 1604
+          },
+          {
+            "prime": 41,
+            "tested": 11895,
+            "rejected": 5581,
+            "calibrated": 3072,
+            "calibration_rejected": 1456
+          },
+          {
+            "prime": 43,
+            "tested": 6314,
+            "rejected": 3254,
+            "calibrated": 3072,
+            "calibration_rejected": 1591
+          },
+          {
+            "prime": 47,
+            "tested": 3060,
+            "rejected": 1479,
+            "calibrated": 3072,
+            "calibration_rejected": 1485
+          },
+          {
+            "prime": 53,
+            "tested": 1581,
+            "rejected": 750,
+            "calibrated": 3072,
+            "calibration_rejected": 1455
+          },
+          {
+            "prime": 59,
+            "tested": 831,
+            "rejected": 390,
+            "calibrated": 3072,
+            "calibration_rejected": 1503
+          },
+          {
+            "prime": 61,
+            "tested": 441,
+            "rejected": 198,
+            "calibrated": 3072,
+            "calibration_rejected": 1334
+          }
+        ],
+        "symmetry_rejected": 46784,
+        "direct_curves": 0,
+        "wheel_curves": 23383
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "direct",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 748608,
+        "eligible_inputs": 93576,
+        "outside_shell": 655032,
+        "norm_evaluations": 64,
+        "recurrence_steps": 748544,
+        "cpu_seconds": 0.088171,
+        "wall_seconds": 0.088746
+      }
+    },
+    {
+      "ell": 25,
+      "radius": 146201,
+      "ratio": 4096,
+      "repeat": 2,
+      "method": "inversion",
+      "checker": {
+        "type": "stats",
+        "version": 1,
+        "complete": true,
+        "mode": "experimental_shell",
+        "k": 114,
+        "ell": 25,
+        "radius": 146201,
+        "start": 2000,
+        "count": 64,
+        "end": 2064,
+        "total": 85499514409,
+        "ratio": 4096,
+        "min_ratio": 0,
+        "policy": "fixed",
+        "permutation_seed": 114,
+        "permutation_stride": 8254347440,
+        "permutation_offset": 30926805082,
+        "candidates": 93576,
+        "curves": 23383,
+        "quotient_points": 95768648,
+        "exact_tests": 243,
+        "hits": 0,
+        "zero_norm": 0,
+        "invalid_d": 15600,
+        "unsupported_D": 0,
+        "noninvertible_C": 7809,
+        "covered": 0,
+        "rejected_mod243": 91039194,
+        "rejected_parity": 1576288,
+        "reorders": 0,
+        "calibration_samples": 3072,
+        "wall_seconds": 0.087463,
+        "final_order": [
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61
+        ],
+        "filters": [
+          {
+            "prime": 5,
+            "tested": 3153166,
+            "rejected": 1009044,
+            "calibrated": 3072,
+            "calibration_rejected": 967
+          },
+          {
+            "prime": 7,
+            "tested": 2144122,
+            "rejected": 1378332,
+            "calibrated": 3072,
+            "calibration_rejected": 1978
+          },
+          {
+            "prime": 11,
+            "tested": 765790,
+            "rejected": 316652,
+            "calibrated": 3072,
+            "calibration_rejected": 1277
+          },
+          {
+            "prime": 13,
+            "tested": 449138,
+            "rejected": 217129,
+            "calibrated": 3072,
+            "calibration_rejected": 1472
+          },
+          {
+            "prime": 17,
+            "tested": 232009,
+            "rejected": 102767,
+            "calibrated": 3072,
+            "calibration_rejected": 1334
+          },
+          {
+            "prime": 19,
+            "tested": 129242,
+            "rejected": 38835,
+            "calibrated": 3072,
+            "calibration_rejected": 893
+          },
+          {
+            "prime": 23,
+            "tested": 90407,
+            "rejected": 41434,
+            "calibrated": 3072,
+            "calibration_rejected": 1394
+          },
+          {
+            "prime": 31,
+            "tested": 48973,
+            "rejected": 24964,
+            "calibrated": 3072,
+            "calibration_rejected": 1594
+          },
+          {
+            "prime": 37,
+            "tested": 24009,
+            "rejected": 12114,
+            "calibrated": 3072,
+            "calibration_rejected": 1604
+          },
+          {
+            "prime": 41,
+            "tested": 11895,
+            "rejected": 5581,
+            "calibrated": 3072,
+            "calibration_rejected": 1456
+          },
+          {
+            "prime": 43,
+            "tested": 6314,
+            "rejected": 3254,
+            "calibrated": 3072,
+            "calibration_rejected": 1591
+          },
+          {
+            "prime": 47,
+            "tested": 3060,
+            "rejected": 1479,
+            "calibrated": 3072,
+            "calibration_rejected": 1485
+          },
+          {
+            "prime": 53,
+            "tested": 1581,
+            "rejected": 750,
+            "calibrated": 3072,
+            "calibration_rejected": 1455
+          },
+          {
+            "prime": 59,
+            "tested": 831,
+            "rejected": 390,
+            "calibrated": 3072,
+            "calibration_rejected": 1503
+          },
+          {
+            "prime": 61,
+            "tested": 441,
+            "rejected": 198,
+            "calibrated": 3072,
+            "calibration_rejected": 1334
+          }
+        ],
+        "symmetry_rejected": 46784,
+        "direct_curves": 0,
+        "wheel_curves": 23383
+      },
+      "generator": {
+        "type": "shell_stats",
+        "complete": true,
+        "method": "inversion",
+        "D0": "185185185185185185",
+        "D1": "370370370370370370",
+        "row_start": 2000,
+        "row_end": 2064,
+        "rows": 64,
+        "empty_rows": 56,
+        "lattice_positions": 748608,
+        "eligible_inputs": 93576,
+        "outside_shell": 655032,
+        "norm_evaluations": 140,
+        "recurrence_steps": 46784,
+        "cpu_seconds": 0.086584,
+        "wall_seconds": 0.087463
+      }
+    }
+  ]
+}

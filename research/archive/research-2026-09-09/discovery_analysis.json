@@ -1,0 +1,538 @@
+{
+  "results_sha256": "2cf65dd373a4b8a1fd6523ec8a8bfda626bd68c1a53a0e447e041aa6a13cbf9c",
+  "analysis_kind": "Post-experiment audit; no new native work or tuning.",
+  "stages": {
+    "train": {
+      "balanced": {
+        "counters": {
+          "attempts": 54000000,
+          "outside_shell": 53385242,
+          "invalid": 327823,
+          "duplicates": 282100,
+          "unique_curves": 4835
+        },
+        "actual_cpu_seconds": 1.532138,
+        "cpu_min": 0.026578,
+        "cpu_median": 0.027748000000000002,
+        "cpu_max": 0.042185,
+        "attempt_cap_runs": 54,
+        "runs": 54,
+        "repeated_run_discoveries": 5,
+        "distinct_solutions": 3,
+        "prefix_equal_observed_cpu_seconds": 1.51986,
+        "prefix_repeated_run_discoveries": 5,
+        "prefix_distinct_solutions": 3,
+        "distinct_solutions_xyz": [
+          [
+            102,
+            [
+              -239,
+              118,
+              229
+            ]
+          ],
+          [
+            129,
+            [
+              -776,
+              193,
+              772
+            ]
+          ],
+          [
+            138,
+            [
+              -86,
+              -77,
+              103
+            ]
+          ]
+        ]
+      },
+      "complex_tube": {
+        "counters": {
+          "attempts": 52189120,
+          "outside_shell": 41060531,
+          "invalid": 5761866,
+          "duplicates": 5365465,
+          "unique_curves": 1258
+        },
+        "actual_cpu_seconds": 2.554331,
+        "cpu_min": 0.041271,
+        "cpu_median": 0.045878,
+        "cpu_max": 0.055018,
+        "attempt_cap_runs": 43,
+        "runs": 54,
+        "repeated_run_discoveries": 0,
+        "distinct_solutions": 0,
+        "prefix_equal_observed_cpu_seconds": 1.51986,
+        "prefix_repeated_run_discoveries": 0,
+        "prefix_distinct_solutions": 0,
+        "distinct_solutions_xyz": []
+      },
+      "cube": {
+        "counters": {
+          "attempts": 53993792,
+          "outside_shell": 51812578,
+          "invalid": 1118531,
+          "duplicates": 1060331,
+          "unique_curves": 2352
+        },
+        "actual_cpu_seconds": 1.580902,
+        "cpu_min": 0.026516,
+        "cpu_median": 0.0280015,
+        "cpu_max": 0.055005,
+        "attempt_cap_runs": 53,
+        "runs": 54,
+        "repeated_run_discoveries": 2,
+        "distinct_solutions": 1,
+        "prefix_equal_observed_cpu_seconds": 1.51986,
+        "prefix_repeated_run_discoveries": 2,
+        "prefix_distinct_solutions": 1,
+        "distinct_solutions_xyz": [
+          [
+            129,
+            [
+              -776,
+              193,
+              772
+            ]
+          ]
+        ]
+      },
+      "real_strip": {
+        "counters": {
+          "attempts": 52997248,
+          "outside_shell": 47508784,
+          "invalid": 2959556,
+          "duplicates": 2526892,
+          "unique_curves": 2016
+        },
+        "actual_cpu_seconds": 2.35723,
+        "cpu_min": 0.039487,
+        "cpu_median": 0.0418675,
+        "cpu_max": 0.055011,
+        "attempt_cap_runs": 50,
+        "runs": 54,
+        "repeated_run_discoveries": 6,
+        "distinct_solutions": 3,
+        "prefix_equal_observed_cpu_seconds": 1.51986,
+        "prefix_repeated_run_discoveries": 6,
+        "prefix_distinct_solutions": 3,
+        "distinct_solutions_xyz": [
+          [
+            102,
+            [
+              -239,
+              118,
+              229
+            ]
+          ],
+          [
+            129,
+            [
+              -776,
+              193,
+              772
+            ]
+          ],
+          [
+            138,
+            [
+              -86,
+              -77,
+              103
+            ]
+          ]
+        ]
+      }
+    },
+    "target_holdout": {
+      "best_fixed": {
+        "counters": {
+          "attempts": 38000000,
+          "outside_shell": 37765360,
+          "invalid": 128686,
+          "duplicates": 102347,
+          "unique_curves": 3607
+        },
+        "actual_cpu_seconds": 1.095526,
+        "cpu_min": 0.026776,
+        "cpu_median": 0.0286885,
+        "cpu_max": 0.036092,
+        "attempt_cap_runs": 38,
+        "runs": 38,
+        "repeated_run_discoveries": 10,
+        "distinct_solutions": 5,
+        "prefix_equal_observed_cpu_seconds": 1.095526,
+        "prefix_repeated_run_discoveries": 10,
+        "prefix_distinct_solutions": 5,
+        "distinct_solutions_xyz": [
+          [
+            6,
+            [
+              -60355,
+              10529,
+              60248
+            ]
+          ],
+          [
+            6,
+            [
+              -637,
+              -205,
+              644
+            ]
+          ],
+          [
+            6,
+            [
+              -58,
+              -43,
+              65
+            ]
+          ],
+          [
+            15,
+            [
+              -265,
+              -262,
+              332
+            ]
+          ],
+          [
+            69,
+            [
+              -403,
+              134,
+              398
+            ]
+          ]
+        ]
+      },
+      "learned_mixture": {
+        "counters": {
+          "attempts": 37667072,
+          "outside_shell": 34728816,
+          "invalid": 1535819,
+          "duplicates": 1398880,
+          "unique_curves": 3557
+        },
+        "actual_cpu_seconds": 1.699715,
+        "cpu_min": 0.041342,
+        "cpu_median": 0.043271000000000004,
+        "cpu_max": 0.055007,
+        "attempt_cap_runs": 36,
+        "runs": 38,
+        "repeated_run_discoveries": 10,
+        "distinct_solutions": 5,
+        "prefix_equal_observed_cpu_seconds": 1.095526,
+        "prefix_repeated_run_discoveries": 10,
+        "prefix_distinct_solutions": 5,
+        "distinct_solutions_xyz": [
+          [
+            6,
+            [
+              -60355,
+              10529,
+              60248
+            ]
+          ],
+          [
+            6,
+            [
+              -637,
+              -205,
+              644
+            ]
+          ],
+          [
+            6,
+            [
+              -58,
+              -43,
+              65
+            ]
+          ],
+          [
+            15,
+            [
+              -265,
+              -262,
+              332
+            ]
+          ],
+          [
+            69,
+            [
+              -403,
+              134,
+              398
+            ]
+          ]
+        ]
+      },
+      "uniform_mixture": {
+        "counters": {
+          "attempts": 37576128,
+          "outside_shell": 34144626,
+          "invalid": 1783674,
+          "duplicates": 1644305,
+          "unique_curves": 3523
+        },
+        "actual_cpu_seconds": 1.734359,
+        "cpu_min": 0.041726,
+        "cpu_median": 0.044479500000000005,
+        "cpu_max": 0.055016,
+        "attempt_cap_runs": 35,
+        "runs": 38,
+        "repeated_run_discoveries": 10,
+        "distinct_solutions": 5,
+        "prefix_equal_observed_cpu_seconds": 1.095526,
+        "prefix_repeated_run_discoveries": 10,
+        "prefix_distinct_solutions": 5,
+        "distinct_solutions_xyz": [
+          [
+            6,
+            [
+              -60355,
+              10529,
+              60248
+            ]
+          ],
+          [
+            6,
+            [
+              -637,
+              -205,
+              644
+            ]
+          ],
+          [
+            6,
+            [
+              -58,
+              -43,
+              65
+            ]
+          ],
+          [
+            15,
+            [
+              -265,
+              -262,
+              332
+            ]
+          ],
+          [
+            69,
+            [
+              -403,
+              134,
+              398
+            ]
+          ]
+        ]
+      }
+    },
+    "scale_holdout": {
+      "best_fixed": {
+        "counters": {
+          "attempts": 51064576,
+          "outside_shell": 49732011,
+          "invalid": 720555,
+          "duplicates": 80218,
+          "unique_curves": 531792
+        },
+        "actual_cpu_seconds": 1.874565,
+        "cpu_min": 0.02848,
+        "cpu_median": 0.031253,
+        "cpu_max": 0.055057,
+        "attempt_cap_runs": 48,
+        "runs": 54,
+        "repeated_run_discoveries": 1,
+        "distinct_solutions": 1,
+        "prefix_equal_observed_cpu_seconds": 1.8745,
+        "prefix_repeated_run_discoveries": 1,
+        "prefix_distinct_solutions": 1,
+        "distinct_solutions_xyz": [
+          [
+            12,
+            [
+              -9019406,
+              -5725013,
+              9730705
+            ]
+          ]
+        ]
+      },
+      "learned_mixture": {
+        "counters": {
+          "attempts": 37211904,
+          "outside_shell": 26648934,
+          "invalid": 5742517,
+          "duplicates": 3863406,
+          "unique_curves": 957047
+        },
+        "actual_cpu_seconds": 2.970338,
+        "cpu_min": 0.055,
+        "cpu_median": 0.055006,
+        "cpu_max": 0.055015,
+        "attempt_cap_runs": 0,
+        "runs": 54,
+        "repeated_run_discoveries": 2,
+        "distinct_solutions": 1,
+        "prefix_equal_observed_cpu_seconds": 1.8745,
+        "prefix_repeated_run_discoveries": 2,
+        "prefix_distinct_solutions": 1,
+        "distinct_solutions_xyz": [
+          [
+            159,
+            [
+              -55582,
+              35399,
+              50312
+            ]
+          ]
+        ]
+      },
+      "uniform_mixture": {
+        "counters": {
+          "attempts": 35671296,
+          "outside_shell": 24102685,
+          "invalid": 6286412,
+          "duplicates": 4339043,
+          "unique_curves": 943156
+        },
+        "actual_cpu_seconds": 2.970432,
+        "cpu_min": 0.055,
+        "cpu_median": 0.0550085,
+        "cpu_max": 0.055026,
+        "attempt_cap_runs": 0,
+        "runs": 54,
+        "repeated_run_discoveries": 2,
+        "distinct_solutions": 1,
+        "prefix_equal_observed_cpu_seconds": 1.8745,
+        "prefix_repeated_run_discoveries": 2,
+        "prefix_distinct_solutions": 1,
+        "distinct_solutions_xyz": [
+          [
+            159,
+            [
+              -55582,
+              35399,
+              50312
+            ]
+          ]
+        ]
+      }
+    },
+    "joint_holdout": {
+      "best_fixed": {
+        "counters": {
+          "attempts": 35557760,
+          "outside_shell": 34684006,
+          "invalid": 480253,
+          "duplicates": 39890,
+          "unique_curves": 353611
+        },
+        "actual_cpu_seconds": 1.303758,
+        "cpu_min": 0.028146,
+        "cpu_median": 0.030996000000000003,
+        "cpu_max": 0.055044,
+        "attempt_cap_runs": 34,
+        "runs": 38,
+        "repeated_run_discoveries": 0,
+        "distinct_solutions": 0,
+        "prefix_equal_observed_cpu_seconds": 1.303685,
+        "prefix_repeated_run_discoveries": 0,
+        "prefix_distinct_solutions": 0,
+        "distinct_solutions_xyz": []
+      },
+      "learned_mixture": {
+        "counters": {
+          "attempts": 26516224,
+          "outside_shell": 19097798,
+          "invalid": 4030514,
+          "duplicates": 2729248,
+          "unique_curves": 658664
+        },
+        "actual_cpu_seconds": 2.090282,
+        "cpu_min": 0.055,
+        "cpu_median": 0.055007,
+        "cpu_max": 0.055037,
+        "attempt_cap_runs": 0,
+        "runs": 38,
+        "repeated_run_discoveries": 2,
+        "distinct_solutions": 1,
+        "prefix_equal_observed_cpu_seconds": 1.303685,
+        "prefix_repeated_run_discoveries": 2,
+        "prefix_distinct_solutions": 1,
+        "distinct_solutions_xyz": [
+          [
+            69,
+            [
+              -1213102,
+              261692,
+              1209029
+            ]
+          ]
+        ]
+      },
+      "uniform_mixture": {
+        "counters": {
+          "attempts": 24917760,
+          "outside_shell": 16886827,
+          "invalid": 4364931,
+          "duplicates": 3009342,
+          "unique_curves": 656660
+        },
+        "actual_cpu_seconds": 2.090286,
+        "cpu_min": 0.055,
+        "cpu_median": 0.0550065,
+        "cpu_max": 0.055024,
+        "attempt_cap_runs": 0,
+        "runs": 38,
+        "repeated_run_discoveries": 2,
+        "distinct_solutions": 1,
+        "prefix_equal_observed_cpu_seconds": 1.303685,
+        "prefix_repeated_run_discoveries": 2,
+        "prefix_distinct_solutions": 1,
+        "distinct_solutions_xyz": [
+          [
+            69,
+            [
+              -1213102,
+              261692,
+              1209029
+            ]
+          ]
+        ]
+      }
+    }
+  },
+  "gate": {
+    "enable_discovery_learning": false,
+    "criterion": "At least 10 qualifying joint-heldout discoveries and >=1.10x uniform discovery/CPU in each seed.",
+    "repeated_discoveries": 2,
+    "distinct_target_solutions": 1,
+    "per_seed_rate_ratios": {
+      "914": 1.0000258345022648,
+      "915": 0.9999779939684337
+    },
+    "count_condition_passed": false,
+    "rate_condition_passed": false,
+    "interpretation": "Fails even under the lenient repeated-run count; seed recurrence is not independent discovery."
+  },
+  "total": {
+    "runs": 606,
+    "attempts": 537362880,
+    "curves": 4122078,
+    "attempt_cap_runs": 391,
+    "native_cpu_seconds": 25.853862,
+    "aggregate_extra_cpu_seconds": 28.815476999999998,
+    "elapsed_seconds": 31.494590582995443,
+    "frozen_files_unchanged": true,
+    "failures": 0
+  }
+}

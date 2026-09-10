@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "target_rule": "All cube-free k in3..240 with kmod9 in{3,6}, excluding114.",
+  "splits": {
+    "train": [
+      3,
+      12,
+      21,
+      33,
+      39,
+      42,
+      57,
+      60,
+      75,
+      78,
+      87,
+      102,
+      111,
+      123,
+      129,
+      132,
+      138,
+      150,
+      159,
+      183,
+      204,
+      210,
+      213,
+      222,
+      228,
+      231,
+      237
+    ],
+    "target_holdout": [
+      6,
+      15,
+      30,
+      51,
+      66,
+      69,
+      84,
+      93,
+      105,
+      141,
+      147,
+      156,
+      165,
+      174,
+      177,
+      186,
+      195,
+      201,
+      219
+    ]
+  },
+  "training_shell": [
+    1,
+    1000
+  ],
+  "larger_holdout_shell": [
+    1000,
+    1000000
+  ],
+  "radii": [
+    8,
+    32
+  ],
+  "ratio": 128,
+  "cpu_quota": 0.055,
+  "seeds": [
+    914,
+    915
+  ],
+  "primary_height": 10,
+  "hard_secondary_height": 1000,
+  "families": [
+    "cube",
+    "balanced",
+    "real_strip",
+    "complex_tube"
+  ],
+  "policy": "Learn only on training targets, small D shell; freeze before every holdout.",
+  "learned_mixture": "40% uniform proposal probability plus60% smoothed positive discovery-rate weights.",
+  "success_gate": "At least10 qualifying joint-heldout discoveries and>=1.10x uniform discovery/CPU in each seed; no114fertility claim regardless.",
+  "allocation": "One native child at a time; initial experiment capped below60aggregate extra CPU seconds.",
+  "source_sha256": "4e2e843fd45a0a98ee1dc7d9f1dea0ab636304942980441c73d25b57cb3de505",
+  "checker_sha256": "9125cd2ff10b42201162845b98a7aa702a8c5b4eea496f09cd6c2af4934767df"
+}

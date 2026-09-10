@@ -1,0 +1,79 @@
+{
+  "parser": {
+    "genuine_k3_positive": true,
+    "production114_rejects_fixtures": true,
+    "false_identity_rejected": true,
+    "malformed_values_rejected": true,
+    "torn_tail_safe": true
+  },
+  "persistence": {
+    "pair_validation": true,
+    "content_addressed": true,
+    "idempotent": true,
+    "discovery_only_replay": true
+  },
+  "recovery": {
+    "torn_journal_recovery": true,
+    "no_database_required": true,
+    "unrelated_corruption_does_not_hide_hit": true,
+    "unresolved_errors_block": true,
+    "atomic_rename_failure_recoverable": true,
+    "incomplete_coverage_preserved": true
+  },
+  "startup": {
+    "recovery_before_database_and_source_checks": true,
+    "no_dispatch_after_recovery": true,
+    "writer_lock_precedes_recovery": true
+  },
+  "processes": {
+    "actual_nonzero_worker_exit": true,
+    "actual_timeout": true,
+    "attempt_journals_unique_and_immutable": true,
+    "killed_controller_and_worker_after_fsync": true,
+    "durable_replay_without_database": true,
+    "fixture_scope": "Actual temporary processes emit genuine k3 identities. Routing parser target3 is injected only in this test; no114 discovery is claimed."
+  },
+  "cleanup": {
+    "committed_job_stays_complete": true,
+    "retained_journal": true,
+    "warning_reported": true,
+    "fixture_scope": "Injected synthetic no-hit statistics test bookkeeping only; no mathematical search was performed."
+  },
+  "migration": {
+    "passed": true,
+    "scope": "Read-only comparison before new dispatch; exact immutable historical records.",
+    "old_database": "./phase2/runs/campaign/campaign.sqlite3",
+    "new_database": "./phase3/runs/campaign/campaign.sqlite3",
+    "historical_complete_jobs": 89685,
+    "epoch_start": 89685,
+    "historical_jobs_sha256": "df492f4cd854dc1b856b65596b15351b2ff85e330ed0b965203a2c33f8f4e728",
+    "all_context_cursors_preserved": 81,
+    "totals_preserved": true,
+    "prior_metadata_archived": true,
+    "solution_records_preserved": true,
+    "timing_only_reset": true,
+    "recorded_new_sources_match_current": true
+  },
+  "passed": true,
+  "controller_sha256": "1ad8fdc86934e071e2921b0faa358ac43655dcbd9dc6d6715fc8f10e6218dd58",
+  "validator_sha256": "76826c858fa0d6926dfb5dbc582a3ea81da16a18e50ecd8d65728d2412c276be",
+  "elapsed_seconds": 2.334370917000342,
+  "limits": "Finite regressions, not formal verification or protection against all hardware/power-loss failures. Positive tests use genuinek3 identities, never a claimed114 solution.",
+  "sources": {
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "bin/offset_worker": "3a0503298ae55f678f3bfb3728f3869b1aa0cce8d6a15239d7950b930e57b819",
+    "build_worker.py": "14c2b2da6dad5949f0bd13e45e413713be0074f427a99687426d2fa903a180ab",
+    "campaign.py": "1ad8fdc86934e071e2921b0faa358ac43655dcbd9dc6d6715fc8f10e6218dd58",
+    "checker.c": "9125cd2ff10b42201162845b98a7aa702a8c5b4eea496f09cd6c2af4934767df",
+    "launch_campaign.py": "d6d2abf778bce34ea98d4476b7049faa39c82c94cf38bef3e3f4c84ddcac22ee",
+    "migrate_campaign.py": "7683e84c3969ee962c4751543714f23240adffcca850bd15626d3028e0c4968e",
+    "offset_worker.c": "43eba3c4a0c91df79ce50087749556700e2e027a552e49acf8f483c0167c713a",
+    "online_model.py": "7a867a3a5ef0b6721e616b02c46c139776f171cdb5276646b68005f8297b05ad",
+    "validate_controller.py": "e0d160e15434547595d0d10ea97800ac3bb61e9bd11fb4adfb958f52fab8ad6e",
+    "validate_discovery.py": "76826c858fa0d6926dfb5dbc582a3ea81da16a18e50ecd8d65728d2412c276be",
+    "validate_known_hits.py": "9d0d2d7eb153cbcc3ce75b84587ba2459300abb21a7b04485cd296964dfb7a2c",
+    "validate_online_model.py": "e4d4dacfbee4b4caa837babacabb4d49686bbeec4565d099ab9121813116fa48",
+    "validate_optimization.py": "f653f274c9da3ac531b276365785e611273ceede78c0e493d6f41ea369f3dd93",
+    "verify_domain.py": "731144d387529c933d0096a52843f659c6dc3638e686782e731e7c965224d147"
+  }
+}

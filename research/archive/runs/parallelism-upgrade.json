@@ -1,0 +1,56 @@
+{
+  "reason": "User requested more compute and smart parallelism",
+  "old_worker_cap": 8,
+  "new_worker_cap": 32,
+  "machine_logical_cpus": 15,
+  "previous_workers": 4,
+  "selected_workers": 12,
+  "measured_speedup_over_four": 2.4903790199819618,
+  "old_sources": {
+    "bin/campaign_worker": "a41963799ebb83d9d94de4e5fc119791cc8f91d192299f35e4fee03eece66e76",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "bin/plane_worker": "d91341e30b0cbfabb5f8f37e4cc75e45cf466c153fa144c95ee882c563b49fde",
+    "campaign.py": "6ae1bb0cf6df4d4c9989b57951e3fd036ea5426696e138cf70a160811eebd10c",
+    "campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "plane_worker.c": "ccc0ed4746dab6dbb699bfca1de1d2047fd6eac10e6aa337c325906513a38914"
+  },
+  "new_sources": {
+    "bin/campaign_worker": "a41963799ebb83d9d94de4e5fc119791cc8f91d192299f35e4fee03eece66e76",
+    "bin/libpari.dylib": "3d6029abd9b90ab43708c39b09150e3a0197c02496c925bfeca24db5f57cc3cd",
+    "bin/plane_worker": "d91341e30b0cbfabb5f8f37e4cc75e45cf466c153fa144c95ee882c563b49fde",
+    "campaign.py": "6962b53ed50d105f4494cbcc46fbff34b5f4b041828177678389e836a69c63a9",
+    "campaign_worker.c": "ac760d7870daef12e2ad334598f075e19fb9fbef8ed670bc4bbb1fd283570c34",
+    "plane_worker.c": "ccc0ed4746dab6dbb699bfca1de1d2047fd6eac10e6aa337c325906513a38914"
+  },
+  "audit_before": {
+    "database_integrity": "ok",
+    "reserved_tiles_disjoint_and_gapless": true,
+    "complete_tiles": 7026,
+    "unfinished_tiles": 0
+  },
+  "mathematical_sources_and_geometry_unchanged": true,
+  "original_deadline": 1788899769.479903,
+  "old_process": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "./campaign.py",
+      "run",
+      "--directory",
+      "./runs/campaign",
+      "--hours",
+      "2.0",
+      "--workers",
+      "4"
+    ],
+    "launched_utc": "2026-09-08T18:36:10Z",
+    "directory": "./runs/campaign",
+    "log": "./runs/campaign/process.log",
+    "note": "Prevents idle sleep only; lid closure, shutdown or process termination can interrupt the session."
+  },
+  "audit_after": {
+    "database_integrity": "ok",
+    "reserved_tiles_disjoint_and_gapless": true,
+    "complete_tiles": 7026,
+    "unfinished_tiles": 0
+  }
+}

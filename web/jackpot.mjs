@@ -59,7 +59,7 @@ export function createJackpot({ root = document, target = 114, onSave = () => {}
       // original task envelope or browser storage failed. No coverage is claimed.
       bank.href = local
         ? `https://github.com/Kuberwastaken/math-gambling/issues/new?title=${encodeURIComponent("[bank] Exact identity for " + target)}&body=${encodeURIComponent(JSON.stringify({schema: "math-gambling-identity-v1", contributor: evidence.contributor || {name: "Anonymous", github: ""}, hits: [{xyz: [...xyz]}]}))}`
-        : "https://github.com/Kuberwastaken/math-gambling/tree/main/data/receipts/hits";
+        : "https://github.com/Kuberwastaken/math-gambling/tree/cluster-data/data/receipts/hits";
       if (animate && !celebrated.has(key)) {
         celebrated.add(key);
         panel.focus({ preventScroll: true });

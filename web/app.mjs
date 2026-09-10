@@ -503,7 +503,7 @@ function renderAllocation() {
       b.setAttribute("aria-pressed", "true");
       text(
         "context-detail",
-        `${context.id}: ℓ=${context.ell}, shape ${context.shape + 1}, shell ${context.shell + 1}, |z|/D ∈ (${context.low}, ${context.high}]. Allocation ${(100 * entry.weight).toFixed(2)}%. ${entry.sample_size || 0} replay observations; ${entry.robust_cpu_ms == null ? "no stable cost estimate" : Number(entry.robust_cpu_ms).toFixed(2) + " ms robust replay cost"}.`,
+        `${context.id}: ℓ=${context.ell}, shape ${context.shape + 1}, shell ${context.shell + 1}, |z|/D ∈ (${context.low}, ${context.high}]. Allocation ${(100 * entry.weight).toFixed(2)}%. ${entry.sample_size || 0} replay observations; ${entry.robust_cpu_ms == null ? "no stable cost estimate" : Number(entry.robust_cpu_ms).toFixed(2) + " ms median replay cost (descriptive)"}.`,
       );
     });
     grid.append(b);
@@ -533,6 +533,7 @@ async function loadStrategy() {
     )
       throw Error("Invalid policy");
     strategy = s;
+    text("policy-method-note", s.reason + " Allocation is a search preference, not a discovery probability.");
     showRun("policy", strategy);
     renderAllocation();
     if (clusterData)

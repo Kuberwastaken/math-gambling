@@ -63,6 +63,6 @@ export async function loadChallenger(fetchJSON) {
     }
     select.onchange=draw;range.oninput=draw;draw();
   } catch {
-    status.textContent='Challenger report unavailable. The production cost scheduler remains active.';
+    status.textContent='Challenger report unavailable. The production scheduler remains active.';
   }
 }

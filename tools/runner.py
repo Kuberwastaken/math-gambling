@@ -525,7 +525,7 @@ def run_campaign(args, out, db, contributor):
         return 2
     print(f'Coverage: {snapshot["revision"]:,} published tasks, {snapshot["updated_at"]} ({snapshot["mode"]}). Concurrent or not-yet-published work can still overlap.', flush=True)
     weights, epoch = load_strategy(args.offline)
-    print(f'Cost-only scheduling policy epoch {epoch}; at least 40% uniform context exploration.', flush=True)
+    print(f'Scheduling policy epoch {epoch}; at least 40% uniform task proposals, not CPU shares.', flush=True)
     audit.policy(weights, epoch, snapshot)
     rng, resumed_seed = restore_rng(db, seed)
     audit.write('rng', resumed=resumed_seed, state=rng.getstate())

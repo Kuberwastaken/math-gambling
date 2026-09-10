@@ -103,7 +103,7 @@ export function renderModelEvolution(cluster, strategy) {
       const select = () =>
         text(
           "model-detail",
-          `${id} · epoch ${record.epoch} · ${(100 * weight).toFixed(3)}% of allocation · ${(weight * 81).toFixed(2)}× uniform. Allocation is a cost decision, not a discovery probability.`,
+          `${id} · epoch ${record.epoch} · ${(100 * weight).toFixed(3)}% of allocation · ${(weight * 81).toFixed(2)}× uniform. Allocation is a declared search preference, not a discovery probability.`,
         );
       bar.addEventListener("click", select);
       bar.addEventListener("keydown", (e) => {

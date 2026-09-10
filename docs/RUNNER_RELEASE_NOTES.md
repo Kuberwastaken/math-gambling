@@ -1,3 +1,13 @@
+# Math Gambling runner v0.4.0
+
+Exact norm-shell pruning skips provably excluded coefficient intervals using integer bounds and bisection. Logical counters, task definitions and old receipt digests are preserved. The runner keeps independent local seeds and reads the same public policy and exact completed-task index as the browser.
+
+The new production policy combines an explicit geometric preference with measured curve yield and CPU cost; it does not predict winning odds. Existing saved output folders and banks remain compatible. Stop an old runner before opening its output with the new version.
+
+Release gates execute the extracted archive on Linux, macOS and Windows. Python 3.11 or newer is required.
+
+## Previous release
+
 # Math Gambling runner v0.3.1
 
 This release addresses the 10 September audit. Existing task identities and receipt digests stay valid.

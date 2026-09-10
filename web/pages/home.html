@@ -372,10 +372,8 @@
     value="0"
     aria-label="Verified batches toward the next model epoch"
   ></progress>
-  <p class="table-note">
-    Median replay efficiency; at least three observations before changing a
-    lane’s score; scores limited to ¼–4× the baseline. We learn execution cost.
-    Our separate attempt to predict discoveries failed its acceptance test.
+  <p class="table-note" id="policy-method-note">
+    Loading the published policy method. Allocation is a search preference, not a discovery probability.
   </p>
   <p>
     <a href="{{BASE}}cluster/">Inspect every context and epoch ↗</a> ·
@@ -386,7 +384,7 @@
   <section id="challenger" class="challenger-study" aria-labelledby="challenger-heading">
     <div class="section-heading"><h3 id="challenger-heading">Can task geometry teach us more?</h3><span>Challenger · shadow only</span></div>
     <p id="challenger-status">Loading frozen model evaluations…</p>
-    <p>Every 1,024 verified tasks freezes a new spatial model. We test its predictions on the next window of receipts. It watches the search; the cost scheduler above still makes the decisions.</p>
+    <p>Every 1,024 verified tasks freezes a new spatial model. We test its predictions on the next window of receipts. It watches the search; the published scheduler above still makes the decisions.</p>
     <div class="challenger-controls">
       <label>Predicting <select id="challenger-metric" disabled><option value="cpu_ms">Server CPU cost</option><option value="quotient_points">Quotient positions</option><option value="curves">Curve intervals</option><option value="exact_tests">Exact square tests</option></select></label>
       <output id="challenger-selected" for="challenger-window">No evaluation selected</output>
@@ -400,7 +398,7 @@
     <figure class="challenger-pilot">
       <figcaption>A small performance pilot</figcaption>
       <div id="challenger-pilot-bars"></div>
-      <p>Quotient exposure per CPU, relative to the current scheduler. Four seeds; about 8.35 CPU-seconds across all four tested arms. Exploratory, not sufficient for promotion or a multiplier on discovery odds.</p>
+      <p>Quotient exposure per CPU, relative to the legacy scheduler tested in this pilot. Four seeds; about 8.35 CPU-seconds across all four tested arms. Exploratory, not sufficient for promotion or a multiplier on discovery odds.</p>
     </figure>
     <p><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md">Design, promotion gates and the exploratory performance pilot ↗</a> · <a href="{{BASE}}data/learning/visuals.json">Chart data ↗</a></p>
     <noscript><img src="{{BASE}}data/learning/evolution.svg" alt="Challenger prediction error across frozen evaluations" width="1200" height="730"></noscript>
@@ -424,7 +422,7 @@
     <div class="runner-links">
       <a
         class="button primary"
-        href="https://github.com/Kuberwastaken/math-gambling/releases/download/v0.3.1/math-gambling-runner-v0.3.1.zip"
+        href="https://github.com/Kuberwastaken/math-gambling/releases/download/v0.4.0/math-gambling-runner-v0.4.0.zip"
         download data-runner-download
         >Download the local runner ↓</a
       >

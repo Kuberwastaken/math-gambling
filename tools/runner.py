@@ -62,11 +62,14 @@ def initialize_worker():
 
 def atomic_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix+'.tmp')
-    with temporary.open('w', encoding='utf-8', newline='\n') as handle:
-        handle.write(canonical_json(data)+'\n')
-        handle.flush(); os.fsync(handle.fileno())
-    os.replace(temporary, path)
+    temporary = path.with_name(path.name+f'.{os.getpid()}.{secrets.token_hex(8)}.tmp')
+    try:
+        with temporary.open('x', encoding='utf-8', newline='\n') as handle:
+            handle.write(canonical_json(data)+'\n')
+            handle.flush(); os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
     if hasattr(os, 'O_DIRECTORY'):
         fd = os.open(path.parent, os.O_RDONLY | os.O_DIRECTORY)
         try: os.fsync(fd)
@@ -97,7 +100,9 @@ def open_state(out, contributor):
       CREATE TABLE IF NOT EXISTS tasks(id TEXT PRIMARY KEY,task TEXT NOT NULL,result TEXT,bank TEXT);
       CREATE TABLE IF NOT EXISTS banks(id TEXT PRIMARY KEY,path TEXT NOT NULL,submitted TEXT);
       CREATE TABLE IF NOT EXISTS coverage_skips(id TEXT PRIMARY KEY,revision INTEGER NOT NULL);
-      CREATE TABLE IF NOT EXISTS bank_priority(id TEXT PRIMARY KEY);''')
+      CREATE TABLE IF NOT EXISTS bank_priority(id TEXT PRIMARY KEY);
+      CREATE TABLE IF NOT EXISTS rng_states(seed TEXT PRIMARY KEY,algorithm TEXT NOT NULL,runtime TEXT NOT NULL,state TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS discoveries(id TEXT PRIMARY KEY,xyz TEXT NOT NULL,bank TEXT NOT NULL);''')
     identity = canonical_json(dict(engine=ENGINE, contributor=contributor))
     previous = db.execute("SELECT value FROM meta WHERE key='identity'").fetchone()
     if previous and previous[0] != identity:
@@ -141,8 +146,28 @@ def load_strategy(offline=False):
     return [1/81]*81, 0
 
 
-def choose_task(rng, weights, db, coverage=None):
-    for _ in range(100):
+def restore_rng(db, seed):
+    rng = random.Random(int(seed, 16))
+    previous = db.execute('SELECT algorithm,runtime,state FROM rng_states WHERE seed=?', (seed,)).fetchone()
+    if previous:
+        if previous[0] != RNG_ALGORITHM or previous[1] != sys.version.split()[0]:
+            raise RuntimeError('This seed checkpoint belongs to another PRNG/runtime; use its Python version or choose a new seed')
+        state = json.loads(previous[2])
+        rng.setstate((state[0], tuple(state[1]), state[2]))
+    return rng, previous is not None
+
+
+def save_rng(db, seed, rng):
+    db.execute('INSERT OR REPLACE INTO rng_states VALUES(?,?,?,?)',
+               (seed, RNG_ALGORITHM, sys.version.split()[0], canonical_json(rng.getstate())))
+
+
+def choose_task(rng, weights, db, coverage=None, seed=None):
+    # Older checkpoints have no saved PRNG state. Permit skipping their local
+    # prefix once; subsequent allocations checkpoint the cursor atomically.
+    legacy = seed is not None and db.execute('SELECT 1 FROM rng_states WHERE seed=?', (seed,)).fetchone() is None
+    attempts = 100 + (db.execute('SELECT count(*) FROM tasks').fetchone()[0] if legacy else 0)
+    for _ in range(attempts):
         c = rng.choices(CONTEXTS, weights=weights, k=1)[0]
         row = rng.randrange(int(c['rowTasks']))*c['rowStride']
         task = make_task(c['id'], row, rng.randrange(c['blocks']))
@@ -150,9 +175,14 @@ def choose_task(rng, weights, db, coverage=None):
         if coverage is not None and coverage.contains(task):
             continue
         if db.execute('SELECT 1 FROM tasks WHERE id=?', (tid,)).fetchone() is None:
-            db.execute('INSERT INTO tasks(id,task) VALUES(?,?)', (tid, canonical_json(task)))
-            db.commit()
+            with db:
+                db.execute('INSERT INTO tasks(id,task) VALUES(?,?)', (tid, canonical_json(task)))
+                if seed is not None:
+                    save_rng(db, seed, rng)
             return task
+    if seed is not None:
+        with db:
+            save_rng(db, seed, rng)
     raise RuntimeError('Could not allocate a fresh local task')
 
 
@@ -170,16 +200,74 @@ def preserve_result(out, db, result):
     db.commit()
 
 
+def preserve_identity(output, hit, task=None):
+    if not verify_triple(hit.get('xyz')):
+        raise ArithmeticError('independent discovery verification failed')
+    xyz = sorted(hit['xyz'], key=int)
+    digest = hashlib.sha256(canonical_json(xyz).encode()).hexdigest()
+    path = Path(output)/'discoveries'/f'identity-{digest}.json'
+    try:
+        atomic_json(path, {'schema': 'math-gambling-discovery-v1', 'engine': ENGINE,
+                           'task': task, 'hit': {**hit, 'xyz': xyz}})
+    except Exception as exc:
+        raise RuntimeError(f'EXACT IDENTITY {canonical_json(xyz)} could not be saved: {exc}') from exc
+    return path
+
+
 def execute_task(task, output):
-    result = run_task(task)
-    # A worker writes a hit before IPC; parent failure after discovery therefore
-    # cannot erase the only copy. This file is never interpreted as task credit.
-    for hit in result['hits']:
-        if not verify_triple(hit['xyz']):
-            raise ArithmeticError('worker cube verification failed')
-        digest = hashlib.sha256(canonical_json(hit['xyz']).encode()).hexdigest()
-        atomic_json(Path(output)/'discoveries'/f'worker-{digest}.json', {'engine': ENGINE, 'result': result, 'hit': hit})
-    return result
+    return run_task(task, on_hit=lambda hit: preserve_identity(output, hit, task))
+
+
+def recover_discoveries(out, db, contributor, *, scan_results=False):
+    """Independently recover identities without claiming their task completed."""
+    candidates, errors = [], []
+    for path in (out/'discoveries').glob('*.json'):
+        try:
+            with path.open('rb') as handle:
+                raw = handle.read(8*1024*1024+1)
+            if len(raw) > 8*1024*1024:
+                raise ValueError('discovery file exceeds recovery cap')
+            record = json.loads(raw)
+            if not isinstance(record, dict) or not isinstance(record.get('hit'), dict):
+                raise ValueError('malformed saved discovery')
+            candidates.append(record['hit'])
+        except (OSError, ValueError) as exc:
+            errors.append(f'{path}: {exc}')
+    if scan_results:
+        for text, in db.execute('SELECT result FROM tasks WHERE result IS NOT NULL AND result LIKE ?', ('%"hits":[{%',)):
+            try:
+                hits = json.loads(text)['hits']
+                if not isinstance(hits, list):
+                    raise ValueError('saved result hits must be a list')
+                candidates.extend(hits)
+            except (ValueError, KeyError, TypeError) as exc:
+                errors.append(f'Saved result: {exc}')
+    recovered = []
+    for hit in candidates:
+        if not isinstance(hit, dict) or not verify_triple(hit.get('xyz')):
+            errors.append('Saved discovery failed independent verification')
+            continue
+        xyz = sorted(hit['xyz'], key=int)
+        digest = hashlib.sha256(canonical_json(xyz).encode()).hexdigest()
+        if db.execute('SELECT 1 FROM discoveries WHERE id=?', (digest,)).fetchone():
+            continue
+        print('EXACT IDENTITY RECOVERED: '+canonical_json(xyz), flush=True)
+        # Keep the worker's original task/curve provenance when it already
+        # wrote the canonical identity file before recovery noticed it.
+        if not (out/'discoveries'/f'identity-{digest}.json').exists():
+            preserve_identity(out, hit)
+        bank = {'schema': 'math-gambling-identity-v1', 'contributor': contributor, 'hits': [{'xyz': xyz}]}
+        bid = hashlib.sha256(canonical_json(bank).encode()).hexdigest()
+        relative = f'banks/bank-{bid[:16]}.json'
+        atomic_json(out/relative, bank)
+        with db:
+            db.execute('INSERT OR IGNORE INTO banks(id,path) VALUES(?,?)', (bid, relative))
+            db.execute('INSERT OR IGNORE INTO bank_priority VALUES(?)', (bid,))
+            db.execute('INSERT INTO discoveries VALUES(?,?,?)', (digest, canonical_json(xyz), bid))
+        recovered.append(xyz)
+    if errors:
+        raise RuntimeError('Discovery recovery needs attention; scheduling is blocked. '+'; '.join(errors))
+    return recovered
 
 
 def write_bank(out, db, contributor, force=False, bank_every=BANK_LIMIT, priority_id=None):
@@ -207,7 +295,7 @@ def write_bank(out, db, contributor, force=False, bank_every=BANK_LIMIT, priorit
     path = out/'banks'/f'bank-{bid[:16]}.json'
     atomic_json(path, bank)
     with db:
-        db.execute('INSERT OR IGNORE INTO banks(id,path) VALUES(?,?)', (bid, str(path)))
+        db.execute('INSERT OR IGNORE INTO banks(id,path) VALUES(?,?)', (bid, path.relative_to(out).as_posix()))
         if any(claim.get('hits') for claim in claims):
             db.execute('INSERT OR IGNORE INTO bank_priority(id) VALUES(?)', (bid,))
         db.executemany('UPDATE tasks SET bank=? WHERE id=?', [(bid, tid) for tid in chosen])
@@ -223,10 +311,9 @@ def maybe_submit(db, repo, last_attempt):
         return last_attempt
     bid, path = pending
     attempt = time.monotonic()
-    dispatched = False
     try:
         title = f'[bank] Bank-in {bid[:16]}'
-        bank_body = json.loads(Path(path).read_text())
+        path, bank_body = resolve_bank(db, bid, path)
         lookup = subprocess.run(['gh', 'issue', 'list', '--repo', repo, '--state', 'all',
             '--search', bid[:16], '--json', 'title,url,body', '--limit', '100'], text=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
@@ -246,9 +333,13 @@ def maybe_submit(db, repo, last_attempt):
             db.execute('UPDATE banks SET submitted=? WHERE id=?', (existing[0], bid)); db.commit()
             print(f'Existing submission retained: {existing[0]}', flush=True)
             return attempt
-        dispatched = True
+        # This committed marker survives a kill between external dispatch and
+        # recording the response. A later invocation will not blindly resend.
+        with db:
+            db.execute('UPDATE banks SET submitted=? WHERE id=?',
+                       ('uncertain; submission intent recorded; inspect GitHub before retrying', bid))
         proc = subprocess.run(['gh', 'issue', 'create', '--repo', repo,
-            '--title', title, '--body-file', path], text=True,
+            '--title', title, '--body-file', str(path)], text=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
         if proc.returncode:
             raise RuntimeError(proc.stderr.strip()[:200])
@@ -257,12 +348,29 @@ def maybe_submit(db, repo, last_attempt):
             raise RuntimeError('ambiguous gh response; check GitHub before retrying this bank')
         db.execute('UPDATE banks SET submitted=? WHERE id=?', (url, bid)); db.commit()
         print(f'Submitted: {url} (queued, not yet verified)', flush=True)
-    except (OSError, ValueError, subprocess.TimeoutExpired, RuntimeError) as exc:
-        if dispatched:
-            # Do not silently retry an ambiguous external side effect.
-            db.execute('UPDATE banks SET submitted=? WHERE id=?', ('uncertain; inspect GitHub and bank manually if needed', bid)); db.commit()
+    except (OSError, ValueError, subprocess.TimeoutExpired, RuntimeError, sqlite3.Error) as exc:
+        db.rollback()
+        # Any dispatch intent was already committed before the request.
         print(f'Bank retained locally; submission did not confirm: {exc}', file=sys.stderr)
     return attempt
+
+
+def resolve_bank(db, bid, stored):
+    out = Path(db.execute('PRAGMA database_list').fetchone()[2]).resolve().parent
+    expected = f'bank-{bid[:16]}.json'
+    if str(stored).replace('\\', '/').rsplit('/', 1)[-1] != expected:
+        raise ValueError('Bank filename does not match its checkpoint digest')
+    path = out/'banks'/expected
+    if not path.resolve().is_relative_to(out):
+        raise ValueError('Bank path escapes the checkpoint directory')
+    body = json.loads(path.read_text(encoding='utf-8'))
+    if hashlib.sha256(canonical_json(body).encode()).hexdigest() != bid:
+        raise ValueError('Bank contents no longer match the checkpoint digest')
+    relative = f'banks/{expected}'
+    if stored != relative:
+        with db:
+            db.execute('UPDATE banks SET path=? WHERE id=?', (relative, bid))
+    return path, body
 
 
 def github_identity(login=False):
@@ -353,13 +461,43 @@ def main(argv=None):
         lock.close()
         raise
     if args.mark_banked:
-        matches = [(bid, path) for bid, path in db.execute('SELECT id,path FROM banks') if Path(path).name == args.mark_banked]
+        matches = [(bid, path) for bid, path in db.execute('SELECT id,path FROM banks')
+                   if path.replace('\\', '/').rsplit('/', 1)[-1] == args.mark_banked]
         if len(matches) != 1:
             db.close(); lock.close()
             parser.error('--mark-banked must name one existing bank file')
         db.execute('UPDATE banks SET submitted=? WHERE id=?', ('manually reported submitted; not verified', matches[0][0])); db.commit()
         db.close(); lock.close()
         print('Marked manually submitted; no claim of server verification.'); return 0
+    try:
+        return run_campaign(args, out, db, contributor)
+    except Exception as exc:
+        print(f'Run failed; saved evidence is retained: {exc}', file=sys.stderr)
+        try:
+            identities = [json.loads(row[0]) for row in db.execute('SELECT xyz FROM discoveries ORDER BY id')]
+            atomic_json(out/'status.json', dict(engine=ENGINE, version=VERSION, state='failed',
+                error=str(exc), discoveries=identities, queue=bank_queue(db)))
+        except Exception as write_error:
+            print(f'Could not persist failure status: {write_error}', file=sys.stderr)
+        return 2
+    finally:
+        db.close(); lock.close()
+
+
+def run_campaign(args, out, db, contributor):
+    recover_discoveries(out, db, contributor, scan_results=True)
+    identities = [json.loads(row[0]) for row in db.execute('SELECT xyz FROM discoveries ORDER BY id')]
+    if identities:
+        if any(not verify_triple(xyz) for xyz in identities):
+            raise RuntimeError('Stored discovery registry failed independent verification')
+        print('EXACT DISCOVERY RECOVERED. No new work will be scheduled.', flush=True)
+        for xyz in identities:
+            print('Identity: '+canonical_json(xyz), flush=True)
+        if args.submit:
+            maybe_submit(db, args.repo, -math.inf)
+        atomic_json(out/'status.json', dict(engine=ENGINE, version=VERSION, state='discovery_found',
+            completed_this_run=0, discoveries=identities, queue=bank_queue(db)))
+        return 0
     print(f'Math Gambling {VERSION} | {ENGINE}: {args.workers} workers, at most {args.minutes:g} minutes.', flush=True)
     print('Results are local until banked; GitHub replays before credit. Ctrl-C stops scheduling and drains current tasks.', flush=True)
     queue = bank_queue(db)
@@ -373,15 +511,17 @@ def main(argv=None):
         snapshot = coverage.refresh()
     except CoverageError as exc:
         audit.write('blocked', reason=str(exc))
-        db.close(); lock.close()
+        atomic_json(out/'status.json', dict(engine=ENGINE, version=VERSION, state='failed', error=str(exc), completed_this_run=0))
         print(f'Coverage unavailable; no new tasks dispatched. {exc}. Retry online or explicitly choose --offline for the bundled snapshot.', file=sys.stderr)
         return 2
     print(f'Coverage: {snapshot["revision"]:,} published tasks, {snapshot["updated_at"]} ({snapshot["mode"]}). Concurrent or not-yet-published work can still overlap.', flush=True)
     weights, epoch = load_strategy(args.offline)
     print(f'Cost-only scheduling policy epoch {epoch}; at least 40% uniform context exploration.', flush=True)
     audit.policy(weights, epoch, snapshot)
-    rng = random.Random(int(seed, 16))
+    rng, resumed_seed = restore_rng(db, seed)
+    audit.write('rng', resumed=resumed_seed, state=rng.getstate())
     stop = False
+    failures = []
     def request_stop(*_):
         nonlocal stop
         stop = True
@@ -408,7 +548,7 @@ def main(argv=None):
                 if not args.submit: stop = True
             else:
                 capacity_paused = False
-            while not stop and not capacity_paused and time.monotonic() < deadline and completed+len(active) < args.max_tasks and len(active) < args.workers:
+            while not stop and not capacity_paused and time.monotonic() < deadline and completed+len(active) < args.max_tasks and len(active) < args.workers and unbanked+len(active) < OUTBOX_LIMIT:
                 try:
                     if pending:
                         task = pending.pop(0)
@@ -418,10 +558,11 @@ def main(argv=None):
                             audit.write('already_published', task_id=task_id(task), revision=coverage.index['revision'])
                             continue
                     else:
-                        task = choose_task(rng, weights, db, coverage)
-                except CoverageError as exc:
-                    print(f'Coverage lookup failed; scheduling paused: {exc}', file=sys.stderr)
+                        task = choose_task(rng, weights, db, coverage, seed=seed)
+                except Exception as exc:
+                    print(f'Task allocation failed; scheduling paused: {exc}', file=sys.stderr)
                     audit.write('blocked', reason=str(exc))
+                    failures.append(str(exc))
                     stop = True
                     break
                 audit.write('dispatch', task=task, task_id=task_id(task), policy_epoch=epoch, coverage_revision=coverage.index['revision'])
@@ -440,6 +581,10 @@ def main(argv=None):
                         continue
                 break
             done, _ = wait(active, timeout=0.25, return_when=FIRST_COMPLETED)
+            if any((out/'discoveries').glob('*.json')):
+                recover_discoveries(out, db, contributor)
+                if db.execute('SELECT 1 FROM discoveries LIMIT 1').fetchone():
+                    stop = True
             for future in done:
                 task = active.pop(future)
                 try:
@@ -447,6 +592,7 @@ def main(argv=None):
                     if result['id'] != task_id(task): raise ArithmeticError('worker task identity mismatch')
                     preserve_result(out, db, result)
                 except Exception as exc:
+                    failures.append(str(exc))
                     stop = True
                     print(f'Worker failed; reserved task remains retryable: {exc}', file=sys.stderr)
                     continue
@@ -470,30 +616,47 @@ def main(argv=None):
                     weights, epoch = load_strategy(args.offline)
                     audit.policy(weights, epoch, snapshot)
                     print(f'Policy epoch {epoch}; coverage revision {snapshot["revision"]:,}; {coverage.known_skips:,} published task selections skipped.', flush=True)
-                except CoverageError as exc:
+                except Exception as exc:
                     print(f'Coverage refresh failed; scheduling paused: {exc}', file=sys.stderr)
-                    audit.write('blocked', reason=str(exc)); stop = True
+                    audit.write('blocked', reason=str(exc)); failures.append(str(exc)); stop = True
                 last_refresh = now; last_refresh_completed = completed
+    except Exception as exc:
+        failures.append(str(exc))
+        print(f'Run failed; unfinished task reservations remain retryable: {exc}', file=sys.stderr)
     finally:
         pool.shutdown(wait=True, cancel_futures=True)
-        while write_bank(out, db, contributor, force=True, bank_every=args.bank_every): pass
-        if args.submit: last_submit = maybe_submit(db, args.repo, last_submit)
+        try:
+            recover_discoveries(out, db, contributor, scan_results=True)
+        except Exception as exc:
+            failures.append(str(exc))
+        while True:
+            try:
+                if not write_bank(out, db, contributor, force=True, bank_every=args.bank_every):
+                    break
+            except Exception as exc:
+                failures.append(str(exc))
+                break
+        if args.submit:
+            last_submit = maybe_submit(db, args.repo, last_submit)
+        identities = [json.loads(row[0]) for row in db.execute('SELECT xyz FROM discoveries ORDER BY id')]
+        queue = bank_queue(db)
+        state = 'failed' if failures else 'discovery_found' if identities else 'stopped'
         atomic_json(out/'status.json', dict(engine=ENGINE, completed_this_run=completed,
             version=VERSION, seed=seed, rng=RNG_ALGORITHM, run_id=audit.id,
             inputs_this_run=inputs, exact_tests_this_run=exact, coverage=coverage.snapshot(),
             published_selections_skipped=coverage.known_skips,
             curves_this_run=curves, quotient_points_this_run=points,
             elapsed_seconds=round(time.monotonic()-started, 3), policy_epoch=epoch,
-            pending_banks=db.execute("SELECT count(*) FROM banks WHERE submitted IS NULL OR submitted LIKE 'uncertain;%' ").fetchone()[0],
-            uncertain_banks=db.execute("SELECT count(*) FROM banks WHERE submitted LIKE 'uncertain;%' ").fetchone()[0],
-            state='stopped', verified_community_credit='check GitHub; local completion is not server verification'))
-        audit.write('stopped', completed=completed, inputs=inputs, curves=curves, exact_tests=exact, queue=bank_queue(db))
-        queue = bank_queue(db)
-        db.close(); lock.close()
-    print(f'Finished {completed:,} tasks. Bank files: {out / "banks"}', flush=True)
+            pending_banks=queue['pending']+queue['uncertain'], uncertain_banks=queue['uncertain'],
+            state=state, errors=failures, discoveries=identities,
+            verified_community_credit='check GitHub; local completion is not server verification'))
+        audit.write(state, completed=completed, inputs=inputs, curves=curves, exact_tests=exact,
+                    queue=queue, errors=failures, discoveries=identities)
+    outcome = 'Run failed after' if failures else 'Finished'
+    print(f'{outcome} {completed:,} completed tasks. Bank files: {out / "banks"}', flush=True)
     print(f'Bank queue: {queue["pending"]} awaiting submission, {queue["uncertain"]} uncertain. Restart with --submit to continue automatic banking; GitHub issues show verification status.', flush=True)
     print(f'Manual bank: open https://github.com/{args.repo}/issues/new?title=%5Bbank%5D%20Local%20computation%20bank and paste one bank JSON as the body.', flush=True)
-    return 0
+    return 2 if failures else 0
 
 
 if __name__ == '__main__':

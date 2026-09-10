@@ -26,7 +26,7 @@ S_c = G_c \frac{Y_c+32\overline{Y}}{C_c+32\overline{C}},\qquad
 P(c)=\frac{0.4}{81}+0.6\frac{S_c}{\sum_j S_j}.
 ```
 
-This ratio uses aggregate yield/cost; it cannot collapse because most individual yields are zero. The limited recent window gradually replaces timings from older kernels. Newly accepted records retain their verifier kernel SHA so timing transitions can be audited. Cross-machine timing noise and biased voluntary submissions remain limitations.
+This ratio uses aggregate yield/cost; it cannot collapse because most individual yields are zero. The limited recent window gradually replaces timings from older kernels. Newly accepted records retain their verifier kernel SHA so timing transitions can be audited. Historical cost samples are not retrospectively relabeled as measurements of the new kernel. Cross-machine timing noise and biased voluntary submissions remain limitations.
 
 40% means **uniform task proposals**, then uniform row/block choices inside that context. It is not uniform over every possible task globally, nor a reserved CPU budget. We retain this floor because the prior has not earned exclusive control. Local seeds remain independent, the exact completed-task index is still consulted, and no task bounds or mathematical filters are changed by the policy.
 

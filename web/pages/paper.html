@@ -44,8 +44,8 @@
       We describe an open volunteer search for integer solutions to x³ + y³ + z³
       = 114. The implementation combines a cubic-field norm construction, exact
       arithmetic, modular rejection, bounded client tasks, durable result
-      receipts and independent replay. Scheduling adapts to measured execution
-      cost while preserving exploration. The selected domains are finite and do
+      receipts and independent replay. Scheduling combines measured curve yield and execution
+      cost with an explicit geometric prior while preserving exploration. The selected domains are finite and do
       not constitute an exhaustive height search.
       <strong>No solution is claimed in this draft.</strong>
     </p>
@@ -94,13 +94,13 @@
   <section>
     <h3>4. Adaptive allocation</h3>
     <p>
-      The cluster publishes a versioned policy after each epoch of 64 newly
-      verified unique tasks. At least 40% of allocation is reserved for
-      exploration. Observed replay costs inform the remaining allocation. This
-      objective is a throughput proxy under explicit assumptions, not an
-      estimate of the probability of discovering a solution. A separate
-      exploratory discovery-learning experiment failed its predeclared
-      acceptance criterion.
+      Every 64 newly verified tasks freezes a policy. Existing epochs retain
+      their original method. The current policy combines aggregate curve yield
+      and CPU, including empty-task costs, with an uncalibrated geometric
+      band/shell prior. Forty percent of task proposals remain uniform across
+      contexts; this is not a fixed CPU share. The spatial predictor stays in
+      shadow, and the earlier discovery experiment failed its acceptance test.
+      Neither is a validated estimate of discovery probability.
     </p>
   </section>
   <section>

@@ -121,6 +121,7 @@ def render_snapshot(report, policy, config=None):
              "| Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |",
              "| ---: | --- | --- | ---: | ---: |"]
     aliases = (config or {}).get("display_aliases", {})
+    urls = (config or {}).get("display_urls", {})
     people = []
     for person in report.get("contributors", []):
         account = person.get("github")
@@ -131,7 +132,8 @@ def render_snapshot(report, policy, config=None):
         people.append((integer(person["verified_computations"]), integer(person["verified_tasks"]), account, person))
     for rank, (inputs, tasks, account, person) in enumerate(sorted(people, key=lambda p: (-p[0], -p[1], p[2].casefold()))[:10], 1):
         alias = aliases.get(account.casefold(), person.get("name", "Anonymous")) if isinstance(aliases, dict) else person.get("name", "Anonymous")
-        lines.append(f"| {rank} | {profile_link(alias, person.get('url'))} | [@{account}](https://github.com/{account}) | {inputs:,} | {tasks:,} |")
+        url = safe_profile_url(person.get("url")) or (urls.get(account.casefold()) if isinstance(urls, dict) else None)
+        lines.append(f"| {rank} | {profile_link(alias, url)} | [@{account}](https://github.com/{account}) | {inputs:,} | {tasks:,} |")
     if not people:
         lines += ["", "No participants have independently verified work yet."]
     lines += ["", "Rank is based on replayed coefficient inputs. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.", "",

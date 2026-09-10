@@ -512,6 +512,7 @@ async function loadCluster() {
     ]);
     clusterData = report;
     const aliases = config.display_aliases || {};
+    const urls = config.display_urls || {};
     const t = clusterData.totals || {};
     text("cluster-reported", fmt(t.reported_tasks));
     text("cluster-inputs", fmt(t.verified_computations));
@@ -539,18 +540,20 @@ async function loadCluster() {
         return y > x ? 1 : y < x ? -1 : 0;
       });
       for (const [rank, p] of people.entries()) {
-        const row = body.insertRow(),
+        const user = String(p.submitter || ""),
+          website = safeProfileURL(p.url) ||
+            (Object.hasOwn(urls, user.toLowerCase()) ? safeProfileURL(urls[user.toLowerCase()]) : ""),
+          row = body.insertRow(),
           alias = row.insertCell(),
           place = document.createElement("span"),
-          name = document.createElement(safeProfileURL(p.url) ? "a" : "span");
-        if (safeProfileURL(p.url)) {
-          name.href = safeProfileURL(p.url);
+          name = document.createElement(website ? "a" : "span");
+        if (website) {
+          name.href = website;
           name.rel = "nofollow ugc noopener noreferrer";
         }
         place.className = "rank-number";
         place.textContent = String(rank + 1).padStart(2, "0");
-        const user = String(p.submitter || ""),
-          display = Object.hasOwn(aliases, user.toLowerCase())
+        const display = Object.hasOwn(aliases, user.toLowerCase())
             ? aliases[user.toLowerCase()]
             : null;
         name.textContent =

@@ -5,7 +5,7 @@ from readme_snapshot import ROOT
 
 def render(data):
     path=Path(data)/'learning/latest.json'
-    if not path.exists():return 'Learning report unavailable. Production remains on the established cost scheduler.'
+    if not path.exists():return 'Learning report unavailable. Production remains on the published scheduler.'
     r=json.loads(path.read_text())
     cluster=Path(data)/'cluster.json'
     current=json.loads(cluster.read_text()).get('totals',{}).get('verified_unique_tasks',0) if cluster.exists() else 0
@@ -14,7 +14,7 @@ def render(data):
            f"Frozen through **{r['through']:,} verified tasks**; **{r['model_count']} models** and **{r['completed_evaluations']} completed forward-window evaluations**. Mode: **shadow**, with no production influence.",'',
            'The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.','',
            '```mermaid','flowchart TD','    Receipts[Independently replayed receipts] --> Ledger[Canonical ledger]',
-           '    Ledger --> Production[Existing cost policy: 40 percent exploration]',
+           '    Ledger --> Production[Geometry and measured cost: 40 percent exploration]',
            '    Ledger --> Freeze[Freeze each 1024 task boundary]',
            '    Freeze --> Spatial[Train spatial challenger excluding held-out geometry]',
            '    Spatial --> Future[Score next 1024 accepted tasks]',

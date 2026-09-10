@@ -63,10 +63,10 @@ def generate(data=ROOT/'data'):
             cpu=sum(r['cpu_ms'] for r in runs)
             if cpu>0:rates[arm]=sum(r['counters']['quotient_points'] for r in runs)/cpu
         if rates.get('current',0)>0:
-            arms=[('uniform','Uniform'),('current','Current scheduler'),('spatial_q','Spatial challenger')]
+            arms=[('uniform','Uniform'),('current','Legacy scheduler (pilot)'),('spatial_q','Spatial challenger')]
             report['pilot']=[{'label':label,'ratio':rates[arm]/rates['current']} for arm,label in arms]
             atomic_json(data/'learning/visuals.json',report)
-            chart=['<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-label="Exploratory pilot quotient exposure per CPU relative to current scheduler">',
+            chart=['<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300" role="img" aria-label="Exploratory pilot quotient exposure per CPU relative to legacy scheduler">',
                    '<rect width="900" height="300" fill="white"/><g font-family="Arial,Helvetica,sans-serif" fill="#111">',
                    '<text x="25" y="35" font-size="22">A small performance pilot</text>']
             for j,(arm,label) in enumerate(arms):

@@ -43,11 +43,54 @@ const date = (v) => {
     ? d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
     : "No timestamp";
 };
-const fetchJSON = async (file) => {
-  const response = await fetch(new URL(file, BASE), { cache: "no-cache" });
-  if (!response.ok) throw new Error(`Report unavailable (${response.status})`);
-  return response.json();
-};
+const reportRequests = new Map();
+const REPORT_TIMEOUT_MS = 12000, REPORT_BYTE_LIMIT = 16 * 1024 * 1024;
+function fetchJSON(file) {
+  if (reportRequests.has(file)) return reportRequests.get(file);
+  const controller = new AbortController();
+  let timer;
+  const deadline = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(Error("Report request timed out"));
+    }, REPORT_TIMEOUT_MS);
+  });
+  const reading = (async () => {
+    const response = await fetch(new URL(file, BASE), {
+      cache: "no-cache", signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`Report unavailable (${response.status})`);
+    if (Number(response.headers.get("content-length")) > REPORT_BYTE_LIMIT) {
+      controller.abort();
+      throw Error("Report exceeds its size limit");
+    }
+    const reader = response.body.getReader(), chunks = [];
+    let length = 0;
+    try {
+      for (;;) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        length += value.byteLength;
+        if (length > REPORT_BYTE_LIMIT) throw Error("Report exceeds its size limit");
+        chunks.push(value);
+      }
+    } catch (error) {
+      controller.abort();
+      try { await reader.cancel(); } catch {}
+      throw error;
+    }
+    const bytes = new Uint8Array(length);
+    let offset = 0;
+    for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+    return JSON.parse(new TextDecoder("utf-8", {fatal: true}).decode(bytes));
+  })();
+  const request = Promise.race([reading, deadline]).finally(() => {
+    clearTimeout(timer);
+    reportRequests.delete(file);
+  });
+  reportRequests.set(file, request);
+  return request;
+}
 const sharedCoverage = createCoverageClient(BASE);
 let jackpot;
 try {
@@ -670,6 +713,77 @@ async function hash(obj) {
     x.toString(16).padStart(2, "0"),
   ).join("");
 }
+// Keep identities outside the task/bank database: a broken task envelope or
+// unavailable receipt store must not prevent an independently checked rescue.
+let identityDBPromise, pendingIdentitySaves = 0;
+const rescuedIdentities = new Map();
+function identityDB() {
+  return (identityDBPromise ??= new Promise((resolve, reject) => {
+    const request = indexedDB.open("math-gambling-identities-v1", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("identities", {keyPath: "key"});
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+    request.onblocked = () => reject(Error("Identity backup database is blocked"));
+  }));
+}
+async function saveIdentity(key, evidence) {
+  const d = await identityDB();
+  return new Promise((resolve, reject) => {
+    const tx = d.transaction("identities", "readwrite");
+    tx.objectStore("identities").put({key, evidence});
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+    tx.onabort = () => reject(tx.error || Error("Identity backup aborted"));
+  });
+}
+function preserveIdentity(xyz, owner, provenance) {
+  if (!verifyTriple(xyz)) return;
+  const key = [...xyz].sort((a, b) => BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0).join(",");
+  let rescue = rescuedIdentities.get(key);
+  if (rescue?.saved || rescue?.saving) return;
+  if (!rescue) {
+    const copy = [...xyz];
+    rescue = {evidence: {
+      schema: "math-gambling-independent-browser-identity-v1",
+      xyz: [copy], hits: [{xyz: copy}], contributor: {...owner},
+      search_session: {...provenance}, observed: new Date().toISOString(),
+    }, saved: false, saving: false};
+    rescuedIdentities.set(key, rescue);
+  }
+  const evidence = rescue.evidence;
+  try {
+    localStorage.setItem("mg-discovery-v1", JSON.stringify(evidence));
+    rescue.saved = true;
+  } catch {}
+  rescue.saving = true;
+  pendingIdentitySaves++;
+  saveIdentity(key, evidence).then(() => { rescue.saved = true; }).catch(() => {
+    if (!rescue.saved) text("session-message", "The identity is displayed, but browser storage failed. Save the discovery evidence before closing this page.");
+  }).finally(() => { rescue.saving = false; pendingIdentitySaves--; });
+  $("discovery").hidden = false;
+  $("discovery").textContent =
+    `Exact identity: ${xyz.map((x) => `(${x})³`).join(" + ")} = 114. Save the evidence and bank the discovery.`;
+  showJackpot(xyz, evidence);
+  // Download and animation failures cannot interrupt either persistent store.
+  try {
+    download("math-gambling-identity-evidence.json", JSON.stringify(evidence, null, 2));
+  } catch {}
+}
+async function recoverIdentityBackups() {
+  try {
+    const d = await identityDB();
+    const rows = await new Promise((resolve, reject) => {
+      const req = d.transaction("identities").objectStore("identities").getAll(null, 64);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    if (rescuedIdentities.size) return;
+    for (const {evidence} of rows.sort((a, b) => String(b.evidence?.observed).localeCompare(String(a.evidence?.observed)))) {
+      const xyz = evidence?.hits?.find((hit) => verifyTriple(hit?.xyz))?.xyz;
+      if (xyz) { showJackpot(xyz, evidence, "local", false); break; }
+    }
+  } catch { /* Optional rescue recovery cannot block the ordinary outbox. */ }
+}
 let tasks = [],
   banks = [],
   activeBank = null,
@@ -965,7 +1079,6 @@ let worker = null,
   busy = false,
   stopReason = "",
   sessionGeneration = 0,
-  activeTask = null,
   startAt = 0,
   nextTimer = null,
   runTimer = null,
@@ -975,7 +1088,8 @@ let worker = null,
   currentSeed = "",
   randomStream = null,
   assigningGeneration = null,
-  assignedProvenance = null;
+  coverageRefreshDue = false;
+const workerAssignments = new WeakMap();
 async function nextTask(generation) {
   const weights =
     strategy?.contexts || CONTEXTS.map((c) => ({ id: c.id, weight: 1 / 81 }));
@@ -1066,7 +1180,8 @@ async function dispatch() {
     showRun("state", "paused");
     return;
   }
-  if (tasks.filter((t) => !coveredIds().has(t.id)).length >= 4096) {
+  const covered = coveredIds();
+  if (tasks.filter((t) => !covered.has(t.id)).length >= 4096) {
     stop(
       "Local receipt limit reached. Bank and save your work before starting another session.",
     );
@@ -1076,18 +1191,23 @@ async function dispatch() {
   assigningGeneration = generation;
   try {
     text("session-state", "Checking shared coverage");
+    if (coverageRefreshDue) {
+      await sharedCoverage.refresh(true);
+      if (generation !== sessionGeneration || !running) return;
+      coverageRefreshDue = false;
+    }
     const selection = await nextTask(generation);
     if (!selection || generation !== sessionGeneration || !running || !worker) return;
     if (document.hidden) { text("session-state", "Paused · tab hidden"); return; }
     const { task, policyEpoch } = selection;
     showCoverage();
-    assignedProvenance = {
+    const provenance = Object.freeze({
       seed: currentSeed, algorithm: SEED_ALGORITHM,
       policy_epoch: policyEpoch,
       coverage_revision: sharedCoverage.revision,
-    };
+    });
+    workerAssignments.set(worker, Object.freeze({task: Object.freeze({...task}), provenance}));
     busy = true;
-    activeTask = task;
     text("session-state", "Computing");
     text(
       "task-detail",
@@ -1120,6 +1240,7 @@ async function start(e) {
   try {
     text("session-state", "Loading shared coverage");
     await sharedCoverage.refresh(true);
+    coverageRefreshDue = false;
     showCoverage();
     currentSeed = newSeed();
     randomStream = seededRandom(currentSeed);
@@ -1152,13 +1273,14 @@ async function start(e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;
   }
+  const sessionWorker = worker;
   worker.onerror = (e) => {
     if (generation === sessionGeneration)
       failStop(`Worker stopped after an error: ${e.message}. Completed receipts are preserved.`);
   };
   worker.onmessage = ({ data }) => {
     (async () => {
-      if (generation !== sessionGeneration && data.type !== "result") return;
+      if (generation !== sessionGeneration && !["result", "identity"].includes(data.type)) return;
       if (data.type === "ready") {
         if (running) dispatch();
         else finishStop();
@@ -1168,39 +1290,23 @@ async function start(e) {
         failStop(`Worker error: ${data.message}`);
         return;
       }
-      if (data.type !== "result") return;
-      const r = data.result;
-      const issuedTask = activeTask, provenance = { ...assignedProvenance };
+      if (!["result", "identity"].includes(data.type)) return;
+      const r = data.type === "identity" ? {hits: [data.hit]} : data.result;
+      const assignment = workerAssignments.get(sessionWorker);
+      const issuedTask = assignment?.task, provenance = assignment?.provenance;
       // An exact identity is valuable even if the surrounding task envelope is damaged.
       const exactHits = Array.isArray(r?.hits)
         ? r.hits.slice(0, 64).filter((h) => verifyTriple(h?.xyz))
         : [];
       if (exactHits.length) {
-        const evidence = {
-          schema: "math-gambling-independent-browser-identity-v1",
-          xyz: exactHits.map((h) => h.xyz),
-          hits: exactHits.map((h) => ({ xyz: h.xyz })),
-          contributor: owner,
-          search_session: provenance,
-          observed: new Date().toISOString(),
-        };
-        try {
-          localStorage.setItem("mg-discovery-v1", JSON.stringify(evidence));
-        } catch {
-          download(
-            "math-gambling-emergency-discovery.json",
-            JSON.stringify(evidence, null, 2),
-          );
-        }
-        $("discovery").hidden = false;
-        $("discovery").textContent =
-          "An exact 114 identity was detected and preserved before checking task metadata. Keep this browser data and save the evidence.";
-        download(
-          "math-gambling-identity-evidence.json",
-          JSON.stringify(evidence, null, 2),
-        );
-        showJackpot(exactHits[0].xyz, evidence);
+        for (const hit of exactHits) preserveIdentity(hit.xyz, owner, provenance);
+        if (data.type === "identity")
+          stop("An exact identity was preserved. Finishing the current task before banking its full receipt.");
       }
+
+      // An early positive is evidence of the equation only, never completed
+      // task coverage. The ordinary result must still pass every receipt check.
+      if (data.type === "identity") return;
 
       if (generation !== sessionGeneration) {
         if (exactHits.length) stop("An exact identity from an earlier session was preserved. Save the discovery evidence.");
@@ -1281,15 +1387,14 @@ async function start(e) {
         await prepareBank(r.id);
         return;
       }
+      busy = false;
       if (running && ++completedSinceRefresh >= 64) {
         completedSinceRefresh = 0;
-        await loadStrategy();
-        await loadCluster();
-        await sharedCoverage.refresh(true);
-        if (generation !== sessionGeneration) return;
-        showCoverage();
+        coverageRefreshDue = true;
+        // Optional reports never hold the save/stop barrier. Fresh shared
+        // coverage is still required by dispatch before the next task starts.
+        void Promise.allSettled([loadStrategy(), loadCluster()]);
       }
-      busy = false;
       if (running) {
         const duty = processorDuty();
         nextTimer = setTimeout(
@@ -1313,7 +1418,7 @@ async function start(e) {
 $("join-form")?.addEventListener("submit", start);
 $("stop-button")?.addEventListener("click", () => stop());
 window.addEventListener("beforeunload", (e) => {
-  if (busy) {
+  if (busy || pendingIdentitySaves) {
     e.preventDefault();
     e.returnValue = "";
   }
@@ -1329,6 +1434,7 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 if ($("join-form")) {
+  void recoverIdentityBackups();
   try {
     const saved = localStorage.getItem("mg-discovery-v1");
     if (saved && saved.length < 100000) {

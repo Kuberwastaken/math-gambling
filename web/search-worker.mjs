@@ -1,4 +1,4 @@
-import {runTask, ENGINE} from './engine.mjs';
+import {runTask, verifyTriple, ENGINE} from './engine.mjs';
 
 // A worker accepts one task at a time. The page decides when to queue the next.
 // Stop is a task-boundary instruction; terminating a worker discards only its
@@ -14,7 +14,10 @@ self.onmessage = async ({data}) => {
   busy = true;
   const started = performance.now();
   try {
-    const result = await runTask(data.task);
+    const result = await runTask(data.task, {onHit(hit) {
+      if (verifyTriple(hit?.xyz))
+        self.postMessage({type: 'identity', hit, task: data.task});
+    }});
     self.postMessage({type: 'result', result, elapsedMs: performance.now() - started});
   } catch (error) {
     self.postMessage({type: 'error', message: String(error?.message || error)});

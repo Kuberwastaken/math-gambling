@@ -117,7 +117,7 @@ export function checkCandidate(k, s, z, {minimal = true} = {}) {
   return xyz;
 }
 
-export function scanCurve(k, d, r, qlo, qhi, {sieve = true, minimal = true} = {}) {
+export function scanCurve(k, d, r, qlo, qhi, {sieve = true, minimal = true, onHit} = {}) {
   if (!Number.isSafeInteger(k) || k < 3 || k > 1000 || ![3, 6].includes(modNumber(k, 9))) throw new RangeError('unsupported regression k');
   d = BigInt(d); r = BigInt(r); qlo = BigInt(qlo); qhi = BigInt(qhi);
   if (d < 2n || d % 3n === 0n || r < 0n || r >= d || r ** 3n % d !== mod(BigInt(k), d)) throw new RangeError('invalid modular root');
@@ -143,13 +143,19 @@ export function scanCurve(k, d, r, qlo, qhi, {sieve = true, minimal = true} = {}
     if (sieve && PRIMES.some((p, j) => !masks[j][smallS[j]][Number(mod(z, BigInt(p)))])) { counters.rejected_prime++; continue; }
     counters.exact_tests++;
     const xyz = checkCandidate(k, s, z, {minimal});
-    if (xyz) hits.push({xyz, D: String(d), r: String(r), q: String(q)});
+    if (xyz) {
+      const hit = {xyz, D: String(d), r: String(r), q: String(q)};
+      hits.push(hit);
+      // Publish an exact positive before another candidate or receipt hashing
+      // can fail. Observers cannot mutate, or abort, the mathematical result.
+      try { onHit?.({...hit, xyz: [...xyz]}); } catch {}
+    }
   }
   counters.hits = hits.length;
   return {counters, hits};
 }
 
-function runRow(task, c, row) {
+function runRow(task, c, row, onHit) {
   const ell = BigInt(c.ell), radius = BigInt(c.radius), width = 2n * radius + 1n;
   const b = row % width - radius, cc = row / width - radius, base = offsetBase(ell, b, cc);
   const tlo = c.tlo + BLOCK_SIZE * task.block, thi = Math.min(tlo + BLOCK_SIZE - 1, c.thi);
@@ -170,7 +176,8 @@ function runRow(task, c, row) {
     const zmin = BigInt(c.low) * d > 10n ** 17n ? BigInt(c.low) * d : 10n ** 17n;
     const zmax = BigInt(c.high) * d;
     const [qlo, qhi] = s < 0n ? [floorDiv(zmin - r, d) + 1n, floorDiv(zmax - r, d)] : [-((zmax + r) / d), -((zmin + r) / d) - 1n];
-    const found = scanCurve(114, d, r, qlo, qhi);
+    const found = scanCurve(114, d, r, qlo, qhi, {onHit: onHit && (hit =>
+      onHit({...hit, abc: [String(a), String(b), String(cc)], t, row: String(row)}))});
     for (const key of counterKeys) counters[key] += found.counters[key];
     for (const hit of found.hits) hits.push({...hit, abc: [String(a), String(b), String(cc)], t, row: String(row)});
   }
@@ -179,20 +186,20 @@ function runRow(task, c, row) {
   return {counters, hits};
 }
 
-export function runTaskCore(input) {
+export function runTaskCore(input, {onHit} = {}) {
   const task = validateTask(input), c = byId.get(task.context);
   const start = BigInt(task.row), end = start + BigInt(ROWS_PER_TASK) < BigInt(c.totalRows) ? start + BigInt(ROWS_PER_TASK) : BigInt(c.totalRows);
   const counters = emptyCounters(), hits = [];
   for (let row = start; row < end; row++) {
-    const found = runRow(task, c, row);
+    const found = runRow(task, c, row, onHit);
     for (const key of counterKeys) counters[key] += found.counters[key];
     hits.push(...found.hits);
   }
   return {task, id: taskId(task), counters, hits};
 }
 
-export async function runTask(input) {
-  const result = runTaskCore(input);
+export async function runTask(input, options) {
+  const result = runTaskCore(input, options);
   const hash = await globalThis.crypto.subtle.digest('SHA-256', new TextEncoder().encode(canonicalJSON(result)));
   return {...result, digest: Array.from(new Uint8Array(hash), x => x.toString(16).padStart(2, '0')).join('')};
 }

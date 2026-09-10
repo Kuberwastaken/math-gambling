@@ -60,9 +60,15 @@ async function harness({
   cachedProfile = null,
   coverageFails = false,
   coverageProbe = null,
+  coverageRefreshProbe = null,
   randomFactory = null,
   fixtureTarget = 114,
   brokenCelebration = false,
+  fetchProbe = null,
+  localStorageFails = false,
+  downloadFails = false,
+  identityStorageFails = false,
+  cachedIdentities = [],
 } = {}) {
   const elements = new Map();
   const get = (id) => {
@@ -87,7 +93,7 @@ async function harness({
   const local = new Map(), celebrations = [];
   if (cachedProfile !== null)
     local.set("mg-profile", JSON.stringify(cachedProfile));
-  const stores = new Map(),
+  const stores = new Map(), databases = new Set(),
     workers = [],
     pendingWrites = [],
     timeouts = new Map(),
@@ -96,7 +102,10 @@ async function harness({
     timerId = 0;
   const connection = {
     createObjectStore(name, { keyPath }) {
-      stores.set(name, { keyPath, rows: new Map() });
+      const rows = new Map();
+      if (name === "identities") for (const record of cachedIdentities)
+        rows.set(record[keyPath], structuredClone(record));
+      stores.set(name, { keyPath, rows });
     },
     transaction(name, mode) {
       const tx = {};
@@ -113,6 +122,11 @@ async function harness({
         },
         put(record) {
           const commit = () => {
+            if (name === "identities" && identityStorageFails) {
+              tx.error = Error("fixture identity backup unavailable");
+              tx.onabort?.();
+              return;
+            }
             const store = stores.get(name);
             store.rows.set(record[store.keyPath], structuredClone(record));
             tx.oncomplete?.();
@@ -125,11 +139,11 @@ async function harness({
     },
   };
   const indexedDB = {
-    open() {
+    open(name) {
       const req = {};
       queueMicrotask(() => {
         req.result = connection;
-        req.onupgradeneeded?.();
+        if (!databases.has(name)) { req.onupgradeneeded?.(); databases.add(name); }
         req.onsuccess?.();
       });
       return req;
@@ -163,7 +177,10 @@ async function harness({
     } }),
     __sessionTools: {...sessionTools, seededRandom: randomFactory || sessionTools.seededRandom, createCoverageClient: () => ({
       revision: 128,
-      async refresh() { if (coverageFails) throw Error("fixture coverage offline"); },
+      async refresh(force) {
+        if (coverageFails) throw Error("fixture coverage offline");
+        if (coverageRefreshProbe) return coverageRefreshProbe(force);
+      },
       async has(task) { return coverageProbe ? coverageProbe(task) : false; },
     })},
     console,
@@ -172,25 +189,32 @@ async function harness({
     Worker: FakeWorker,
     localStorage: {
       getItem: (key) => local.get(key) ?? null,
-      setItem: (key, value) => local.set(key, String(value)),
+      setItem: (key, value) => {
+        if (localStorageFails) throw Error("fixture localStorage unavailable");
+        local.set(key, String(value));
+      },
       removeItem: (key) => local.delete(key),
     },
     crypto: globalThis.crypto,
     TextEncoder,
     TextDecoder,
-    URL,
+    URL: downloadFails ? class extends URL {
+      static createObjectURL() { throw Error("fixture download unavailable"); }
+    } : URL,
     Blob,
+    AbortController,
     Intl,
     Date,
     navigator: { clipboard: { writeText: async () => {} } },
     window: { print() {}, addEventListener() {} },
     matchMedia: () => ({ matches: true }),
-    fetch: async () => {
+    fetch: async (...args) => {
+      if (fetchProbe) return fetchProbe(...args);
       throw new Error("fixture offline; no network requests");
     },
-    setTimeout(fn) {
+    setTimeout(fn, delay) {
       const id = ++timerId;
-      timeouts.set(id, fn);
+      timeouts.set(id, {fn, delay});
       return id;
     },
     clearTimeout(id) {
@@ -227,7 +251,9 @@ async function harness({
     .replaceAll("import.meta.url", JSON.stringify(appURL.href));
   await vm.runInContext(
     `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,openBank,submitBankProfile,prepareBank,safeProfileURL,counter,
-    state:()=>({running,starting,busy,worker,tasks,counts}),
+    state:()=>({running,starting,busy,worker,tasks,counts,pendingIdentitySaves}),
+    fetchJSON, setRefreshCounter:n=>{completedSinceRefresh=n;},
+    setHistory:(t,b)=>{tasks=t;banks=b;},
     ageRun:()=>{startAt=Date.now()-86400000;}};})()`,
     context,
     { filename: "app-under-lifecycle-test.mjs" },
@@ -257,6 +283,11 @@ async function harness({
     },
     tickIntervals() {
       for (const fn of [...intervals.values()]) fn();
+    },
+    tickTimeouts(delay) {
+      for (const [id, timer] of [...timeouts]) {
+        if (timer.delay === delay) { timeouts.delete(id); timer.fn(); }
+      }
     },
   };
 }
@@ -579,3 +610,147 @@ for (const brokenCelebration of [false, true]) {
   assert.equal(h.celebrations.length, 0, "unverified candidates must never celebrate");
 }
 console.log("Positive lifecycle checks passed with isolated k=39: emergency preservation, priority banking, stop, animation-failure isolation and false-hit rejection.");
+
+// A positive crosses the worker boundary before receipt hashing. Its independent
+// backup survives a later worker error even when localStorage and downloads fail.
+{
+  const h = await harness({fixtureTarget: 39, localStorageFails: true, downloadFails: true});
+  const worker = await ready(h), seed = h.get("run-seed").textContent;
+  const xyz = ["-159380", "134476", "117367"];
+  worker.emit({type: "identity", hit: {xyz}, task: worker.posts[0].task});
+  worker.emit({type: "error", message: "fixture failure after the independently verified hit"});
+  await waitFor(() => h.stores.get("identities").rows.size === 1, "early identity lost when the task later failed");
+  const backup = [...h.stores.get("identities").rows.values()][0].evidence;
+  assert.deepEqual(backup.hits, [{xyz}]);
+  assert.equal(backup.search_session.seed, seed);
+  assert.equal(h.local.has("mg-discovery-v1"), false);
+  assert.equal(h.stores.get("tasks").rows.size, 0, "identity event must not grant task credit");
+  assert.equal(h.app.state().counts.tasks, 0);
+  assert.equal(worker.terminated, true);
+  assert.equal(h.celebrations.length, 1);
+  const restored = await harness({fixtureTarget: 39, localStorageFails: true,
+    cachedIdentities: [...h.stores.get("identities").rows.values()]});
+  await waitFor(() => restored.celebrations.length === 1, "durable identity backup was not recovered after reload");
+  assert.deepEqual([...restored.celebrations[0].xyz], xyz);
+  assert.equal(restored.celebrations[0].receipt.search_session.seed, seed);
+  assert.equal(restored.celebrations[0].animate, false);
+}
+{
+  const h = await harness({fixtureTarget: 39, identityStorageFails: true});
+  const worker = await ready(h), xyz = ["-159380", "134476", "117367"];
+  worker.emit({type: "identity", hit: {xyz}});
+  await waitFor(() => h.local.has("mg-discovery-v1"), "local identity rescue was not synchronous");
+  worker.emit({type: "error", message: "fixture receipt store failed"});
+  await waitFor(() => !h.app.state().pendingIdentitySaves, "failed backup did not release its unload guard");
+  assert.deepEqual(JSON.parse(h.local.get("mg-discovery-v1")).hits, [{xyz}]);
+  assert.equal(h.stores.get("tasks").rows.size, 0);
+}
+{
+  const h = await harness(), worker = await ready(h);
+  worker.emit({type: "identity", hit: {xyz: ["1", "2", "3"]}});
+  await new Promise(setImmediate);
+  assert.equal(h.app.state().running, true, "an invalid early identity stopped the search");
+  assert.equal(h.stores.get("identities").rows.size, 0);
+  h.app.stop(); await deliver(worker);
+  await waitFor(() => worker.terminated, "invalid identity fixture did not drain");
+}
+
+// Old-session evidence carries the old assignment, regardless of the currently
+// running worker. Both early events and legacy result envelopes use this path.
+for (const type of ["identity", "result"]) {
+  const h = await harness({fixtureTarget: 39});
+  const oldWorker = await ready(h), oldSeed = h.get("run-seed").textContent;
+  oldWorker.onerror({message: "fixture restart"});
+  const newWorker = await ready(h), newSeed = h.get("run-seed").textContent;
+  const hit = {xyz: ["-159380", "134476", "117367"]};
+  oldWorker.emit(type === "identity" ? {type, hit} : {type, result: {hits: [hit]}});
+  await waitFor(() => h.local.has("mg-discovery-v1"), "late identity was not preserved");
+  const evidence = JSON.parse(h.local.get("mg-discovery-v1"));
+  assert.equal(evidence.search_session.seed, oldSeed);
+  assert.notEqual(evidence.search_session.seed, newSeed);
+  assert.equal(h.app.state().running, false);
+  await deliver(newWorker);
+  await waitFor(() => newWorker.terminated, "replacement worker did not drain after late identity");
+}
+
+// Optional refreshes cannot trap Stop after the receipt is already saved.
+// Even a fetcher that never settles is bounded, and overlapping requests share
+// one fetch. Real browser fetch also receives an AbortSignal.
+{
+  let stall = false, stalledRequests = 0, aborted = false;
+  const h = await harness({fetchProbe: async (url, options) => {
+    if (stall && String(url).endsWith("strategy.json")) {
+      stalledRequests++;
+      options.signal.addEventListener("abort", () => { aborted = true; });
+      return new Promise(() => {});
+    }
+    throw Error("fixture offline");
+  }});
+  const worker = await ready(h);
+  h.app.setRefreshCounter(63); stall = true;
+  await deliver(worker);
+  await waitFor(() => stalledRequests === 1, "64th completion did not request reports");
+  assert.equal(h.app.state().busy, false, "report fetch held the durable-save barrier");
+  assert.equal(h.stores.get("tasks").rows.size, 1);
+  h.app.stop();
+  assert.equal(worker.terminated, true);
+  assert.equal(h.get("start-button").disabled, false);
+  const waiting = h.app.fetchJSON("data/strategy.json");
+  assert.equal(stalledRequests, 1, "overlapping report requests were not coalesced");
+  h.tickTimeouts(12000);
+  await assert.rejects(waiting, /timed out/);
+  assert.equal(aborted, true);
+}
+{
+  let report = null, aborted = false;
+  const h = await harness({fetchProbe: async (_url, options) => {
+    if (!report) throw Error("fixture offline");
+    options.signal.addEventListener("abort", () => { aborted = true; });
+    return report;
+  }});
+  report = new Response("{}", {headers: {"content-length": String(16 * 1024 * 1024 + 1)}});
+  await assert.rejects(h.app.fetchJSON("data/oversized.json"), /size limit/);
+  assert.equal(aborted, true);
+  aborted = false;
+  report = new Response(new ReadableStream({start(controller) {
+    controller.enqueue(new Uint8Array(8 * 1024 * 1024));
+    controller.enqueue(new Uint8Array(8 * 1024 * 1024 + 1));
+    controller.close();
+  }}));
+  await assert.rejects(h.app.fetchJSON("data/oversized-stream.json"), /size limit/);
+  assert.equal(aborted, true, "streaming reports also need a byte limit");
+}
+
+// Count a getter, not wall time: bank membership must be read once per dispatch,
+// even after many successful banks. This fails deterministically on O(n²) scans.
+{
+  const h = await harness();
+  await h.app.start(event());
+  const history = Array.from({length: 10000}, (_, i) => ({id: `history-${i}`}));
+  const ids = history.map(task => task.id);
+  let reads = 0;
+  h.app.setHistory(history, [{posted: true, get ids() { reads++; return ids; }}]);
+  await h.app.dispatch();
+  assert.equal(reads, 1, "dispatch rebuilt all posted IDs for each saved task");
+  const worker = h.workers[0];
+  assert.equal(worker.posts.length, 1);
+  h.app.stop(); await deliver(worker);
+  await waitFor(() => worker.terminated, "history regression did not drain");
+}
+console.log("Audit regressions passed: early identity rescue, independent storage failure, immutable worker provenance, bounded report refresh and linear history checks.");
+
+{
+  let refreshes = 0;
+  const h = await harness({coverageRefreshProbe: () => {
+    if (++refreshes > 1) throw Error("fixture new coverage unavailable");
+  }});
+  const worker = await ready(h);
+  h.app.setRefreshCounter(63);
+  await deliver(worker);
+  await waitFor(() => h.app.state().counts.tasks === 1 && !h.app.state().busy, "64th result was not saved");
+  await h.app.dispatch();
+  assert.equal(refreshes, 2);
+  assert.equal(worker.posts.length, 1, "failed mandatory coverage refresh allowed new work");
+  assert.equal(worker.terminated, true);
+  assert.equal(h.stores.get("tasks").rows.size, 1);
+}

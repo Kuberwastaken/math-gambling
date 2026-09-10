@@ -26,16 +26,18 @@ jobs:
       - name: Checkout trusted default branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
-          ref: ${{ github.event.repository.default_branch }}
+          ref: main
           fetch-depth: 1
-      - name: Read the latest ledger
-        run: git pull --ff-only
+      - name: Overlay the authoritative data branch without checking out its code
+        run: python3 tools/branch_state.py overlay --fetch
       - name: Test verification, aggregation and safe README rendering
         run: |
           python3 -m unittest discover -s tests -p test_cluster.py
           python3 -m unittest discover -s tests -p test_readme.py
           python3 -m unittest discover -s tests -p test_replay_pool.py
           python3 -m unittest discover -s tests -p test_coverage.py
+          python3 -m unittest discover -s tests -p test_geometric_policy.py
+          python3 -m unittest discover -s tests -p test_branch_state.py
       - name: Independently replay bounded receipts
         id: replay
         continue-on-error: true
@@ -47,26 +49,18 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -p test_strategy_model.py
           python3 tools/strategy_model.py
-      - name: Commit verified data without modifying source
-        shell: bash
+      - name: Generate verified reports with trusted main code
         run: |
           python3 tools/aggregate.py
           python3 tools/coverage_index.py --prune
           python3 tools/readme_charts.py
-          python3 tools/readme_snapshot.py
           python3 tools/learning_visuals.py
-          python3 tools/learning_readme.py
-          git config user.name 'math-gambling verifier'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- data/cluster.json data/strategy.json data/receipts data/coverage data/readme-progress.svg data/learning README.md
-          if ! git diff --cached --quiet; then
-            git commit -m 'Record verified community receipts and frozen cost calibration'
-            for attempt in 1 2 3; do
-              if git push; then break; fi
-              if [ "$attempt" -eq 3 ]; then exit 1; fi
-              git pull --rebase
-            done
-          fi
+      - name: Export a bounded mathematical coverage increment
+        id: geometry
+        continue-on-error: true
+        run: python3 tools/math_coverage.py --data data --max-tasks 32 --seconds 15
+      - name: Publish only generated data and a freshly rendered README
+        run: python3 tools/branch_state.py publish-data --push
       - name: Surface operational failure after preserving verified progress
         if: steps.replay.outcome == 'failure'
         run: |
@@ -78,3 +72,6 @@ jobs:
         run: |
           echo 'Challenger learning failed; existing production policy retained. See learning step logs.' >> "$GITHUB_STEP_SUMMARY"
           exit 1
+      - name: Report deferred mathematical coverage export
+        if: always() && steps.geometry.outcome == 'failure'
+        run: echo 'Mathematical coverage export was deferred. Verified task coverage remains authoritative; inspect the exporter logs and data/math-coverage/last-error.json.' >> "$GITHUB_STEP_SUMMARY"

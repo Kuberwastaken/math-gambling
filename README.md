@@ -16,7 +16,7 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-10 19:45:50 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-10 19:46:22 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
@@ -163,6 +163,8 @@ flowchart TD
     Gate --> NoPromotion[No automatic discovery-policy promotion]
 ```
 
+
+**Learning report is behind the ledger; inspect the latest Action before interpreting freshness.**
 Latest evaluation: tasks 14,337–15,360. Lower mean absolute log1p prediction error is better.
 
 | Quantity | Context baseline | Spatial challenger |

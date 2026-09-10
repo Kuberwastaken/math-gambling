@@ -31,11 +31,13 @@ jobs:
         run: python3 tools/build_site.py
       - name: Validate links and downloadable runner
         run: python3 tools/check_site.py
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - if: github.event.repository.private == false
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: dist/math-gambling
   deploy:
+    if: github.event.repository.private == false
     needs: build
     runs-on: ubuntu-24.04
     environment:

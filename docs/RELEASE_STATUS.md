@@ -21,7 +21,11 @@ No code was pushed. The GitHub repository remains private and empty; no bank iss
 
 The existing native Mac campaign and its hourly monitor were not changed by the website release. Public snapshot publishing is implemented but has not been scheduled or pushed.
 
-## Remaining after an approved Git exception
+## Designated personal-work environment
+
+The user subsequently clarified that Razorpay allotted `ai-vps` for personal work and explicitly requested its use. The source repository has been transferred to `/Users/kuber.mehta/Projects/math-gambling` there for normal Git publication and bounded release tests. No Mac Git hooks or managed settings were changed. The live native campaign and its ledger remain on the Mac. Hosted publication checks are still pending.
+
+## Remaining release checks
 
 1. Push the committed source through the approved Git route and run the hosted build and verification checks while the repository remains private.
 2. Submit the prepared real validation bank with explicit attribution, inspect hosted replay and duplicate handling, and inspect the published aggregate. Keep its provenance visible as launch validation.

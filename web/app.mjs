@@ -363,7 +363,7 @@ async function loadCluster() {
     text(
       "cluster-updated",
       clusterData.updated_at
-        ? `Published ${date(clusterData.updated_at)}`
+        ? `Snapshot generated ${date(clusterData.updated_at)}`
         : "No published verification run yet",
     );
     text(

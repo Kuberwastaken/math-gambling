@@ -7,7 +7,7 @@ This records checks actually run on 10 September 2026. It is not a formal verifi
 - 243 deterministic tasks matched completely between the JavaScript and Python implementations: 34,824 root intervals, 47,544,575 logical quotient positions, and 84 exact square tests.
 - Python tests cover exact roots, integer reconstruction, residue filtering, fixed task bounds, complete small domains, known-positive cases for other targets, bank limits, and durable local resumption.
 - Two task digests extracted from an actual browser run independently matched Python replay.
-- A two-worker local launch-validation run completed 128 real tasks and produced a bank; its GitHub processing is separate evidence once the workflow runs.
+- A two-worker local launch-validation run completed 128 real tasks and produced a bank. Feeding that bank through a local fixture of a GitHub issue payload independently replayed all 128 tasks, credited 238,592 coefficient inputs, and produced two calibration epochs in 13.37 seconds. Resubmitting it used zero additional replay slots and earned no additional credit. This exercised the actual ingestion and aggregation code locally, not GitHub's API or hosted Actions. Production leaderboard data remains empty.
 
 ## Banking and calibration
 
@@ -26,5 +26,7 @@ The portable scientific archive contains 158 files with original and sanitized h
 Nine exporter tests check exact large integer counters, public-field allowlisting, no modification of the source campaign or database access, rejection of false identities, genuine bounded history, audit timestamps, monotonic snapshot updates, safe output location, and bounded allowlisted model calibration rows.
 
 ## Operational limits
+
+Publication was blocked by this Mac's managed pre-push hook. No external bank issue, hosted verification workflow, or Pages deployment has run. See [release status](RELEASE_STATUS.md) for the precise remaining release checks.
 
 Banked data is only credited after independent replay. A receipt can be copied, and a digest is not proof that a donor used a processor. Empty-shell tasks can be cheaper than other tasks. The leaderboard counts context-specific coefficient inputs, not CPU instructions or discovery probability. Full replay may bottleneck the verifier; public scaling has not yet been established. GitHub Actions may delay scheduled jobs, and the public Mac report is a timestamped snapshot rather than a direct connection.

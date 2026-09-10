@@ -4,7 +4,7 @@ Stake some processor time on `x³ + y³ + z³ = 114`.
 
 An open computational mathematics experiment by Kuber Mehta. No money, token, payout, known odds, or promise of a breakthrough. A valid integer triple would be interesting mathematics. An unsuccessful computation still produces an auditable record of exactly what was checked.
 
-The website lives at **https://kuber.studio/math-gambling/**. This repository is the source of truth for the website, portable search workers, cluster protocol, and prior research.
+The intended website address is **https://kuber.studio/math-gambling/**. Publication is pending a managed Git policy exception; see [release status](docs/RELEASE_STATUS.md). This repository contains the website, portable search workers, cluster protocol, and prior research.
 
 ## What runs
 

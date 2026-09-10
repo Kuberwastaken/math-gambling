@@ -25,10 +25,10 @@ python3 tools/export_mac.py --source /path/to/three-cubes-lab --output data
 The existing hourly campaign monitor can publish the report with:
 
 ```sh
-python3 tools/publish_snapshot.py --source /path/to/three-cubes-lab --push
+python3 tools/publish_snapshot_vps.py --source /path/to/three-cubes-lab --push
 ```
 
-This uses a temporary clean checkout and only commits `data/mac.json` and `data/mac-history.json`; it does not touch the development checkout or live ledger. Concurrent updates are rebased, never force-pushed. No scheduler is installed by this script. A stale snapshot stays timestamped and becomes visibly overdue after two hours. GitHub Actions cannot read the Mac directly.
+The reviewed exporter reads the Mac campaign locally and sends only the two public JSON files over authenticated SSH to the user-designated personal-work host `ai-vps`. Its receiving helper must be installed at `/Users/kuber.mehta/Projects/math-gambling/tools/publish_snapshot_vps.py`. Git publication runs there through its normal configuration. No Mac Git hook is changed. The receiver uses a temporary clean checkout and only commits `data/mac.json` and `data/mac-history.json`; it does not touch the development checkout or live ledger. Concurrent updates are rebased, never force-pushed. No scheduler is installed by this script. A stale snapshot stays timestamped and becomes visibly overdue after two hours. GitHub Actions cannot read the Mac directly.
 
 ## Verification and preservation
 

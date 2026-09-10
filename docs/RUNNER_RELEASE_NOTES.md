@@ -1,4 +1,18 @@
-# Math Gambling runner v0.2.2
+# Math Gambling runner v0.3.0
+
+This release addresses the 10 September audit. Existing task identities and receipt digests stay valid.
+
+- Exact identities are saved as soon as the kernel finds them, before later work or receipt hashing. Startup checks saved discoveries and prepares them for priority banking.
+- Explicit seeded runs resume their saved selection stream. Operational failures produce a distinct status and nonzero exit code.
+- Banks use relocatable paths. Submission intent is durable before GitHub creation; uncertain attempts require reconciliation rather than blind retries.
+- Coverage v2 uses exact hash-routed chunks. It removes the old 100,000-ID context cap and bounds client memory. Both legacy v1 and new v2 snapshots are readable.
+- New builds include every chunk needed for offline use. Upgrade from v0.2.x to use the new published coverage; preserve your output folder and existing bank files.
+
+The release is published only after its extracted archive passes the Linux, macOS and Windows gates. These are tested fault-handling improvements, not an absolute guarantee against hardware or storage failure. The search still has no guaranteed result or discovery ETA.
+
+## Earlier releases
+
+### v0.2.2
 
 A portable Python 3.11+ client for the community search for x³ + y³ + z³ = 114.
 

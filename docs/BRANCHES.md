@@ -12,10 +12,11 @@ Generated-data links stay relative to this branch; links to code, research,
 static Mac snapshots, and documentation point to `main`.
 
 [`gh-pages`](https://github.com/Kuberwastaken/math-gambling/tree/gh-pages) contains
-only the built site. The Pages workflow also uploads the same built directory
-to the existing GitHub Pages artifact/deployment service. GitHub Pages remains
-configured to use GitHub Actions; the `gh-pages` branch is an inspectable copy
-of those built files.
+only the built site. After publishing that branch, a separate deploy job checks
+out its exact commit and uploads those checked-out files to GitHub Pages.
+The deployed bytes therefore come from `gh-pages`, not from the source build
+directory. GitHub Pages uses the Actions deployment service, which avoids
+depending on whether a bot commit triggers an automatic branch build.
 
 The verifier responds to eligible issue events and keeps its hourly fallback.
 Deployment is batched at minutes **7, 27, and 47 of each hour**, plus explicit

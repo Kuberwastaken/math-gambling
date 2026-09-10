@@ -232,6 +232,9 @@ class BranchStateTests(unittest.TestCase):
         self.assertNotIn('workflow_run:', pages)
         self.assertNotIn('  push:', pages)
         self.assertIn('publish-site --directory dist/math-gambling --push', pages)
+        self.assertIn('ref: ${{ needs.build.outputs.site_commit }}', pages)
+        self.assertIn('path: published-site', pages)
+        self.assertNotIn('path: dist/math-gambling', pages)
 
 
 if __name__ == '__main__': unittest.main()

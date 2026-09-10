@@ -14,6 +14,8 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      site_commit: ${{ steps.site.outputs.commit }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -36,12 +38,18 @@ jobs:
       - name: Validate links and downloadable runner
         run: python3 tools/check_site.py
       - name: Publish built files to the separate gh-pages branch
-        run: python3 tools/branch_state.py publish-site --directory dist/math-gambling --push
-      - if: github.event.repository.private == false
-        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
-      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
-        with:
-          path: dist/math-gambling
+        id: site
+        run: |
+          python3 tools/branch_state.py publish-site --directory dist/math-gambling --push > /tmp/site-publication.json
+          python3 - <<'PYCODE'
+          import json, os, re
+          result = json.load(open('/tmp/site-publication.json'))
+          assert result['branch'] == 'gh-pages' and result['pushed'] is True
+          assert re.fullmatch(r'[0-9a-f]{40}', result['commit'])
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('commit=' + result['commit'] + '\n')
+          print('Published gh-pages commit ' + result['commit'])
+          PYCODE
   deploy:
     if: github.event.repository.private == false
     needs: build
@@ -50,6 +58,17 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy
+      - name: Checkout the exact published gh-pages commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.build.outputs.site_commit }}
+          path: published-site
+          persist-credentials: false
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Upload only the files read back from gh-pages
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: published-site
+      - name: Deploy gh-pages snapshot
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

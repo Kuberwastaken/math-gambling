@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-10 19:55:32 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-10 19:56:41 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 20,313 |
-| Coefficient-generator inputs | 37,989,376 |
-| Bounded curve intervals | 2,778,664 |
-| Logical quotient positions | 4,020,941,782 |
-| Exact integer square tests | 8,330 |
+| Unique finite tasks | 20,569 |
+| Coefficient-generator inputs | 38,469,632 |
+| Bounded curve intervals | 2,816,497 |
+| Logical quotient positions | 4,078,996,816 |
+| Exact integer square tests | 8,461 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,7 +35,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 36,314,112 | 19,417 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 36,794,368 | 19,673 |
 | 2 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 512 |
 | 3 | Pierre | [@pcrooks](https://github.com/pcrooks) | 482,304 | 256 |
 | 4 | [Kuber](<https://kuber.studio>) | [@Kuberwastaken](https://github.com/Kuberwastaken) | 238,592 | 128 |
@@ -44,18 +44,18 @@ Rank is based on replayed coefficient inputs. Alias websites are optional and se
 
 ### The current allocation
 
-**Epoch 317**, frozen from **20,288 verified tasks**. The next policy update needs **39 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 321**, frozen from **20,544 verified tasks**. The next policy update needs **39 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 314: 20,096 tasks; c00 1.23%"]
-    H1["Epoch 315: 20,160 tasks; c00 1.23%"]
+    H0["Epoch 318: 20,352 tasks; c00 1.23%"]
+    H1["Epoch 319: 20,416 tasks; c00 1.23%"]
     H0 --> H1
-    H2["Epoch 316: 20,224 tasks; c00 1.23%"]
+    H2["Epoch 320: 20,480 tasks; c00 1.23%"]
     H1 --> H2
-    H3["Epoch 317: 20,288 tasks; c00 1.23%"]
+    H3["Epoch 321: 20,544 tasks; c00 1.23%"]
     H2 --> H3
-    Policy["Current policy: epoch 317"]
+    Policy["Current policy: epoch 321"]
     H3 --> Policy
     Policy --> Explore["40% uniform exploration across 81 contexts"]
     Policy --> Cost["60% weighted by measured replay efficiency"]
@@ -80,11 +80,11 @@ Weights describe allocation, not the probability that a lane contains a solution
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 313 | 20,032 | c00 | 1.2346% |
-| 314 | 20,096 | c00 | 1.2346% |
-| 315 | 20,160 | c00 | 1.2346% |
-| 316 | 20,224 | c00 | 1.2346% |
 | 317 | 20,288 | c00 | 1.2346% |
+| 318 | 20,352 | c00 | 1.2346% |
+| 319 | 20,416 | c00 | 1.2346% |
+| 320 | 20,480 | c00 | 1.2346% |
+| 321 | 20,544 | c00 | 1.2346% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -147,7 +147,7 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **19,456 verified tasks**; **19 models** and **18 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **20,480 verified tasks**; **20 models** and **19 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
 The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.
 
@@ -163,16 +163,16 @@ flowchart TD
     Gate --> NoPromotion[No automatic discovery-policy promotion]
 ```
 
-Latest evaluation: tasks 18,433–19,456. Lower mean absolute log1p prediction error is better.
+Latest evaluation: tasks 19,457–20,480. Lower mean absolute log1p prediction error is better.
 
 | Quantity | Context baseline | Spatial challenger |
 | --- | ---: | ---: |
-| cpu_ms | 1.1246 | 1.0962 |
-| quotient_points | 8.7130 | 8.6614 |
-| curves | 3.9619 | 3.9195 |
-| exact_tests | 0.3292 | 0.3191 |
+| cpu_ms | 1.1567 | 1.1236 |
+| quotient_points | 8.8657 | 8.8094 |
+| curves | 4.0420 | 3.9930 |
+| exact_tests | 0.3325 | 0.3208 |
 
-Unseen-geometry evaluation: 163 tasks. Full errors and nonzero-count support are in the report.
+Unseen-geometry evaluation: 172 tasks. Full errors and nonzero-count support are in the report.
 
 Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.
 

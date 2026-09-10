@@ -31,6 +31,7 @@ MAX_HITS = 64
 MAX_DIGITS = 128
 USER_AGENT = "OpenAI File Downloader, XaiImageApiFetch/1.0"
 ROOT = Path(__file__).resolve().parents[1]
+REPLAY_KERNEL_SHA256 = hashlib.sha256((ROOT / "tools/search_core.py").read_bytes()).hexdigest()
 DECIMAL = re.compile(r"-?(?:0|[1-9][0-9]*)\Z")
 
 
@@ -439,6 +440,7 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
                         budget.next_sequence = sum(1 for _ in (Path(data) / "receipts" / "tasks").glob("*/*.json")) + 1
                     atomic_json(path, {"schema": "math-gambling-verified-task-v1", "sequence": budget.next_sequence,
                                        "result": expected, "verified_at": now(), "server_replay_cpu_ms": cpu_ms,
+                                       "replay_kernel_sha256": REPLAY_KERNEL_SHA256,
                                        "contributor": contributor(receipt), "source": source})
                     budget.next_sequence += 1
                     record["accepted_tasks"].append(identifier)

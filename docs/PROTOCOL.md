@@ -196,7 +196,7 @@ as verification. Work awaiting replay stays out of verified totals.
 After each 64 unique verified tasks, the aggregator may publish a new frozen
 `data/strategy.json` epoch. It uses server-measured replay cost and deterministic
 logical position counts, retaining a 40% uniform context exploration floor.
-This optimizes a **cost proxy**, not a learned probability of discovering 114.
+The [current policy](GEOMETRIC_POLICY.md) combines measured cost with an uncalibrated geometric exposure prior, not a learned probability of discovering 114.
 Uniform task sampling and this proxy can both have substantial mathematical
 sampling bias. The previous discovery-learning experiment did not demonstrate
 better success than its uniform control.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish exact replay totals and an explicitly cost-only scheduling policy."""
+"""Publish exact replay totals and an explicit geometry/cost scheduling preference."""
 from __future__ import annotations
 
 import argparse
@@ -41,7 +41,7 @@ def initial_strategy():
                           "exploit_weight": 1 / 81, "sample_size": 0, "robust_cpu_ms": None} for c in CONTEXT_IDS]}
 
 
-def calibrate(tasks, epoch):
+def legacy_calibrate(tasks, epoch):
     """Freeze a policy at a 64-task boundary; noisy client speed never enters it."""
     through = epoch * EPOCH_SIZE
     observations = defaultdict(list)
@@ -88,6 +88,20 @@ def aggregate(data):
         raise ValueError("verified task count regressed behind frozen policy")
     if not previous:
         previous = initial_strategy()
+    # Migration starts only at a NEW boundary. Existing history is immutable.
+    config_path = data / 'policy-config.json'
+    config = read_json(config_path)
+    if config is None:
+        config = {'schema': 'mg114-policy-migration-v1', 'geometry_start_epoch': max(1, previous['epoch'] + 1)}
+        atomic_json(config_path, config)
+    start_epoch = config.get('geometry_start_epoch')
+    if type(start_epoch) is not int or start_epoch < 1:
+        raise ValueError('invalid policy migration boundary')
+    def calibrate(tasks, number):
+        if number < start_epoch:
+            return legacy_calibrate(tasks, number)
+        from geometric_policy import calibrate as geometric_calibrate
+        return geometric_calibrate(tasks, number)
     recorded = read_json(data / "cluster.json", {}).get("calibration_history", [])
     if not isinstance(recorded, list):
         raise ValueError("invalid calibration history")
@@ -108,7 +122,7 @@ def aggregate(data):
             computed = calibrate(tasks, update)
             entry = {"epoch": update, "through_verified_tasks": update * EPOCH_SIZE,
                      "updated_at": tasks[update * EPOCH_SIZE - 1]["verified_at"],
-                     "objective": "cost only", "exploration_fraction": EXPLORATION,
+                     "objective": computed["objective"], "policy_version": computed.get("policy_version", "legacy-cost-v1"), "exploration_fraction": EXPLORATION,
                      "weights": {x["id"]: x["weight"] for x in computed["contexts"]}}
         history.append(entry)
     if previous["epoch"] != epoch:
@@ -173,6 +187,8 @@ def aggregate(data):
                           "reported_tasks": sum(x["reported_tasks"] for x in receipts),
                           "verified_unique_tasks": len(tasks),
                           "verified_computations": str(totals.get("generators", 0)),
+                          "zero_curve_tasks": sum(int(t["result"]["counters"].get("curves", 0)) == 0 for t in tasks),
+                          "nonempty_curve_tasks": sum(int(t["result"]["counters"].get("curves", 0)) > 0 for t in tasks),
                           "replay_cpu_ms": sum(x["server_replay_cpu_ms"] for x in tasks),
                           "rejected_receipts": sum(x["status"] == "rejected" for x in receipts),
                           "partial_receipts": sum(x["status"] == "partial" for x in receipts),

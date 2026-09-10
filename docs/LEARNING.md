@@ -1,6 +1,6 @@
 # Learning from exact searches
 
-The production cost scheduler remains active. A separate deterministic spatial challenger now learns from authoritative replay records. No browser copy, task definition, random seed, leaderboard unit or mathematical exclusion is changed.
+Production uses the [geometry/cost preference](GEOMETRIC_POLICY.md), with historical epochs preserved. A separate deterministic spatial challenger now learns from authoritative replay records. No browser copy, task definition, random seed, leaderboard unit or mathematical exclusion is changed.
 
 ## What is implemented
 
@@ -16,13 +16,13 @@ Next-window errors are mean absolute log1p errors, reported separately by target
 
 The existing serialized verification Action runs learning after receipt replay and aggregation. A model error cannot prevent accepted coverage and leaderboard publication. The job visibly reports learning failure, and an old report stays old rather than fabricating a fresh model. Generated learning data and the README report are committed alongside ordinary ledger updates. There is no second ledger writer, arbitrary issue code, pickle loading, cloud search or website-side model execution.
 
-Every 64 accepted tasks still updates the existing cost policy. Challenger fitting uses a coarser 1,024-task boundary to avoid chasing noise. No discovery policy is automatically promoted. Model files contain no contributor identity; the canonical input hashes permit audit against the public ledger.
+Every 64 accepted tasks still updates the published geometry/cost policy. Challenger fitting uses a coarser 1,024-task boundary to avoid chasing noise. No discovery policy is automatically promoted. Model files contain no contributor identity; the canonical input hashes permit audit against the public ledger.
 
 ## Required gate before changing task selection
 
 1. Freeze candidate source, feature schema, model hash, objective, reference scheduler and evaluation budget before measuring. Keep an untouched final test after exploratory tuning.
 2. Draw fresh task proposal pools from a declared distribution, excluding training tasks and already covered IDs. Uniform context sampling must not be described as uniform sampling of all tasks.
-3. Compare uniform, current cost scheduler and challenger on the same controlled execution environment. Randomize order, use repeated independent seeds, count scoring, coverage/network and verifier cost, and enforce equal CPU budgets rather than equal task counts. Preserve every encountered identity synchronously. Evaluate browser and Python clients separately.
+3. Compare uniform, published scheduler and challenger on the same controlled execution environment. Randomize order, use repeated independent seeds, count scoring, coverage/network and verifier cost, and enforce equal CPU budgets rather than equal task counts. Preserve every encountered identity synchronously. Evaluate browser and Python clients separately.
 4. Report distinct canonical coverage, geometry/scale distribution, quotient exposure, curves, exact tests, failures, overlap and total cost. Exact-test throughput is diagnostic: weakening a sieve must never qualify as an improvement. Unique task IDs do not by themselves prove unique mathematical candidates across different parameterizations.
 5. Use uncertainty across independent pools/regions, not billions of correlated counter increments. Require repeatable improvement over the existing policy on a prespecified useful-coverage objective, with no unacceptable concentration or operational regression. A new objective needs mathematical justification, not merely a nicer numerical score.
 6. Publish a human-reviewed promotion record naming the exact evidence and limited claim. Keep the exploration distribution supported everywhere in the declared domain and measure its compute share. Never turn a low score into mathematical exclusion.
@@ -52,7 +52,7 @@ The first frozen challenger was run locally on fresh tasks, using four independe
 | Arm | Completed tasks | Logical quotient positions / CPU ms | Exact tests |
 | --- | ---: | ---: | ---: |
 | Uniform contexts | 505 | 38,641.75 | 158 |
-| Existing cost scheduler | 490 | 36,239.57 | 149 |
+| Legacy cost scheduler (pilot) | 490 | 36,239.57 | 149 |
 | Spatial quotient challenger | 243 | 50,327.40 | 203 |
 | Spatial exact-count diagnostic | 232 | 50,769.30 | 207 |
 

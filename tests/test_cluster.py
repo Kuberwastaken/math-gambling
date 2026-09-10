@@ -231,6 +231,29 @@ class ClusterTests(unittest.TestCase):
         self.assertEqual(frozen, (self.data / "strategy.json").read_bytes())
         self.assertEqual(len(updated["calibration_history"]), 1)
 
+    def test_geometry_migration_preserves_legacy_epochs_and_credit(self):
+        results = [run_task(make_task("c00", 128 * i)) for i in range(128)]
+        self.submit(bank(results[:64]), 1)
+        tasks = sorted(ag.load_kind(self.data, "tasks"), key=lambda t:t["sequence"])
+        legacy = ag.legacy_calibrate(tasks, 1)
+        ig.atomic_json(self.data / "strategy.json", legacy)
+        before = ag.aggregate(self.data)
+        self.assertEqual(ig.read_json(self.data / "strategy.json"), legacy)
+        self.assertEqual(ig.read_json(self.data / "policy-config.json")["geometry_start_epoch"], 2)
+        old_history = copy.deepcopy(before["calibration_history"])
+        self.submit(bank(results[64:]), 2)
+        after = ag.aggregate(self.data)
+        self.assertEqual(after["calibration_history"][:1], old_history)
+        policy = ig.read_json(self.data / "strategy.json")
+        self.assertEqual(policy["policy_version"], "mg114-geometric-cost-v1")
+        self.assertEqual(after["totals"]["verified_computations"], str(sum(r["counters"]["generators"] for r in results)))
+        # Recover a missing new history entry without reinterpreting the old epoch.
+        after["calibration_history"] = old_history
+        ig.atomic_json(self.data / "cluster.json", after)
+        rebuilt = ag.aggregate(self.data)
+        self.assertEqual(rebuilt["calibration_history"][:1], old_history)
+        self.assertEqual(rebuilt["calibration_history"][-1]["weights"], {c["id"]:c["weight"] for c in policy["contexts"]})
+
     def test_strict_full_result_backwards_compatibility(self):
         receipt = {"schema": "math-gambling-receipt-v1", "contributor": {"name": "X", "github": "X"},
                    "results": self.results[:1]}

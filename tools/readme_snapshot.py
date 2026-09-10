@@ -105,6 +105,9 @@ def validated_state(report, policy):
 def render_snapshot(report, policy, config=None):
     total, epoch, size, through, exploration, current, history, stamp = validated_state(report, policy)
     counters = report["totals"]["counters"]
+    geometric = policy.get('policy_version') == 'mg114-geometric-cost-v1'
+    allocation_label = 'geometry-weighted curve exposure / cost' if geometric else 'measured replay efficiency'
+    method = policy.get('reason', 'Legacy cost allocation; no discovery probability.')
     count = lambda key: f"{integer(counters.get(key, 0)):,}"
     next_tasks = (epoch + 1) * size - total
     lines = ["## Current verified campaign", "", f"Published observation: **{stamp}**. This section updates after trusted receipt processing.", "",
@@ -136,6 +139,10 @@ def render_snapshot(report, policy, config=None):
         lines.append(f"| {rank} | {profile_link(alias, url)} | [@{account}](https://github.com/{account}) | {inputs:,} | {tasks:,} |")
     if not people:
         lines += ["", "No participants have independently verified work yet."]
+    if 'zero_curve_tasks' in report['totals']:
+        empty = integer(report['totals']['zero_curve_tasks'])
+        lines += [f"**{empty:,} / {total:,} verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.", "",
+                  "[Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](docs/MATHEMATICAL_COVERAGE.md)", ""]
     lines += ["", "Rank is based on replayed coefficient inputs. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.", "",
               "### The current allocation", "",
               f"**Epoch {epoch}**, frozen from **{through:,} verified tasks**. The next policy update needs **{next_tasks:,} more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.", "", "```mermaid", "flowchart TD"]
@@ -149,7 +156,7 @@ def render_snapshot(report, policy, config=None):
     if recent:
         lines.append(f"    H{len(recent)-1} --> Policy")
     lines += [f'    Policy --> Explore["{100*exploration:g}% uniform exploration across 81 contexts"]',
-              f'    Policy --> Cost["{100*(1-exploration):g}% weighted by measured replay efficiency"]',
+              f'    Policy --> Cost["{100*(1-exploration):g}% weighted by {allocation_label}"]',
               '    Explore --> Mix["Combined task-selection weights"]', '    Cost --> Mix']
     top = sorted(current, key=lambda c: (-current[c], c))[:3]
     for i, context in enumerate(top):
@@ -161,7 +168,7 @@ def render_snapshot(report, policy, config=None):
               '    Check --> Replay["Bank result; independently replay"]',
               f'    Replay --> Gate["{size} new verified tasks completes an epoch"]',
               '    Gate --> Policy', '```', "",
-              "Weights describe allocation, not the probability that a lane contains a solution. Median replay efficiency, a minimum observation count and clipped scores limit noisy updates; at least 40% uniform exploration remains.", "",
+              "Weights describe task-selection shares, not CPU-time shares or discovery probabilities. " + markdown_text(method), "",
               "### Model history and evidence", "",
               "| Epoch | Verified-task boundary | Largest allocation | Weight |",
               "| ---: | ---: | --- | ---: |"]
@@ -172,7 +179,7 @@ def render_snapshot(report, policy, config=None):
         lines += ["", "The initial uniform policy has not completed a calibration epoch."]
     lines += ["", "Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:", "",
               "[Current policy](data/strategy.json) · [Complete model history and bank audits](data/cluster.json) · [Verified task records](data/receipts/tasks/) · [Exact completed-task index](data/coverage/index.json) · [Working paper](https://kuber.studio/math-gambling/paper/)", "",
-              "The separate discovery-learning experiment failed its promotion gate. This campaign currently learns execution cost; it has not established a discovery predictor."]
+              "The separate discovery-learning experiment failed its promotion gate. This campaign learns execution cost and applies a declared geometric prior; it has not established a discovery predictor."]
     return "\n".join(lines)
 
 

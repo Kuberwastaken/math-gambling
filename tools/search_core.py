@@ -128,7 +128,7 @@ def check_candidate(k, s, z, *, minimal=True):
     return xyz
 
 
-def scan_curve(k, d, r, qlo, qhi, *, sieve=True, minimal=True):
+def scan_curve(k, d, r, qlo, qhi, *, sieve=True, minimal=True, on_hit=None):
     """Regression API, not an accepted public task. k must be 3 or 6 modulo9."""
     if any(type(v) is not int for v in (k, d, r, qlo, qhi)) or not 3 <= k <= 1000 or k % 9 not in (3, 6):
         raise ValueError("unsupported regression curve")
@@ -168,12 +168,17 @@ def scan_curve(k, d, r, qlo, qhi, *, sieve=True, minimal=True):
         stats["exact_tests"] += 1
         xyz = check_candidate(k, s, z, minimal=minimal)
         if xyz:
-            hits.append(dict(xyz=xyz, D=str(d), r=str(r), q=str(q)))
+            hit = dict(xyz=xyz, D=str(d), r=str(r), q=str(q))
+            if on_hit is not None:
+                # check_candidate has independently verified the identity.
+                # Deliver it before another candidate or any result hashing.
+                on_hit({**hit, 'xyz': list(xyz)})
+            hits.append(hit)
     stats["hits"] = len(hits)
     return dict(counters=stats, hits=hits)
 
 
-def _run_row(task, c, row):
+def _run_row(task, c, row, on_hit=None):
     ell, radius = c["ell"], c["radius"]
     width = 2*radius+1
     b, cc = row % width-radius, row//width-radius
@@ -212,7 +217,9 @@ def _run_row(task, c, row):
         else:
             qlo, qhi = -((zmax+r)//d), -((zmin+r)//d)-1
             # ceil((-zmax-r)/d), ceil((-zmin-r)/d)-1
-        found = scan_curve(114, d, r, qlo, qhi)
+        def report_hit(hit):
+            on_hit({**hit, 'abc': [str(a), str(b), str(cc)], 't': t, 'row': str(row)})
+        found = scan_curve(114, d, r, qlo, qhi, on_hit=report_hit if on_hit is not None else None)
         for key, value in found["counters"].items():
             counters[key] += value
         for hit in found["hits"]:
@@ -225,13 +232,13 @@ def _run_row(task, c, row):
     return counters, hits
 
 
-def run_task(task):
+def run_task(task, on_hit=None):
     task = validate_task(task)
     c = CONTEXT_BY_ID[task["context"]]
     counters, hits = empty_counters(), []
     start = int(task['row'])
     for row in range(start, min(start+ROWS_PER_TASK, int(c['totalRows']))):
-        row_counters, row_hits = _run_row(task, c, row)
+        row_counters, row_hits = _run_row(task, c, row, on_hit=on_hit)
         for key, value in row_counters.items():
             counters[key] += value
         hits.extend(row_hits)

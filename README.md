@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-10 19:49:56 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-10 19:50:39 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 18,777 |
-| Coefficient-generator inputs | 35,093,504 |
-| Bounded curve intervals | 2,567,181 |
-| Logical quotient positions | 3,745,821,779 |
-| Exact integer square tests | 7,785 |
+| Unique finite tasks | 19,033 |
+| Coefficient-generator inputs | 35,573,760 |
+| Bounded curve intervals | 2,598,234 |
+| Logical quotient positions | 3,783,382,509 |
+| Exact integer square tests | 7,855 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,7 +35,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 33,418,240 | 17,881 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 33,898,496 | 18,137 |
 | 2 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 512 |
 | 3 | Pierre | [@pcrooks](https://github.com/pcrooks) | 482,304 | 256 |
 | 4 | [Kuber](<https://kuber.studio>) | [@Kuberwastaken](https://github.com/Kuberwastaken) | 238,592 | 128 |
@@ -44,18 +44,18 @@ Rank is based on replayed coefficient inputs. Alias websites are optional and se
 
 ### The current allocation
 
-**Epoch 293**, frozen from **18,752 verified tasks**. The next policy update needs **39 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 297**, frozen from **19,008 verified tasks**. The next policy update needs **39 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 290: 18,560 tasks; c00 1.23%"]
-    H1["Epoch 291: 18,624 tasks; c00 1.23%"]
+    H0["Epoch 294: 18,816 tasks; c00 1.23%"]
+    H1["Epoch 295: 18,880 tasks; c00 1.23%"]
     H0 --> H1
-    H2["Epoch 292: 18,688 tasks; c00 1.23%"]
+    H2["Epoch 296: 18,944 tasks; c00 1.23%"]
     H1 --> H2
-    H3["Epoch 293: 18,752 tasks; c00 1.23%"]
+    H3["Epoch 297: 19,008 tasks; c00 1.23%"]
     H2 --> H3
-    Policy["Current policy: epoch 293"]
+    Policy["Current policy: epoch 297"]
     H3 --> Policy
     Policy --> Explore["40% uniform exploration across 81 contexts"]
     Policy --> Cost["60% weighted by measured replay efficiency"]
@@ -80,11 +80,11 @@ Weights describe allocation, not the probability that a lane contains a solution
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 289 | 18,496 | c00 | 1.2346% |
-| 290 | 18,560 | c00 | 1.2346% |
-| 291 | 18,624 | c00 | 1.2346% |
-| 292 | 18,688 | c00 | 1.2346% |
 | 293 | 18,752 | c00 | 1.2346% |
+| 294 | 18,816 | c00 | 1.2346% |
+| 295 | 18,880 | c00 | 1.2346% |
+| 296 | 18,944 | c00 | 1.2346% |
+| 297 | 19,008 | c00 | 1.2346% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 

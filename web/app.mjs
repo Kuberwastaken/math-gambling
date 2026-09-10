@@ -6,6 +6,7 @@ import {
   verifyTriple,
   validateTask,
 } from "./engine.mjs";
+import { createLiveVisuals } from "./live-viz.mjs";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -42,6 +43,40 @@ const fetchJSON = async (file) => {
   if (!response.ok) throw new Error(`Report unavailable (${response.status})`);
   return response.json();
 };
+let liveVisuals;
+try {
+  liveVisuals = createLiveVisuals(CONTEXTS);
+} catch {
+  /* Visuals never decide coverage. */
+}
+function showRun(method, value) {
+  try {
+    liveVisuals?.[method](value);
+  } catch {
+    liveVisuals = null;
+    text(
+      "viz-state",
+      "Charts paused. Exact computation and saving remain active.",
+    );
+  }
+}
+function processorDuty() {
+  const value = Number($("run-duty")?.value);
+  return Math.min(90, Math.max(5, Number.isFinite(value) ? value : 25)) / 100;
+}
+function updateProcessor() {
+  const percent = Math.round(processorDuty() * 100);
+  text(
+    "duty-readout",
+    `${percent}% · ${percent === 90 ? "All in" : percent >= 60 ? "Feeling lucky" : percent >= 40 ? "A little more" : "Taking it easy"}`,
+  );
+  $("run-duty")?.setAttribute(
+    "aria-valuetext",
+    `${percent} percent of one worker${percent === 90 ? ", All in" : ""}`,
+  );
+}
+$("run-duty")?.addEventListener("input", updateProcessor);
+updateProcessor();
 let profile = { name: "", github: "" };
 try {
   profile = JSON.parse(localStorage.getItem("mg-profile") || "null") || profile;
@@ -208,17 +243,85 @@ function lineChart(el, points, { label, format = small, height = 170 } = {}) {
   el.replaceChildren(svg);
 }
 function calibrationScatter(mac) {
-  const el=$('mac-calibration'); if(!el)return;
-  const h=mac.learning?.holdout||{}, rows=(h.rows||[]).filter(r=>r.predicted>0&&r.observed>0);
-  text('mac-calibration-note', `Rank correlation: ${Number.isFinite(h.spearman)?h.spearman.toFixed(3):'unavailable'}. Top-quarter observed throughput / baseline: ${Number.isFinite(h.top_quarter_over_baseline)?h.top_quarter_over_baseline.toFixed(2)+'×':'unavailable'}. ${rows.length} held-out contexts.`);
-  if(!rows.length){el.textContent='No per-context calibration observations are available.';return;}
-  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 1000 340');svg.setAttribute('role','img');svg.setAttribute('aria-label','Frozen Mac model: predicted versus observed conditional throughput, logarithmic axes');
-  const values=rows.flatMap(r=>[Math.log10(r.predicted),Math.log10(r.observed)]),lo=Math.floor(Math.min(...values)),hi=Math.ceil(Math.max(...values)),X=v=>80+(v-lo)/(hi-lo)*860,Y=v=>290-(v-lo)/(hi-lo)*260;
-  function node(tag,attrs,value){const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(value!=null)e.textContent=value;svg.append(e);return e;}
-  for(let i=lo;i<=hi;i++){node('line',{x1:80,y1:Y(i),x2:940,y2:Y(i),class:'chart-grid'});node('text',{x:70,y:Y(i)+4,'text-anchor':'end',class:'chart-label'},small(10**i));node('text',{x:X(i),y:315,'text-anchor':'middle',class:'chart-label'},small(10**i));}
-  node('line',{x1:80,y1:290,x2:940,y2:30,stroke:'#b5c5b8','stroke-dasharray':'4 5'});
-  for(const r of rows){const circle=node('circle',{cx:X(Math.log10(r.predicted)),cy:Y(Math.log10(r.observed)),r:4,fill:'#dfbd72','fill-opacity':'.7'});const t=document.createElementNS(ns,'title');t.textContent=`${r.context}: predicted ${r.predicted.toFixed(2)}, observed ${r.observed.toFixed(2)}`;circle.append(t);}
-  node('text',{x:510,y:338,'text-anchor':'middle',class:'chart-label'},'Predicted throughput score');node('text',{x:80,y:15,class:'chart-label'},'Observed throughput score');el.replaceChildren(svg);
+  const el = $("mac-calibration");
+  if (!el) return;
+  const h = mac.learning?.holdout || {},
+    rows = (h.rows || []).filter((r) => r.predicted > 0 && r.observed > 0);
+  text(
+    "mac-calibration-note",
+    `Rank correlation: ${Number.isFinite(h.spearman) ? h.spearman.toFixed(3) : "unavailable"}. Top-quarter observed throughput / baseline: ${Number.isFinite(h.top_quarter_over_baseline) ? h.top_quarter_over_baseline.toFixed(2) + "×" : "unavailable"}. ${rows.length} held-out contexts.`,
+  );
+  if (!rows.length) {
+    el.textContent = "No per-context calibration observations are available.";
+    return;
+  }
+  const ns = "http://www.w3.org/2000/svg",
+    svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", "0 0 1000 340");
+  svg.setAttribute("role", "img");
+  svg.setAttribute(
+    "aria-label",
+    "Frozen Mac model: predicted versus observed conditional throughput, logarithmic axes",
+  );
+  const values = rows.flatMap((r) => [
+      Math.log10(r.predicted),
+      Math.log10(r.observed),
+    ]),
+    lo = Math.floor(Math.min(...values)),
+    hi = Math.ceil(Math.max(...values)),
+    X = (v) => 80 + ((v - lo) / (hi - lo)) * 860,
+    Y = (v) => 290 - ((v - lo) / (hi - lo)) * 260;
+  function node(tag, attrs, value) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    if (value != null) e.textContent = value;
+    svg.append(e);
+    return e;
+  }
+  for (let i = lo; i <= hi; i++) {
+    node("line", { x1: 80, y1: Y(i), x2: 940, y2: Y(i), class: "chart-grid" });
+    node(
+      "text",
+      { x: 70, y: Y(i) + 4, "text-anchor": "end", class: "chart-label" },
+      small(10 ** i),
+    );
+    node(
+      "text",
+      { x: X(i), y: 315, "text-anchor": "middle", class: "chart-label" },
+      small(10 ** i),
+    );
+  }
+  node("line", {
+    x1: 80,
+    y1: 290,
+    x2: 940,
+    y2: 30,
+    stroke: "#b5c5b8",
+    "stroke-dasharray": "4 5",
+  });
+  for (const r of rows) {
+    const circle = node("circle", {
+      cx: X(Math.log10(r.predicted)),
+      cy: Y(Math.log10(r.observed)),
+      r: 4,
+      fill: "#dfbd72",
+      "fill-opacity": ".7",
+    });
+    const t = document.createElementNS(ns, "title");
+    t.textContent = `${r.context}: predicted ${r.predicted.toFixed(2)}, observed ${r.observed.toFixed(2)}`;
+    circle.append(t);
+  }
+  node(
+    "text",
+    { x: 510, y: 338, "text-anchor": "middle", class: "chart-label" },
+    "Predicted throughput score",
+  );
+  node(
+    "text",
+    { x: 80, y: 15, class: "chart-label" },
+    "Observed throughput score",
+  );
+  el.replaceChildren(svg);
 }
 
 let macData = null,
@@ -235,6 +338,7 @@ async function loadMac() {
     calibrationScatter(mac);
     text("mac-curves", small(mac.totals?.curve_checks));
     text("mac-exact", small(mac.totals?.exact_tests));
+    text("mac-hits", fmt((mac.solutions || []).length));
     const age = Date.now() - Date.parse(mac.updated_utc),
       stale = age > 2 * 3600000;
     text(
@@ -343,9 +447,11 @@ async function loadStrategy() {
     )
       throw Error("Invalid policy");
     strategy = s;
+    showRun("policy", strategy);
     renderAllocation();
   } catch {
     strategy = null;
+    showRun("policy", null);
     text(
       "strategy-reason",
       "Strategy unavailable or invalid. Browser work uses uniform exploration.",
@@ -357,6 +463,7 @@ async function loadCluster() {
     clusterData = await fetchJSON("data/cluster.json");
     const t = clusterData.totals || {};
     text("cluster-reported", fmt(t.reported_tasks));
+    text("cluster-inputs", fmt(t.verified_computations));
     text("cluster-verified", fmt(t.verified_unique_tasks));
     text("cluster-duplicates", fmt(t.duplicate_tasks));
     text("cluster-hits", fmt(t.verified_hits));
@@ -369,17 +476,17 @@ async function loadCluster() {
     text(
       "cluster-note",
       Number(t.verified_unique_tasks)
-        ? "Only independently replayed tasks enter this ledger. Authenticated GitHub submitters receive credit when their unique task results are first accepted."
+        ? "Ranked by independently verified inputs. Duplicate tasks earn no extra credit."
         : "The volunteer ledger starts at zero. Be the first to bank a verified computation.",
     );
     const body = $("contributors");
     if (body) {
       body.replaceChildren();
-      const people = [...(clusterData.contributors || [])].sort(
-        (a, b) =>
-          Number(b.verified_computations || 0) -
-          Number(a.verified_computations || 0),
-      );
+      const people = [...(clusterData.contributors || [])].sort((a, b) => {
+        const x = BigInt(a.verified_computations || 0),
+          y = BigInt(b.verified_computations || 0);
+        return y > x ? 1 : y < x ? -1 : 0;
+      });
       if (!people.length) {
         const row = body.insertRow();
         const cell = row.insertCell();
@@ -387,9 +494,15 @@ async function loadCluster() {
         cell.textContent =
           "No independently verified volunteer contributions yet.";
       } else
-        for (const p of people) {
+        for (const [rank, p] of people.entries()) {
           const row = body.insertRow();
-          row.insertCell().textContent = p.name || p.submitter || "Contributor";
+          const alias = row.insertCell();
+          const place = document.createElement("span");
+          place.className = "rank-number";
+          place.textContent = String(rank + 1).padStart(2, "0");
+          const name = document.createElement("span");
+          name.textContent = p.name || p.submitter || "Contributor";
+          alias.append(place, name);
           const user = String(p.submitter || "");
           const cell = row.insertCell();
           if (/^[A-Za-z0-9-]{1,39}$/.test(user)) {
@@ -712,11 +825,9 @@ let worker = null,
   sessionGeneration = 0,
   activeTask = null,
   startAt = 0,
-  deadline = 0,
   nextTimer = null,
   runTimer = null,
   counts = { generators: 0, curves: 0, exact_tests: 0, tasks: 0 },
-  curveHistory = [],
   seen = new Set(),
   completedSinceRefresh = 0;
 function randBelow(limit) {
@@ -769,6 +880,7 @@ function finishStop() {
   $("stop-button").disabled = true;
   $("start-button").disabled = false;
   text("session-state", "Stopped");
+  showRun("state", "stopped");
   text(
     "session-message",
     stopReason || "Stopped. Finished tasks remain saved.",
@@ -799,12 +911,9 @@ function failStop(reason) {
 }
 function dispatch() {
   if (!running || busy) return;
-  if (Date.now() >= deadline) {
-    stop("Time budget reached. Bank your finished work when you’re ready.");
-    return;
-  }
   if (document.hidden) {
     text("session-state", "Paused · tab hidden");
+    showRun("state", "paused");
     return;
   }
   if (tasks.filter((t) => !coveredIds().has(t.id)).length >= 4096) {
@@ -822,6 +931,7 @@ function dispatch() {
       "task-detail",
       `${task.context} · rows ${task.row}–${BigInt(task.row) + 127n} · block ${task.block}`,
     );
+    showRun("dispatch", task);
     worker.postMessage({ type: "start", task });
   } catch (e) {
     failStop(e.message);
@@ -831,9 +941,10 @@ async function start(e) {
   e.preventDefault();
   if (running || starting || worker) return;
   starting = true;
+  const username = $("player-github").value.trim().replace(/^@/, "");
   profile = {
-    name: $("player-name").value.trim(),
-    github: $("player-github").value.trim(),
+    name: $("player-name").value.trim() || username || "Anonymous",
+    github: username,
   };
   if (!validProfile(profile)) {
     text(
@@ -861,21 +972,18 @@ async function start(e) {
   profilePreview();
   seen = new Set(tasks.map((t) => t.id));
   counts = { generators: 0, curves: 0, exact_tests: 0, tasks: 0 };
-  curveHistory = [];
   renderCounts();
   startAt = Date.now();
-  deadline = startAt + Number($("run-minutes").value) * 60000;
+  showRun("reset");
   running = true;
   busy = false;
-  const duty = Number($("run-duty").value);
   $("start-button").disabled = true;
   $("stop-button").disabled = false;
-  $("join-form")
-    .querySelectorAll("input,select")
-    .forEach((el) => (el.disabled = true));
+  for (const id of ["player-name", "player-github"]) $(id).disabled = true;
+  // The processor slider remains adjustable during a run.
   text(
     "session-message",
-    "Exact work is running. Completed tasks are saved on this device. Bank them when you’re ready.",
+    "Your hand is in play. Every finished batch gets saved.",
   );
   try {
     worker = new Worker(new URL("search-worker.mjs", BASE), { type: "module" });
@@ -982,20 +1090,7 @@ async function start(e) {
       counts.tasks++;
       renderCounts();
       updateBankUI();
-      curveHistory.push({
-        x: Date.now(),
-        y: counts.curves,
-        label: new Date().toLocaleTimeString([], {
-          minute: "2-digit",
-          second: "2-digit",
-        }),
-      });
-      if (curveHistory.length > 100) curveHistory.shift();
-      if (counts.tasks % 8 === 0)
-        lineChart($("session-chart"), curveHistory, {
-          label: "Your measured cumulative root-interval checks this session",
-          height: 110,
-        });
+      showRun("result", { result: r, elapsedMs: data.elapsedMs });
       if (r.hits?.length) {
         const hit = r.hits[0];
         $("discovery").hidden = false;
@@ -1018,12 +1113,13 @@ async function start(e) {
         await loadCluster();
       }
       busy = false;
-      if (running)
+      if (running) {
+        const duty = processorDuty();
         nextTimer = setTimeout(
           dispatch,
-          Math.max(25, (data.elapsedMs * (1 - duty)) / duty),
+          Math.max(0, (data.elapsedMs * (1 - duty)) / duty),
         );
-      else finishStop();
+      } else finishStop();
     })().catch((e) =>
       failStop(
         `Result handling failed: ${e.message}. Previously completed receipts are preserved.`,
@@ -1036,8 +1132,6 @@ async function start(e) {
       "elapsed",
       `${Math.floor(elapsed / 60)}:${String(elapsed % 60).padStart(2, "0")}`,
     );
-    if (Date.now() >= deadline)
-      stop("Time budget reached. Finished work is saved and ready to bank.");
   }, 500);
 }
 $("join-form")?.addEventListener("submit", start);
@@ -1049,9 +1143,13 @@ window.addEventListener("beforeunload", (e) => {
   }
 });
 document.addEventListener("visibilitychange", () => {
-  if (running && !document.hidden) {
-    text("session-state", "Computing");
-    dispatch();
+  if (running) {
+    text(
+      "session-state",
+      document.hidden ? "Paused · tab hidden" : "Computing",
+    );
+    showRun("state", document.hidden ? "paused" : "running");
+    if (!document.hidden) dispatch();
   }
 });
 if ($("join-form")) {
@@ -1063,8 +1161,8 @@ if ($("join-form")) {
       text(
         "session-message",
         tasks.length
-          ? `${fmt(tasks.length)} finished tasks restored from this device. Your previous receipts are safe.`
-          : "Finished tasks stay on this device until you choose to bank them on GitHub.",
+          ? `${fmt(tasks.length)} hands saved on this device. Ready for another?`
+          : "Waiting for you to make a questionable computational decision.",
       );
     })
     .catch(() => {

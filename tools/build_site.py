@@ -5,18 +5,17 @@ import hashlib, html, json, re, shutil, zipfile
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'dist'/'math-gambling'
 BASE='/math-gambling/'
-NAV=[('', 'The table'),('approach/', 'The approach'),('cluster/', 'The cluster'),('paper/', 'The paper'),('research/', 'The notebook')]
+VERSION=hashlib.sha256(b''.join(p.read_bytes() for p in sorted((ROOT/'web').glob('*')) if p.is_file())).hexdigest()[:12]
 
 def shell(title, body, active=''):
-    nav=''.join(f'<a href="{BASE}{p}"'+(' aria-current="page"' if p==active else '')+f'>{label}</a>' for p,label in NAV)
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(title)} · math-gambling</title><meta name="description" content="An open search for x³ + y³ + z³ = 114. Contribute processor time, watch exact computations, and help test our strategy. The odds are unknown.">
-<meta name="theme-color" content="#132d25"><meta property="og:title" content="math-gambling — stake some processor time"><meta property="og:description" content="An open mathematical long shot. Real computation. Unknown odds."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.svg">
-<link rel="icon" href="{BASE}assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="{BASE}styles.css"><link rel="canonical" href="https://kuber.studio{BASE}{active}">
-<script type="module" src="{BASE}app.mjs"></script></head><body data-page="{active or 'home'}">
-<a class="skip" href="#main">Skip to content</a><header class="site-header"><a class="wordmark" href="{BASE}"><span class="mark" aria-hidden="true">∛</span> math-gambling</a><nav aria-label="Main navigation">{nav}</nav><a class="source-link" href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></header>
-<main id="main">{body}</main><footer><a class="wordmark" href="{BASE}">math-gambling</a><p>Unknown odds. Exact arithmetic. Shared credit.</p><div><a href="{BASE}approach/#limits">The limits</a><a href="{BASE}approach/#privacy">Your device & data</a><a href="https://github.com/Kuberwastaken/math-gambling">Source ↗</a></div></footer>
+<title>{"Math Gambling" if not active else html.escape(title)+" · Math Gambling"}</title><meta name="description" content="An open search for x³ + y³ + z³ = 114. Contribute processor time, watch exact computations, and help test our strategy. The odds are unknown.">
+<meta name="theme-color" content="#132d25"><meta property="og:title" content="Math Gambling — let it ride"><meta property="og:description" content="An open mathematical long shot. Real computation. Unknown odds."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.svg">
+<link rel="icon" href="{BASE}assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="{BASE}styles.css?v={VERSION}"><link rel="canonical" href="https://kuber.studio{BASE}{active}">
+<script type="module" src="{BASE}app.mjs?v={VERSION}"></script></head><body data-page="{active or 'home'}">
+<a class="skip" href="#main">Skip to content</a>{'<div class="back-to-table"><a href="'+BASE+'">← Back to the table</a></div>' if active else ''}
+<main id="main">{body}</main><footer><a class="wordmark" href="{BASE}">Math Gambling</a><div><a href="{BASE}approach/">The approach</a><a href="{BASE}cluster/">The cluster</a><a href="{BASE}paper/">The paper</a><a href="{BASE}research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
 <noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>'''
 
 def markdown(text):
@@ -52,6 +51,14 @@ def main():
         if source.name=='pages':continue
         if source.is_dir():shutil.copytree(source,OUT/source.name)
         else:shutil.copy2(source,OUT/source.name)
+    # A returning browser must not combine new markup with a cached old worker UI.
+    for module in OUT.glob('*.mjs'):
+        content=module.read_text()
+        for asset in ('engine.mjs','live-viz.mjs','search-worker.mjs'):
+            for prefix in ('./',''):
+                for quote in ('"', "'"):
+                    content=content.replace(quote+prefix+asset+quote, quote+prefix+asset+'?v='+VERSION+quote)
+        module.write_text(content)
     for name,title,path in [('home','The table',''),('approach','The approach','approach/'),('cluster','The cluster','cluster/'),('paper','A paper, unfinished','paper/'),('research','The notebook','research/')]:
         source=ROOT/'web'/'pages'/f'{name}.html'
         if not source.exists():continue

@@ -1,6 +1,8 @@
 name: Verify community compute
 
 on:
+  issues:
+    types: [opened, edited, reopened]
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
@@ -15,6 +17,7 @@ concurrency:
 
 jobs:
   verify:
+    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[bank]') || startsWith(github.event.issue.title, '[compute]')
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
@@ -37,12 +40,17 @@ jobs:
         shell: bash
         run: |
           python3 tools/aggregate.py
+          python3 tools/readme_charts.py
           git config user.name 'math-gambling verifier'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- data/cluster.json data/strategy.json data/receipts
+          git add -- data/cluster.json data/strategy.json data/receipts data/coverage data/readme-progress.svg
           if ! git diff --cached --quiet; then
             git commit -m 'Record verified community receipts and frozen cost calibration'
-            git push
+            for attempt in 1 2 3; do
+              if git push; then break; fi
+              if [ "$attempt" -eq 3 ]; then exit 1; fi
+              git pull --rebase
+            done
           fi
       - name: Surface operational failure after preserving verified progress
         if: steps.replay.outcome == 'failure'

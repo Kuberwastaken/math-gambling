@@ -10,6 +10,7 @@ import { createLiveVisuals } from "./live-viz.mjs";
 import { renderModelEvolution } from "./model-viz.mjs";
 import { setupRunnerDownload } from "./runner-setup.mjs";
 setupRunnerDownload();
+import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -46,6 +47,7 @@ const fetchJSON = async (file) => {
   if (!response.ok) throw new Error(`Report unavailable (${response.status})`);
   return response.json();
 };
+const sharedCoverage = createCoverageClient(BASE);
 let liveVisuals;
 try {
   liveVisuals = createLiveVisuals(CONTEXTS);
@@ -956,43 +958,38 @@ let worker = null,
   runTimer = null,
   counts = { generators: 0, curves: 0, exact_tests: 0, tasks: 0 },
   seen = new Set(),
-  completedSinceRefresh = 0;
-function randBelow(limit) {
-  const n = BigInt(limit);
-  if (n <= 0n) throw Error("Invalid random bound");
-  const max = 1n << 64n,
-    cap = max - (max % n);
-  for (;;) {
-    const bytes = crypto.getRandomValues(new Uint32Array(2));
-    const r = (BigInt(bytes[0]) << 32n) | BigInt(bytes[1]);
-    if (r < cap) return r % n;
-  }
-}
-function nextTask() {
+  completedSinceRefresh = 0,
+  currentSeed = "",
+  randomStream = null,
+  assigningGeneration = null,
+  assignedProvenance = null;
+async function nextTask(generation) {
   const weights =
     strategy?.contexts || CONTEXTS.map((c) => ({ id: c.id, weight: 1 / 81 }));
+  const policyEpoch = strategy?.epoch ?? 0;
+  const rng = randomStream;
   for (let attempt = 0; attempt < 100; attempt++) {
-    let draw = Number(randBelow(1n << 53n)) / 2 ** 53;
+    let draw = Number(await rng.below(1n << 53n)) / 2 ** 53;
     let id = weights.at(-1).id;
     for (const c of weights) {
       draw -= c.weight;
-      if (draw <= 0) {
-        id = c.id;
-        break;
-      }
+      if (draw <= 0) { id = c.id; break; }
     }
     const c = CONTEXTS.find((c) => c.id === id);
-    const task = makeTask(
-      id,
-      randBelow(c.rowTasks) * BigInt(c.rowStride),
-      Number(randBelow(c.blocks)),
-    );
-    if (!seen.has(taskId(task))) {
-      seen.add(taskId(task));
-      return task;
-    }
+    const task = makeTask(id,
+      (await rng.below(c.rowTasks)) * BigInt(c.rowStride),
+      Number(await rng.below(c.blocks)));
+    if (generation !== sessionGeneration || !running) return null;
+    if (seen.has(taskId(task))) continue;
+    if (await sharedCoverage.has(task)) continue;
+    if (generation !== sessionGeneration || !running) return null;
+    return { task, policyEpoch };
   }
-  throw Error("Could not allocate a fresh local task");
+  throw Error("No fresh task found in 100 attempts. Saved work is retained; try a new run after the shared index updates.");
+}
+function showCoverage() {
+  text("run-coverage", sharedCoverage.revision == null ? "Coverage not loaded" :
+    `${fmt(sharedCoverage.revision)} verified batches excluded · policy ${strategy?.epoch ?? 0}`);
 }
 function counter(id, value) {
   const el = $(id);
@@ -1049,8 +1046,8 @@ function failStop(reason) {
   busy = false;
   stop(reason);
 }
-function dispatch() {
-  if (!running || busy) return;
+async function dispatch() {
+  if (!running || busy || assigningGeneration === sessionGeneration) return;
   if (document.hidden) {
     text("session-state", "Paused · tab hidden");
     showRun("state", "paused");
@@ -1062,8 +1059,20 @@ function dispatch() {
     );
     return;
   }
+  const generation = sessionGeneration;
+  assigningGeneration = generation;
   try {
-    const task = nextTask();
+    text("session-state", "Checking shared coverage");
+    const selection = await nextTask(generation);
+    if (!selection || generation !== sessionGeneration || !running || !worker) return;
+    if (document.hidden) { text("session-state", "Paused · tab hidden"); return; }
+    const { task, policyEpoch } = selection;
+    showCoverage();
+    assignedProvenance = {
+      seed: currentSeed, algorithm: SEED_ALGORITHM,
+      policy_epoch: policyEpoch,
+      coverage_revision: sharedCoverage.revision,
+    };
     busy = true;
     activeTask = task;
     text("session-state", "Computing");
@@ -1073,8 +1082,12 @@ function dispatch() {
     );
     showRun("dispatch", task);
     worker.postMessage({ type: "start", task });
+    seen.add(taskId(task));
   } catch (e) {
-    failStop(e.message);
+    if (generation === sessionGeneration && running)
+      failStop(`Could not confirm fresh shared coverage: ${e.message}. Completed work is saved.`);
+  } finally {
+    if (assigningGeneration === generation) assigningGeneration = null;
   }
 }
 async function start(e) {
@@ -1088,6 +1101,19 @@ async function start(e) {
       "session-message",
       "Persistent storage is unavailable. Please enable local storage or use the downloadable runner; starting would risk losing your work.",
     );
+    starting = false;
+    return;
+  }
+  try {
+    text("session-state", "Loading shared coverage");
+    await sharedCoverage.refresh(true);
+    showCoverage();
+    currentSeed = newSeed();
+    randomStream = seededRandom(currentSeed);
+    text("run-seed", currentSeed);
+  } catch (e) {
+    text("session-state", "Could not start");
+    text("session-message", `Shared coverage is unavailable: ${e.message}. Try again when connected; the local runner has an explicit offline mode.`);
     starting = false;
     return;
   }
@@ -1113,13 +1139,13 @@ async function start(e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;
   }
-  worker.onerror = (e) =>
-    failStop(
-      `Worker stopped after an error: ${e.message}. Completed receipts are preserved.`,
-    );
+  worker.onerror = (e) => {
+    if (generation === sessionGeneration)
+      failStop(`Worker stopped after an error: ${e.message}. Completed receipts are preserved.`);
+  };
   worker.onmessage = ({ data }) => {
     (async () => {
-      if (generation !== sessionGeneration) return;
+      if (generation !== sessionGeneration && data.type !== "result") return;
       if (data.type === "ready") {
         if (running) dispatch();
         else finishStop();
@@ -1131,6 +1157,7 @@ async function start(e) {
       }
       if (data.type !== "result") return;
       const r = data.result;
+      const issuedTask = activeTask, provenance = { ...assignedProvenance };
       // An exact identity is valuable even if the surrounding task envelope is damaged.
       const exactHits = Array.isArray(r?.hits)
         ? r.hits.slice(0, 64).filter((h) => verifyTriple(h?.xyz))
@@ -1159,11 +1186,15 @@ async function start(e) {
         );
       }
 
+      if (generation !== sessionGeneration) {
+        if (exactHits.length) stop("An exact identity from an earlier session was preserved. Save the discovery evidence.");
+        return;
+      }
       if (
         !r ||
-        !activeTask ||
-        taskId(validateTask(r.task)) !== taskId(activeTask) ||
-        r.id !== taskId(activeTask) ||
+        !issuedTask ||
+        taskId(validateTask(r.task)) !== taskId(issuedTask) ||
+        r.id !== taskId(issuedTask) ||
         !r.counters ||
         Object.values(r.counters).some(
           (v) => !Number.isSafeInteger(v) || v < 0,
@@ -1181,7 +1212,7 @@ async function start(e) {
         throw Error("Worker result digest mismatch");
       for (const hit of r.hits || []) {
         if (!verifyTriple(hit.xyz)) {
-          failStop(
+          if (generation === sessionGeneration) failStop(
             "A returned candidate failed the independent page identity check. It has not been credited.",
           );
           return;
@@ -1191,21 +1222,25 @@ async function start(e) {
         id: r.id,
         result: r,
         contributor: owner,
+        search_session: provenance,
         created: new Date().toISOString(),
       };
       try {
         await save("tasks", record);
         tasks.push(record);
+        seen.add(record.id);
       } catch {
         download(
           "math-gambling-emergency-result.json",
           JSON.stringify(record, null, 2),
         );
+        if (generation !== sessionGeneration) return;
         failStop(
           "Could not save to local storage. An emergency receipt download was started; preserve it before closing this page.",
         );
         return;
       }
+      if (generation !== sessionGeneration) return;
       counts.generators += Number(r.counters.generators);
       counts.curves += Number(r.counters.curves);
       counts.exact_tests += Number(r.counters.exact_tests);
@@ -1233,6 +1268,9 @@ async function start(e) {
         completedSinceRefresh = 0;
         await loadStrategy();
         await loadCluster();
+        await sharedCoverage.refresh(true);
+        if (generation !== sessionGeneration) return;
+        showCoverage();
       }
       busy = false;
       if (running) {
@@ -1242,11 +1280,10 @@ async function start(e) {
           Math.max(0, (data.elapsedMs * (1 - duty)) / duty),
         );
       } else finishStop();
-    })().catch((e) =>
-      failStop(
-        `Result handling failed: ${e.message}. Previously completed receipts are preserved.`,
-      ),
-    );
+    })().catch((e) => {
+      if (generation === sessionGeneration)
+        failStop(`Result handling failed: ${e.message}. Previously completed receipts are preserved.`);
+    });
   };
   runTimer = setInterval(() => {
     const elapsed = Math.floor((Date.now() - startAt) / 1000);
@@ -1299,3 +1336,13 @@ setInterval(() => {
     loadStrategy();
   }
 }, 60000);
+
+if ($("lane-domains")) {
+  for (const context of CONTEXTS) {
+    const row = $("lane-domains").insertRow();
+    for (const value of [context.id, context.ell, context.shape + 1,
+      fmt(context.dlo), fmt(context.dhi), `(${context.low}, ${context.high}]`]) {
+      row.insertCell().textContent = value;
+    }
+  }
+}

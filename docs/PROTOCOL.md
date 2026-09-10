@@ -53,9 +53,10 @@ measurement, not a time guarantee for every device.
 
 Its stable identity is
 `mg114-offset-v1:<context>:<row>:<block>`.
-Clients choose tasks randomly and avoid their own saved task IDs. They do not
-reserve globally disjoint assignments. The server deduplicates canonical task
-IDs before credit. There is no claim of complete disjointness from the separate
+Clients choose tasks from a recorded random seed and reject IDs found in their
+local completed records or the exact published completed-task snapshot. This
+does not reserve globally disjoint unfinished assignments. The server still
+deduplicates canonical task IDs before credit. There is no claim of complete disjointness from the separate
 Mac campaign or every historical search.
 
 ## Exact generator and checker
@@ -200,15 +201,17 @@ Uniform task sampling and this proxy can both have substantial mathematical
 sampling bias. The previous discovery-learning experiment did not demonstrate
 better success than its uniform control.
 
-The runner checks for a newer policy after at least 64 additional completions
-and at most once per minute. It validates the full fixed context set, finite
+The runner checks shared coverage after 64 additional completions or 60
+seconds. Policy requests remain rate limited to at most once per minute. It validates the full fixed context set, finite
 nonnegative weights and exploration floor. No downloaded policy may change
 arithmetic, filters, task size or accepted mathematical bounds. `--offline`
-uses a local policy or uniform weights and makes no network requests.
+uses the bundled coverage snapshot and a local policy or uniform weights,
+and makes no network requests. It cannot know about work accepted since that
+snapshot was published.
 
 ## Local runner
 
-From the repository root, with Python 3.10 or newer:
+From the repository root, with Python 3.11 or newer:
 
 ```sh
 python3 tools/runner.py --minutes 60 --workers 4 --name "Your name" --github your-handle
@@ -266,3 +269,55 @@ research challenge.
 The browser starts anonymously. At banking time, the participant can select a display alias and an optional claimed GitHub handle. This metadata belongs to the bank; it does not modify the exact saved task result or its digest. A newly named bank has a new canonical bank digest, while previous prepared banks remain available locally. Actual leaderboard identity still comes from the authenticated GitHub issue author, and task identifiers are credited at most once.
 
 Optional `contributor.url` links the display alias to an http(s) website. It is omitted when empty and is never part of a mathematical task digest. The collector strips malformed URLs, credentials, whitespace and control characters without discarding valid computation. The latest uniquely credited task may update the alias and link for its authenticated submitter; duplicate claims cannot update another participant or earn more credit. Website ownership is self-declared.
+
+
+## Exact shared completed-task index
+
+`data/coverage/index.json` has schema `math-gambling-coverage-v1`, engine
+`mg114-offset-v1`, integer `revision`, equal `verified_task_count`, UTC
+`updated_at`, and a `shards` object containing all contexts `c00` through `c80`.
+A revision is the accepted unique-task count, not a scheduling epoch. Policy
+epochs still advance only at 64-task boundaries.
+
+Each context descriptor contains `file`, `sha256`, and integer `count`. Its
+immutable filename is `<context>-<sha256>.json`, relative to the index's
+directory. The shard has schema `math-gambling-coverage-shard-v1`, the same
+engine, its `context`, and `tasks`: every accepted canonical task ID in that
+context, sorted lexicographically without duplicates. Empty contexts have
+explicit empty shards. The counts of all 81 shards sum to the revision.
+
+SHA-256 is computed over the exact file bytes, including JSON whitespace and
+the final newline. Clients must hash received bytes, not parse and reserialize
+them before hashing. They validate the engine, fixed context set, counts,
+canonical IDs, sorted uniqueness, filename and digest before using exact
+membership. The manifest is capped at 128 KiB; each context at 8 MiB and
+100,000 IDs. Invalid or unavailable required online data pauses dispatch.
+The publisher also enforces these limits and never silently truncates coverage.
+
+Only independent accepted replay records enter this index. New immutable
+shards are written before the manifest is atomically replaced, and old shards
+are retained so older manifests still resolve. Publication rejects a regressed
+count or removal or replacement of a previously recorded ID. No mathematical
+candidate is excluded merely because of a low model score or a failed proposal.
+The index covers completed deterministic tasks, not every generator domain or
+all historical searches.
+
+Issue opened, edited and reopened events trigger the trusted verifier for
+`[bank]` and `[compute]` titles, alongside hourly reconciliation. Submitted
+content remains bounded data. It never modifies executable workflow code or
+the mathematical kernel. Negative work still receives full independent replay;
+event-driven scheduling does not weaken verification or change the 64-task
+calibration rule. Published feedback waits for verification and Pages delivery.
+
+A fresh random seed is scheduling provenance, not proof of useful compute.
+Browser results retain the seed, PRNG algorithm, policy epoch and checked
+coverage revision outside the immutable mathematical result digest. The native
+runner also keeps a local audit trail. Reproducing an adaptive selection needs
+its policy and coverage history and actual dispatched tasks, not only its seed.
+Concurrent or offline clients can repeat work they cannot yet know is complete.
+
+There is no calibrated conversion from these selected domains to reference
+core-days or a discovery probability. Analytic expected counts and conservation
+checks can expose mistakes but cannot certify that every candidate was visited.
+The finite negative claim depends on the exact task enumeration and replay;
+the positive claim is the exact integer identity.

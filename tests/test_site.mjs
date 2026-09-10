@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import vm from "node:vm";
 import * as engine from "../web/engine.mjs";
+import * as sessionTools from "../web/search-session.mjs";
 
 const appURL = new URL("../web/app.mjs", import.meta.url);
 const appSource = await fs.readFile(appURL, "utf8");
@@ -57,6 +58,9 @@ class Element {
 async function harness({
   workerCreationFails = false,
   cachedProfile = null,
+  coverageFails = false,
+  coverageProbe = null,
+  randomFactory = null,
 } = {}) {
   const elements = new Map();
   const get = (id) => {
@@ -150,6 +154,11 @@ async function harness({
   }
   const context = vm.createContext({
     __engine: engine,
+    __sessionTools: {...sessionTools, seededRandom: randomFactory || sessionTools.seededRandom, createCoverageClient: () => ({
+      revision: 128,
+      async refresh() { if (coverageFails) throw Error("fixture coverage offline"); },
+      async has(task) { return coverageProbe ? coverageProbe(task) : false; },
+    })},
     console,
     document,
     indexedDB,
@@ -190,6 +199,8 @@ async function harness({
     },
   });
   const source = appSource
+    .replace(/import \{ createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM \} from "\.\/search-session\.mjs";/,
+      "const { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } = __sessionTools;")
     .replace(/import \{ setupRunnerDownload \} from "\.\/runner-setup\.mjs";/,
       "const setupRunnerDownload=()=>{};")
     .replace(
@@ -252,7 +263,7 @@ async function ready(h) {
   await h.app.start(event());
   const worker = h.workers.at(-1);
   await worker.emit({ type: "ready" });
-  assert.equal(worker.posts.length, 1);
+  await waitFor(() => worker.posts.length === 1, "shared coverage dispatch did not finish");
   return worker;
 }
 async function deliver(worker) {
@@ -291,6 +302,7 @@ async function deliver(worker) {
   assert.equal(h.workers.length, 1);
   const worker = h.workers[0];
   await worker.emit({ type: "ready" });
+  await waitFor(() => worker.posts.length === 1, "initial dispatch did not finish");
   const result = await engine.runTask(worker.posts[0].task);
   h.holdWrites();
   const saving = worker.emit({ type: "result", result, elapsedMs: 5 });
@@ -446,3 +458,76 @@ console.log(
     assert.equal(el.getAttribute("aria-label"), el.title);
   }
 }
+
+{
+  const h = await harness({coverageFails: true});
+  await h.app.start(event());
+  assert.equal(h.workers.length, 0);
+  assert.match(h.get("session-message").textContent, /coverage is unavailable/);
+  assert.equal(h.app.state().starting, false);
+}
+
+
+// A tab hidden during a coverage lookup must not reserve a task that was never
+// sent to a worker. A fixed test stream will choose that same task on resume.
+{
+  let releaseCoverage, lookups = 0;
+  const h = await harness({
+    randomFactory: () => ({ async below() { return 0n; } }),
+    coverageProbe: () => ++lookups === 1
+      ? new Promise(resolve => { releaseCoverage = resolve; }) : false,
+  });
+  await h.app.start(event());
+  const worker = h.workers[0];
+  worker.emit({ type: "ready" });
+  await waitFor(() => lookups === 1, "coverage lookup was not held");
+  h.visibility(true);
+  releaseCoverage(false);
+  await new Promise(setImmediate);
+  assert.equal(worker.posts.length, 0, "hidden tab dispatched the pending selection");
+  h.visibility(false);
+  await waitFor(() => worker.posts.length === 1, "unissued selection was incorrectly excluded after resume");
+  assert.equal(engine.taskId(worker.posts[0].task), engine.taskId(engine.makeTask("c00", "0", 0)));
+  h.app.stop();
+  await deliver(worker);
+  await waitFor(() => worker.terminated, "resumed selection did not drain");
+}
+
+// An old receipt transaction can finish after a worker error and a replacement
+// session. Keep that exact result and its original seed, without clearing the
+// new worker's busy flag, changing its counters, or relabelling its provenance.
+{
+  let streams = 0;
+  const h = await harness({ randomFactory: () => {
+    const value = BigInt(streams++);
+    return { async below(limit) { return value % BigInt(limit); } };
+  } });
+  const oldWorker = await ready(h), oldSeed = h.get("run-seed").textContent;
+  const oldResult = await engine.runTask(oldWorker.posts[0].task);
+  h.holdWrites();
+  oldWorker.emit({ type: "result", result: oldResult, elapsedMs: 5 });
+  await waitFor(() => h.pendingWriteCount() === 1, "old result did not reach durable-write barrier");
+  oldWorker.onerror({ message: "fixture error while saving old result" });
+  assert.equal(oldWorker.terminated, true);
+  const newWorker = await ready(h), newSeed = h.get("run-seed").textContent;
+  assert.notEqual(newSeed, oldSeed);
+  assert.notEqual(engine.taskId(newWorker.posts[0].task), oldResult.id);
+  oldWorker.onerror({ message: "late error event from terminated worker" });
+  assert.equal(h.app.state().worker, newWorker);
+  h.flushWrites();
+  await waitFor(() => h.stores.get("tasks").rows.has(oldResult.id), "old completed receipt was lost");
+  await new Promise(setImmediate);
+  const oldStored = h.stores.get("tasks").rows.get(oldResult.id);
+  assert.equal(oldStored.search_session.seed, oldSeed);
+  assert.equal(oldStored.result.digest, oldResult.digest);
+  assert.equal(h.app.state().running, true);
+  assert.equal(h.app.state().busy, true);
+  assert.equal(h.app.state().worker, newWorker);
+  assert.equal(h.app.state().counts.tasks, 0);
+  assert.equal(newWorker.terminated, false);
+  h.app.stop();
+  await deliver(newWorker);
+  await waitFor(() => newWorker.terminated, "replacement session did not drain safely");
+  assert.equal(h.stores.get("tasks").rows.size, 2);
+}
+console.log("Async coverage lifecycle checks passed: hidden selection retry and stale receipt/error isolation.");

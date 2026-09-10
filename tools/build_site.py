@@ -2,6 +2,7 @@
 """Static build with pre-rendered Markdown and math; output is dist/math-gambling."""
 from pathlib import Path
 import hashlib, html, json, shutil, subprocess, zipfile
+from coverage_index import read_coverage
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'dist'/'math-gambling'
 BASE='/math-gambling/'
@@ -43,7 +44,7 @@ def main():
     # A returning browser must not combine new markup with a cached old worker UI.
     for module in OUT.glob('*.mjs'):
         content=module.read_text(encoding='utf-8')
-        for asset in ('engine.mjs','live-viz.mjs','model-viz.mjs','search-worker.mjs','runner-setup.mjs'):
+        for asset in sorted(p.name for p in OUT.glob('*.mjs')):
             for prefix in ('./',''):
                 for quote in ('"', "'"):
                     content=content.replace(quote+prefix+asset+quote, quote+prefix+asset+'?v='+VERSION+quote)
@@ -59,11 +60,16 @@ def main():
             body=body.replace('{{PAPER_PREVIEW}}',manuscript)
         (dest/'index.html').write_text(shell(title,body.replace('{{BASE}}',BASE),path), encoding='utf-8')
     (OUT/'data').mkdir()
-    for name in ['site-config.json','mac.json','mac-history.json','cluster.json','strategy.json']:
+    for name in ['site-config.json','mac.json','mac-history.json','cluster.json','strategy.json','runner-release.json']:
         p=ROOT/'data'/name
         if p.exists():json.loads(p.read_text(encoding='utf-8'));shutil.copy2(p,OUT/'data'/name)
+    chart = ROOT / 'data/readme-progress.svg'
+    if chart.exists(): shutil.copy2(chart, OUT / 'data/readme-progress.svg')
+    coverage, _ = read_coverage(ROOT / 'data/coverage')
+    shutil.copytree(ROOT / 'data/coverage', OUT / 'data/coverage',
+                    ignore=shutil.ignore_patterns('.*', '*.tmp'))
     articles={
-      'RESEARCH':'docs/RESEARCH.md','CLUSTER':'docs/CLUSTER.md','PROTOCOL':'docs/PROTOCOL.md','ARCHIVE':'docs/ARCHIVE.md',
+      'RESEARCH':'docs/RESEARCH.md','REVIEW_RESPONSE':'docs/REVIEW_RESPONSE.md','CLUSTER':'docs/CLUSTER.md','PROTOCOL':'docs/PROTOCOL.md','ARCHIVE':'docs/ARCHIVE.md',
       'SEARCH_VERDICT':'research/archive/research-2026-09-09/SEARCH_VERDICT.md',
       'ALGORITHM_REVIEW':'research/archive/research-2026-09-09/ALGORITHM_REVIEW.md',
       'GEOMETRY_REVIEW':'research/archive/research-2026-09-09/GEOMETRY_REVIEW.md',
@@ -89,10 +95,16 @@ def main():
         (dest / 'index.html').write_text(shell(article['title'] or slug.replace('_', ' ').title(),
                                                content, article_path, math=True), encoding='utf-8')
     downloads=OUT/'downloads';downloads.mkdir()
-    local_files=['tools/runner.py','tools/search_core.py','data/strategy.json','data/site-config.json','docs/PROTOCOL.md','docs/RUNNER_SETUP.md','README.md','LICENSE']
+    local_files=['tools/runner.py','tools/search_core.py','tools/coverage_client.py','tools/client_audit.py','data/runner-release.json','data/readme-progress.svg','data/strategy.json','data/site-config.json','docs/PROTOCOL.md','docs/RUNNER_SETUP.md','README.md','LICENSE']
+    local_files += ['data/coverage/index.json'] + ['data/coverage/' + entry['file'] for entry in coverage['shards'].values()]
     with zipfile.ZipFile(downloads/'math-gambling-runner.zip','w',zipfile.ZIP_DEFLATED) as z:
-        for rel in local_files:
-            if (ROOT/rel).exists():z.write(ROOT/rel,'math-gambling/'+rel)
+        for rel in sorted(set(local_files)):
+            # A tagged release must reproduce its ZIP despite checkout mtimes or host permissions.
+            info = zipfile.ZipInfo('math-gambling/' + rel, date_time=(1980, 1, 1, 0, 0, 0))
+            info.create_system = 3
+            info.external_attr = 0o100644 << 16
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, (ROOT / rel).read_bytes(), compresslevel=9)
     setup = ROOT/'docs/RUNNER_SETUP.md'
     if setup.exists(): shutil.copy2(setup, downloads/'RUNNER_SETUP.md')
     for p in (ROOT/'paper').glob('*.tex'):shutil.copy2(p,downloads/p.name)

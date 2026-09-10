@@ -90,7 +90,7 @@
         mathematics.
       </p>
       <p>
-        GitHub Actions periodically replays a bounded queue using an independent
+        GitHub Actions reacts to new or edited bank issues and replays a bounded queue using an independent
         Python implementation. Exact positive identities are preserved. Matching
         negative results count as verified coverage, with duplicate task IDs
         counted once. Every 64 newly verified unique tasks is a calibration
@@ -116,6 +116,26 @@
       >
     </div>
   </section>
+  <section id="lanes">
+    <h2>The 81 search lanes, explicitly</h2>
+    <p>Each lane fixes one class lattice, coefficient shape, divisor shell and quotient band.
+    A task selects at most 128 coefficient rows and 16 offsets in that lane.
+    Different task IDs identify different coefficient blocks; unit-related generators
+    can still reach the same mathematical root.</p>
+    <p>D₀ = ⌊10¹⁹ / 54⌋ = 185,185,185,185,185,185. The three shells are
+    (D₀, 2D₀], (2D₀, 4D₀], and (4D₀, 8D₀]. The ratio bands are
+    0 &lt; |z|/D ≤ 64, 64 &lt; |z|/D ≤ 256, and 256 &lt; |z|/D ≤ 4096.</p>
+    <p>These are selected norm families above a historical divisor frontier, not
+    a proof of complete coverage there. Starting below 2⁵⁸ does not itself imply
+    repeating the historical rectangular search: 2⁵⁸ is larger than D₀.</p>
+    <details><summary>All lanes and their exact bounds</summary>
+      <div class="table-wrap lane-domain-wrap"><table><thead><tr>
+        <th>Lane</th><th>ℓ</th><th>Shape</th><th>D minimum (exclusive)</th><th>D maximum</th><th>|z| / D</th>
+      </tr></thead><tbody id="lane-domains"></tbody></table></div>
+    </details>
+    <p><a href="{{BASE}}data/coverage/index.json">Published completed-task index</a> ·
+    <a href="{{BASE}}research/domain_proof/">Full arithmetic scope and exclusions</a></p>
+  </section>
   <section id="limits">
     <h2>What this cannot promise</h2>
     <ul class="honest-list">
@@ -136,8 +156,9 @@
         bands leave other regions untouched.
       </li>
       <li>
-        No repeated effort: client-side random allocation and retries can
-        overlap. Verified task receipts are deduplicated; Mac and volunteer
+        No repeated effort in all circumstances: clients skip tasks in the latest
+        published coverage index, but simultaneous or stale clients can still overlap.
+        Verified task receipts are deduplicated; Mac and volunteer
         coverage are not added into a single “unique” total.
       </li>
       <li>
@@ -157,12 +178,12 @@
     <h2>Run it locally</h2>
     <p>
       Install Python 3.11 or later. Download and unzip the
-      <a href="{{BASE}}downloads/math-gambling-runner.zip">portable runner</a>,
+      <a href="https://github.com/Kuberwastaken/math-gambling/releases/download/v0.2.0/math-gambling-runner-v0.2.0.zip" data-runner-download>portable runner</a>,
       then run:
     </p>
     <pre><code>cd math-gambling
 python3 tools/runner.py --name "Your name" \
-  --github username --minutes 60 --workers 4</code></pre>
+  --github username --minutes 60 --workers 1</code></pre>
     <p>
       Your processor and time limits are explicit. Use <code>--help</code> for
       offline mode, receipt output and optional automatic submission with the
@@ -184,9 +205,9 @@ python3 tools/runner.py --name "Your name" \
   <section id="privacy">
     <h2>Your device & data</h2>
     <p>
-      Nothing computes until you press Start. The browser uses one Web Worker,
-      defaults to a gentle duty cycle, stops at your chosen time limit, and
-      pauses when hidden. You can stop immediately; only finished tasks are
+      Nothing computes until you choose Let It Ride. The browser uses one Web Worker,
+      defaults to a gentle duty cycle and pauses when hidden. There is no
+      browser time limit. You can stop immediately; only finished tasks are
       credited. Processor work uses electricity and can warm your device.
     </p>
     <p>

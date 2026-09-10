@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import random
 import re
+import secrets
 import signal
 import sqlite3
 import subprocess
@@ -25,6 +26,8 @@ from urllib.request import Request, urlopen
 from urllib.parse import urlsplit
 
 from search_core import CONTEXTS, ENGINE, canonical_json, make_task, run_task, task_id, verify_triple
+from coverage_client import CoverageError, CoverageIndex
+from client_audit import RunAudit, VERSION, RNG_ALGORITHM, seed_value
 
 ROOT = Path(__file__).resolve().parents[1]
 UA = 'OpenAI File Downloader, XaiImageApiFetch/1.0'
@@ -92,10 +95,13 @@ def open_state(out, contributor):
     db.execute('PRAGMA synchronous=FULL')
     db.executescript('''CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS tasks(id TEXT PRIMARY KEY,task TEXT NOT NULL,result TEXT,bank TEXT);
-      CREATE TABLE IF NOT EXISTS banks(id TEXT PRIMARY KEY,path TEXT NOT NULL,submitted TEXT);''')
+      CREATE TABLE IF NOT EXISTS banks(id TEXT PRIMARY KEY,path TEXT NOT NULL,submitted TEXT);
+      CREATE TABLE IF NOT EXISTS coverage_skips(id TEXT PRIMARY KEY,revision INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS bank_priority(id TEXT PRIMARY KEY);''')
     identity = canonical_json(dict(engine=ENGINE, contributor=contributor))
     previous = db.execute("SELECT value FROM meta WHERE key='identity'").fetchone()
     if previous and previous[0] != identity:
+        db.close()
         raise SystemExit('This checkpoint belongs to another engine/name/GitHub identity; choose a new --output.')
     db.execute("INSERT OR IGNORE INTO meta VALUES('identity',?)", (identity,)); db.commit()
     return db
@@ -135,12 +141,14 @@ def load_strategy(offline=False):
     return [1/81]*81, 0
 
 
-def choose_task(rng, weights, db):
+def choose_task(rng, weights, db, coverage=None):
     for _ in range(100):
         c = rng.choices(CONTEXTS, weights=weights, k=1)[0]
         row = rng.randrange(int(c['rowTasks']))*c['rowStride']
         task = make_task(c['id'], row, rng.randrange(c['blocks']))
         tid = task_id(task)
+        if coverage is not None and coverage.contains(task):
+            continue
         if db.execute('SELECT 1 FROM tasks WHERE id=?', (tid,)).fetchone() is None:
             db.execute('INSERT INTO tasks(id,task) VALUES(?,?)', (tid, canonical_json(task)))
             db.commit()
@@ -174,9 +182,13 @@ def execute_task(task, output):
     return result
 
 
-def write_bank(out, db, contributor, force=False):
-    rows = db.execute('SELECT id,result FROM tasks WHERE result IS NOT NULL AND bank IS NULL ORDER BY rowid LIMIT ?', (BANK_LIMIT,)).fetchall()
-    if not rows or (len(rows) < BANK_LIMIT and not force):
+def write_bank(out, db, contributor, force=False, bank_every=BANK_LIMIT, priority_id=None):
+    if priority_id is not None:
+        rows = db.execute('SELECT id,result FROM tasks WHERE id=? AND result IS NOT NULL AND bank IS NULL', (priority_id,)).fetchall()
+        force = True
+    else:
+        rows = db.execute('SELECT id,result FROM tasks WHERE result IS NOT NULL AND bank IS NULL ORDER BY rowid LIMIT ?', (bank_every,)).fetchall()
+    if not rows or (len(rows) < bank_every and not force):
         return None
     claims, chosen = [], []
     for tid, text in rows:
@@ -196,6 +208,8 @@ def write_bank(out, db, contributor, force=False):
     atomic_json(path, bank)
     with db:
         db.execute('INSERT OR IGNORE INTO banks(id,path) VALUES(?,?)', (bid, str(path)))
+        if any(claim.get('hits') for claim in claims):
+            db.execute('INSERT OR IGNORE INTO bank_priority(id) VALUES(?)', (bid,))
         db.executemany('UPDATE tasks SET bank=? WHERE id=?', [(bid, tid) for tid in chosen])
     print(f'Bank ready: {path} ({len(claims)} tasks; awaiting submission and independent replay)', flush=True)
     return path
@@ -204,7 +218,7 @@ def write_bank(out, db, contributor, force=False):
 def maybe_submit(db, repo, last_attempt):
     if time.monotonic()-last_attempt < 60:
         return last_attempt
-    pending = db.execute('SELECT id,path FROM banks WHERE submitted IS NULL ORDER BY rowid LIMIT 1').fetchone()
+    pending = db.execute('SELECT id,path FROM banks WHERE submitted IS NULL ORDER BY CASE WHEN id IN (SELECT id FROM bank_priority) THEN 0 ELSE 1 END,rowid LIMIT 1').fetchone()
     if not pending:
         return last_attempt
     bid, path = pending
@@ -251,18 +265,49 @@ def maybe_submit(db, repo, last_attempt):
     return attempt
 
 
+def github_identity(login=False):
+    """User-invoked CLI authentication; no browser token is stored by this app."""
+    try:
+        auth = subprocess.run(['gh', 'auth', 'status', '--hostname', 'github.com'], capture_output=True, timeout=15)
+        if auth.returncode and login:
+            authenticated = subprocess.run(['gh', 'auth', 'login', '--hostname', 'github.com', '--web', '--git-protocol', 'https'])
+            if authenticated.returncode:
+                raise RuntimeError('GitHub login was not completed')
+        elif auth.returncode:
+            raise RuntimeError('run with --login once, or use gh auth login')
+        result = subprocess.run(['gh', 'api', '-H', 'User-Agent: ' + UA, 'user', '--jq', '.login'],
+                                capture_output=True, text=True, timeout=20)
+        username = result.stdout.strip()
+        if result.returncode or not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?', username):
+            raise RuntimeError('could not read the authenticated GitHub username')
+        return username
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise RuntimeError(f'GitHub CLI unavailable ({type(exc).__name__}); install it from https://cli.github.com/') from None
+
+
+def bank_queue(db):
+    pending = db.execute('SELECT count(*) FROM banks WHERE submitted IS NULL').fetchone()[0]
+    uncertain = db.execute("SELECT count(*) FROM banks WHERE submitted LIKE 'uncertain;%' ").fetchone()[0]
+    submitted = db.execute("SELECT count(*) FROM banks WHERE submitted LIKE 'https://github.com/%' ").fetchone()[0]
+    return dict(pending=pending, uncertain=uncertain, submitted_awaiting_verification=submitted)
+
+
 def main(argv=None):
     if sys.version_info < MIN_PYTHON:
         raise SystemExit('Math Gambling needs Python 3.11 or later. Install it from https://www.python.org/downloads/.')
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--version', action='version', version='Math Gambling runner ' + VERSION)
     parser.add_argument('--minutes', type=float, default=10)
     parser.add_argument('--workers', type=int, default=max(1, min(4, (os.cpu_count() or 2)//2)))
     parser.add_argument('--name')
     parser.add_argument('--github')
     parser.add_argument('--url', type=profile_url, help='optional public HTTP(S) link for your leaderboard alias')
     parser.add_argument('--output', type=Path, default=Path('math-gambling-run'))
-    parser.add_argument('--offline', action='store_true', help='never fetch the shared strategy; results remain local')
+    parser.add_argument('--offline', action='store_true', help='use the bundled strategy/coverage snapshot; it may miss work banked since release')
+    parser.add_argument('--login', action='store_true', help='use the GitHub CLI browser login and read your authenticated username')
     parser.add_argument('--submit', action='store_true', help='explicitly authorize gh issue creation, at most once/minute')
+    parser.add_argument('--bank-every', type=int, default=BANK_LIMIT, help='prepare a bank every N completed tasks, 1..256 (default256)')
+    parser.add_argument('--seed', type=seed_value, help='reproducible client PRNG seed: exactly64 hex digits; securely generated when omitted')
     parser.add_argument('--bank', action='store_true', help='write a final bank (also done by default)')
     parser.add_argument('--mark-banked', metavar='FILENAME', help='mark an existing bank manually submitted, then exit; this is not verification')
     parser.add_argument('--repo', default='Kuberwastaken/math-gambling')
@@ -274,12 +319,23 @@ def main(argv=None):
         parser.error('--workers must fit available CPUs and be <=32')
     if not 1 <= args.max_tasks <= 4096:
         parser.error('--max-tasks must be 1..4096')
-    if args.offline and args.submit:
-        parser.error('--offline and --submit cannot be combined')
+    if args.offline and (args.submit or args.login):
+        parser.error('--offline cannot be combined with --submit or --login')
+    if not 1 <= args.bank_every <= BANK_LIMIT:
+        parser.error('--bank-every must be 1..256')
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', args.repo):
         parser.error('invalid repository')
     if not args.name and sys.stdin.isatty():
         args.name = input('Name for the draft discovery credits: ').strip()
+    if args.login or args.submit:
+        try:
+            authenticated = github_identity(args.login)
+        except RuntimeError as exc:
+            parser.error(str(exc))
+        if args.github and args.github.lower() != authenticated.lower():
+            parser.error('--github differs from the authenticated account; use its username or a separate output folder')
+        args.github = authenticated
+        print(f'GitHub account: @{authenticated}. ' + ('Automatic banking enabled.' if args.submit else 'Manual banking selected.'), flush=True)
     if not args.github and sys.stdin.isatty():
         args.github = input('GitHub username (self-reported; submission author is authenticated): ').strip()
     if not args.name or len(args.name) > 80 or any(ord(c) < 32 for c in args.name):
@@ -291,32 +347,48 @@ def main(argv=None):
     contributor = dict(name=args.name, github=args.github)
     if args.url:
         contributor['url'] = args.url
-    db = open_state(out, contributor)
+    try:
+        db = open_state(out, contributor)
+    except BaseException:
+        lock.close()
+        raise
     if args.mark_banked:
         matches = [(bid, path) for bid, path in db.execute('SELECT id,path FROM banks') if Path(path).name == args.mark_banked]
         if len(matches) != 1:
+            db.close(); lock.close()
             parser.error('--mark-banked must name one existing bank file')
         db.execute('UPDATE banks SET submitted=? WHERE id=?', ('manually reported submitted; not verified', matches[0][0])); db.commit()
+        db.close(); lock.close()
         print('Marked manually submitted; no claim of server verification.'); return 0
-    if args.submit:
-        try:
-            auth = subprocess.run(['gh', 'auth', 'status'], capture_output=True, timeout=15)
-            if auth.returncode: raise RuntimeError('gh auth status failed')
-        except (OSError, subprocess.TimeoutExpired, RuntimeError) as exc:
-            parser.error(f'--submit needs an authenticated GitHub CLI: {exc}')
-    print(f'{ENGINE}: {args.workers} workers, at most {args.minutes:g} minutes. No discovery ETA or guaranteed odds.', flush=True)
+    print(f'Math Gambling {VERSION} | {ENGINE}: {args.workers} workers, at most {args.minutes:g} minutes.', flush=True)
     print('Results are local until banked; GitHub replays before credit. Ctrl-C stops scheduling and drains current tasks.', flush=True)
+    queue = bank_queue(db)
+    print(f'Bank every {args.bank_every} completed tasks. Queue: {queue["pending"]} pending, {queue["uncertain"]} uncertain; submitted issues await verification.', flush=True)
+    seed = args.seed or secrets.token_hex(32)
+    audit = RunAudit(out, seed, dict(minutes=args.minutes, workers=args.workers, max_tasks=args.max_tasks, bank_every=args.bank_every))
+    print(f'Seed: {seed} ({RNG_ALGORITHM}; Python {sys.version.split()[0]})', flush=True)
+    print(f'Scheduling log: {audit.path}', flush=True)
+    coverage = CoverageIndex(ROOT/'data/coverage', out/'cache/coverage', offline=args.offline)
+    try:
+        snapshot = coverage.refresh()
+    except CoverageError as exc:
+        audit.write('blocked', reason=str(exc))
+        db.close(); lock.close()
+        print(f'Coverage unavailable; no new tasks dispatched. {exc}. Retry online or explicitly choose --offline for the bundled snapshot.', file=sys.stderr)
+        return 2
+    print(f'Coverage: {snapshot["revision"]:,} published tasks, {snapshot["updated_at"]} ({snapshot["mode"]}). Concurrent or not-yet-published work can still overlap.', flush=True)
     weights, epoch = load_strategy(args.offline)
     print(f'Cost-only scheduling policy epoch {epoch}; at least 40% uniform context exploration.', flush=True)
-    rng = random.SystemRandom()
+    audit.policy(weights, epoch, snapshot)
+    rng = random.Random(int(seed, 16))
     stop = False
     def request_stop(*_):
         nonlocal stop
         stop = True
     signal.signal(signal.SIGINT, request_stop)
     if hasattr(signal, 'SIGTERM'): signal.signal(signal.SIGTERM, request_stop)
-    pending = [json.loads(row[0]) for row in db.execute('SELECT task FROM tasks WHERE result IS NULL ORDER BY rowid')]
-    completed = curves = points = 0
+    pending = [json.loads(row[0]) for row in db.execute('SELECT task FROM tasks WHERE result IS NULL AND id NOT IN (SELECT id FROM coverage_skips) ORDER BY rowid')]
+    completed = curves = points = inputs = exact = 0
     deadline = time.monotonic()+args.minutes*60
     last_report = last_refresh = time.monotonic()
     last_refresh_completed = 0
@@ -324,16 +396,48 @@ def main(argv=None):
     started = time.monotonic()
     pool = ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context('spawn'), initializer=initialize_worker)
     active = {}
+    capacity_paused = False
     try:
+        if args.submit:
+            last_submit = maybe_submit(db, args.repo, last_submit)
         while True:
             unbanked = db.execute("SELECT count(*) FROM tasks LEFT JOIN banks ON tasks.bank=banks.id WHERE tasks.result IS NOT NULL AND (banks.submitted IS NULL OR banks.submitted LIKE 'uncertain;%')").fetchone()[0]
             if unbanked >= OUTBOX_LIMIT:
-                if not stop: print('Outbox capacity reached; bank the saved files before more work.', flush=True)
-                stop = True
-            while not stop and time.monotonic() < deadline and completed+len(active) < args.max_tasks and len(active) < args.workers:
-                task = pending.pop(0) if pending else choose_task(rng, weights, db)
+                if not capacity_paused: print('Outbox capacity reached; computation pauses while saved banks await submission.', flush=True)
+                capacity_paused = True
+                if not args.submit: stop = True
+            else:
+                capacity_paused = False
+            while not stop and not capacity_paused and time.monotonic() < deadline and completed+len(active) < args.max_tasks and len(active) < args.workers:
+                try:
+                    if pending:
+                        task = pending.pop(0)
+                        if coverage.contains(task):
+                            db.execute('INSERT OR REPLACE INTO coverage_skips VALUES(?,?)', (task_id(task), coverage.index['revision']))
+                            db.commit()
+                            audit.write('already_published', task_id=task_id(task), revision=coverage.index['revision'])
+                            continue
+                    else:
+                        task = choose_task(rng, weights, db, coverage)
+                except CoverageError as exc:
+                    print(f'Coverage lookup failed; scheduling paused: {exc}', file=sys.stderr)
+                    audit.write('blocked', reason=str(exc))
+                    stop = True
+                    break
+                audit.write('dispatch', task=task, task_id=task_id(task), policy_epoch=epoch, coverage_revision=coverage.index['revision'])
                 active[pool.submit(execute_task, task, str(out))] = task
             if not active:
+                while write_bank(out, db, contributor, force=True, bank_every=args.bank_every): pass
+                # Automatic mode uses the remaining user-selected time to drain
+                # queued banks at the same one-per-minute rate, without compute.
+                if args.submit and not stop and time.monotonic() < deadline and bank_queue(db)['pending']:
+                    last_submit = maybe_submit(db, args.repo, last_submit)
+                    if bank_queue(db)['pending']:
+                        if time.monotonic()-last_report >= 5:
+                            print(f'Computation stopped; {bank_queue(db)["pending"]} banks queued for automatic submission. Ctrl-C saves the queue and exits.', flush=True)
+                            last_report = time.monotonic()
+                        time.sleep(0.25)
+                        continue
                 break
             done, _ = wait(active, timeout=0.25, return_when=FIRST_COMPLETED)
             for future in done:
@@ -348,30 +452,46 @@ def main(argv=None):
                     continue
                 completed += 1
                 curves += result['counters']['curves']; points += result['counters']['quotient_points']
+                inputs += result['counters']['generators']; exact += result['counters']['exact_tests']
+                audit.write('completed', task_id=result['id'], digest=result['digest'], counters=result['counters'])
                 if result['hits']:
                     stop = True
                     print('EXACT SOLUTION PRESERVED. Scheduling halted; submit discovery for independent review.', flush=True)
-                    write_bank(out, db, contributor, force=True)
-                else: write_bank(out, db, contributor)
+                    write_bank(out, db, contributor, force=True, bank_every=args.bank_every, priority_id=result['id'])
+                else: write_bank(out, db, contributor, bank_every=args.bank_every)
             if args.submit: last_submit = maybe_submit(db, args.repo, last_submit)
             now = time.monotonic()
             if now-last_report >= 5:
-                print(f'{completed:,} completed tasks | {curves:,} bounded curves | {points:,} logical q positions | {now-started:.1f}s', flush=True)
+                print(f'{completed:,} tasks | {inputs:,} inputs | {curves:,} curves | {exact:,} exact square tests | {points:,} q positions | {now-started:.1f}s | epoch {epoch} | {bank_queue(db)["pending"]} banks pending', flush=True)
                 last_report = now
-            if completed-last_refresh_completed >= 64 and now-last_refresh >= 60 and not stop:
-                weights, epoch = load_strategy(args.offline); last_refresh = now; last_refresh_completed = completed
+            if (completed-last_refresh_completed >= 64 or now-last_refresh >= 60) and not stop:
+                try:
+                    snapshot = coverage.refresh()
+                    weights, epoch = load_strategy(args.offline)
+                    audit.policy(weights, epoch, snapshot)
+                    print(f'Policy epoch {epoch}; coverage revision {snapshot["revision"]:,}; {coverage.known_skips:,} published task selections skipped.', flush=True)
+                except CoverageError as exc:
+                    print(f'Coverage refresh failed; scheduling paused: {exc}', file=sys.stderr)
+                    audit.write('blocked', reason=str(exc)); stop = True
+                last_refresh = now; last_refresh_completed = completed
     finally:
         pool.shutdown(wait=True, cancel_futures=True)
-        while write_bank(out, db, contributor, force=True): pass
+        while write_bank(out, db, contributor, force=True, bank_every=args.bank_every): pass
         if args.submit: last_submit = maybe_submit(db, args.repo, last_submit)
         atomic_json(out/'status.json', dict(engine=ENGINE, completed_this_run=completed,
+            version=VERSION, seed=seed, rng=RNG_ALGORITHM, run_id=audit.id,
+            inputs_this_run=inputs, exact_tests_this_run=exact, coverage=coverage.snapshot(),
+            published_selections_skipped=coverage.known_skips,
             curves_this_run=curves, quotient_points_this_run=points,
             elapsed_seconds=round(time.monotonic()-started, 3), policy_epoch=epoch,
             pending_banks=db.execute("SELECT count(*) FROM banks WHERE submitted IS NULL OR submitted LIKE 'uncertain;%' ").fetchone()[0],
             uncertain_banks=db.execute("SELECT count(*) FROM banks WHERE submitted LIKE 'uncertain;%' ").fetchone()[0],
             state='stopped', verified_community_credit='check GitHub; local completion is not server verification'))
+        audit.write('stopped', completed=completed, inputs=inputs, curves=curves, exact_tests=exact, queue=bank_queue(db))
+        queue = bank_queue(db)
         db.close(); lock.close()
     print(f'Finished {completed:,} tasks. Bank files: {out / "banks"}', flush=True)
+    print(f'Bank queue: {queue["pending"]} awaiting submission, {queue["uncertain"]} uncertain. Restart with --submit to continue automatic banking; GitHub issues show verification status.', flush=True)
     print(f'Manual bank: open https://github.com/{args.repo}/issues/new?title=%5Bbank%5D%20Local%20computation%20bank and paste one bank JSON as the body.', flush=True)
     return 0
 

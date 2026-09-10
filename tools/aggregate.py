@@ -9,6 +9,7 @@ from pathlib import Path
 import statistics
 
 from ingest import ROOT, MAX_REPLAYS, atomic_json, ledger_path, now, read_json, safe_profile_url
+from coverage_index import publish_coverage
 
 EPOCH_SIZE = 64
 EXPLORATION = 0.4
@@ -79,6 +80,7 @@ def aggregate(data):
     ids = [x["result"]["id"] for x in tasks]
     if len(ids) != len(set(ids)) or [x["sequence"] for x in tasks] != list(range(1, len(tasks) + 1)):
         raise ValueError("duplicate task or noncontiguous verified sequence")
+    coverage = publish_coverage(data, tasks)
     receipts, hits = load_kind(data, "issues"), load_kind(data, "hits")
     epoch = len(tasks) // EPOCH_SIZE
     previous = read_json(data / "strategy.json")
@@ -156,6 +158,8 @@ def aggregate(data):
                           "duplicate_tasks": sum(len(x["duplicate_tasks"]) for x in receipts),
                           "pending_banks": sum(not x.get("complete", True) for x in receipts),
                           "verified_hits": len(hits), "counters": {key: str(value) for key, value in sorted(totals.items())}},
+               "coverage": {"revision": coverage["revision"], "index": "coverage/index.json",
+                            "verified_task_count": coverage["verified_task_count"]},
                "contexts": contexts,
                "contributors": ranked, "banks": banks,
                "discoveries": hits, "calibration_history": history,

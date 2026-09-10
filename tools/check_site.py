@@ -33,10 +33,16 @@ def main():
                 check=Links();check.feed(target.read_text())
                 if parsed.fragment not in check.ids:errors.append(f'missing anchor {url}')
             count+=1
-    required=['tools/runner.py','tools/search_core.py','data/site-config.json','data/strategy.json','LICENSE']
+    required=['tools/runner.py','tools/search_core.py','tools/coverage_client.py','tools/client_audit.py','data/site-config.json','data/strategy.json','data/runner-release.json','data/coverage/index.json','docs/RUNNER_SETUP.md','LICENSE']
     with zipfile.ZipFile(SITE/'downloads/math-gambling-runner.zip') as z:
         for path in required:
             if 'math-gambling/'+path not in z.namelist():errors.append('download missing '+path)
+        coverage=json.loads(z.read('math-gambling/data/coverage/index.json'))
+        for context, entry in coverage['shards'].items():
+            raw=z.read('math-gambling/data/coverage/'+entry['file'])
+            if hashlib.sha256(raw).hexdigest()!=entry['sha256']:errors.append('runner coverage checksum '+context)
+        release=json.loads(z.read('math-gambling/data/runner-release.json'))
+        if release != json.loads((SITE/'data/runner-release.json').read_text()):errors.append('runner release metadata mismatch')
     manifest=json.loads((SITE/'downloads/SHA256SUMS.json').read_text())
     for name,digest in manifest.items():
         if hashlib.sha256((SITE/'downloads'/name).read_bytes()).hexdigest()!=digest:errors.append('download checksum '+name)

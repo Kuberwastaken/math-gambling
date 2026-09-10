@@ -67,7 +67,16 @@ def atomic_json(path, data):
         with temporary.open('x', encoding='utf-8', newline='\n') as handle:
             handle.write(canonical_json(data)+'\n')
             handle.flush(); os.fsync(handle.fileno())
-        os.replace(temporary, path)
+        # Windows briefly denies replacement while another writer closes its
+        # destination handle. Retry only these transient sharing/access errors.
+        for attempt in range(8):
+            try:
+                os.replace(temporary, path)
+                break
+            except PermissionError as exc:
+                if getattr(exc, 'winerror', None) not in (5, 32, 33) or attempt == 7:
+                    raise
+                time.sleep(min(0.01 * 2**attempt, 0.2))
     finally:
         temporary.unlink(missing_ok=True)
     if hasattr(os, 'O_DIRECTORY'):

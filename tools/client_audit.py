@@ -9,7 +9,7 @@ import secrets
 
 from search_core import ENGINE, canonical_json
 
-VERSION = '0.3.0'
+VERSION = '0.3.1'
 RNG_ALGORITHM = 'python-random-mt19937-v1'
 
 

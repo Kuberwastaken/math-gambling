@@ -260,3 +260,7 @@ This is substantial testing, not a formal proof of the complete runtime,
 browser, operating system and synchronization infrastructure. Finding a real
 triple would make verification simple; reaching that triple remains the open
 research challenge.
+
+### Attribution after browser computation
+
+The browser starts anonymously. At banking time, the participant can select a display alias and an optional claimed GitHub handle. This metadata belongs to the bank; it does not modify the exact saved task result or its digest. A newly named bank has a new canonical bank digest, while previous prepared banks remain available locally. Actual leaderboard identity still comes from the authenticated GitHub issue author, and task identifiers are credited at most once.

@@ -62,7 +62,7 @@ function showRun(method, value) {
   }
 }
 const DUTIES = [25, 50, 90],
-  DUTY_NAMES = ["Casual", "Committed", "All in"];
+  DUTY_NAMES = ["Gentle", "Balanced", "All in"];
 function processorDuty() {
   return (DUTIES[Number($("run-duty")?.value)] ?? 25) / 100;
 }
@@ -93,8 +93,8 @@ function profilePreview() {
   text(
     "paper-contributor",
     name
-      ? `Local contribution preview: ${name}${profile.github ? ` (@${profile.github})` : ""}`
-      : "Contributor credit: ________________________",
+      ? `${name}${profile.github ? ` (@${profile.github})` : ""}`
+      : "________________________",
   );
   if (name)
     text(
@@ -642,7 +642,9 @@ async function hash(obj) {
 }
 let tasks = [],
   banks = [],
-  activeBank = null;
+  activeBank = null,
+  priorityBankTask = null,
+  banking = false;
 function validStoredTask(t) {
   try {
     return (
@@ -747,7 +749,10 @@ function validProfile(p) {
       /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(p.github))
   );
 }
-async function prepareBank(priorityId = null) {
+async function prepareBank(priorityId = null, attribution = null) {
+  if (priorityId) priorityBankTask = priorityId;
+  if (attribution && !validProfile(attribution))
+    throw Error("Enter a valid optional GitHub username.");
   await refreshSaved();
   const observed = coveredIds();
   const pending = priorityId
@@ -757,16 +762,25 @@ async function prepareBank(priorityId = null) {
   // A pending prepared bank stays stable until it appears in GitHub's published ledger.
   const previous = priorityId
     ? null
-    : banks.find((b) => !b.observed && !b.posted);
+    : banks.find(
+        (b) =>
+          !b.observed &&
+          !b.posted &&
+          b.ids.every((id) => !observed.has(id)) &&
+          (!attribution ||
+            (b.payload.contributor.name === attribution.name &&
+              b.payload.contributor.github === attribution.github)),
+      );
   let bank = previous;
   if (!bank) {
-    const owner = pending[0].contributor;
+    const originalOwner = pending[0].contributor;
+    const owner = attribution ? { ...attribution } : originalOwner;
     const claims = [];
     for (const r of pending
       .filter(
         (t) =>
-          t.contributor.name === owner.name &&
-          t.contributor.github === owner.github,
+          t.contributor.name === originalOwner.name &&
+          t.contributor.github === originalOwner.github,
       )
       .slice(0, 256)) {
       const claim = { task: r.result.task, digest: r.result.digest };
@@ -798,10 +812,11 @@ async function prepareBank(priorityId = null) {
   }
   activeBank = bank;
   $("bank-panel").hidden = false;
+  $("bank-receipt").hidden = false;
   $("bank-body").value = JSON.stringify(bank.payload);
   text(
     "bank-count",
-    `${bank.ids.length} completed tasks in this bank. Your receipt is kept locally until it appears in the published ledger.`,
+    `${bank.ids.length} completed tasks · ${bank.payload.contributor.name}`,
   );
   $("bank-open").href =
     `${REPO}/issues/new?template=compute.yml&title=${encodeURIComponent("[compute] Bank " + bank.ids.length + " tasks")}`;
@@ -813,14 +828,55 @@ async function prepareBank(priorityId = null) {
     block: "nearest",
   });
 }
-$("bank-button")?.addEventListener("click", () =>
-  prepareBank().catch((e) =>
+function openBank() {
+  $("bank-panel").hidden = false;
+  $("bank-receipt").hidden = true;
+  $("player-name").value = profile.name === "Anonymous" ? "" : profile.name;
+  $("player-github").value = profile.github;
+  text("bank-identity-status", "");
+  $("bank-panel").scrollIntoView({
+    behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : "smooth",
+    block: "nearest",
+  });
+}
+async function submitBankProfile(e) {
+  e.preventDefault();
+  if (banking) return;
+  const github = $("player-github").value.trim().replace(/^@/, ""),
+    name = $("player-name").value.trim() || github || "Anonymous";
+  const attribution = { name, github };
+  if (!validProfile(attribution)) {
+    text("bank-identity-status", "Enter a valid optional GitHub username.");
+    return;
+  }
+  banking = true;
+  $("prepare-bank").disabled = true;
+  try {
+    await prepareBank(priorityBankTask, attribution);
+    profile = attribution;
+    // Attribution is attached to the bank. Exact saved task results stay unchanged.
+    try {
+      localStorage.setItem("mg-profile", JSON.stringify(profile));
+    } catch {}
+    profilePreview();
+    text("bank-identity-status", "");
+  } catch (e) {
     text(
-      "session-message",
-      `Could not prepare bank: ${e.message}. Save your receipts instead.`,
-    ),
-  ),
-);
+      "bank-identity-status",
+      `Could not prepare the bank: ${e.message}. Your saved computations are retained.`,
+    );
+  } finally {
+    banking = false;
+    $("prepare-bank").disabled = false;
+  }
+}
+$("bank-button")?.addEventListener("click", openBank);
+$("close-bank")?.addEventListener("click", () => {
+  $("bank-panel").hidden = true;
+});
+$("bank-profile-form")?.addEventListener("submit", submitBankProfile);
 $("copy-bank")?.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText($("bank-body").value);
@@ -841,6 +897,7 @@ $("posted-bank")?.addEventListener("click", async () => {
   if (!activeBank) return;
   activeBank.posted = true;
   await save("banks", activeBank);
+  priorityBankTask = null;
   await refreshSaved();
   $("bank-panel").hidden = true;
   text(
@@ -988,21 +1045,7 @@ async function start(e) {
   e.preventDefault();
   if (running || starting || worker) return;
   starting = true;
-  const username = $("player-github").value.trim().replace(/^@/, "");
-  profile = {
-    name: $("player-name").value.trim() || username || "Anonymous",
-    github: username,
-  };
-  if (!validProfile(profile)) {
-    text(
-      "session-message",
-      "Please enter a name or alias and a valid optional GitHub username.",
-    );
-    starting = false;
-    return;
-  }
   try {
-    localStorage.setItem("mg-profile", JSON.stringify(profile));
     await refreshSaved();
   } catch (e) {
     text(
@@ -1013,7 +1056,7 @@ async function start(e) {
     return;
   }
   starting = false;
-  const owner = { ...profile },
+  const owner = { name: "Anonymous", github: "" },
     generation = ++sessionGeneration;
   stopReason = "";
   profilePreview();
@@ -1026,12 +1069,8 @@ async function start(e) {
   busy = false;
   $("start-button").disabled = true;
   $("stop-button").disabled = false;
-  for (const id of ["player-name", "player-github"]) $(id).disabled = true;
   // The processor slider remains adjustable during a run.
-  text(
-    "session-message",
-    "Your hand is in play. Every finished batch gets saved.",
-  );
+  text("session-message", "");
   try {
     worker = new Worker(new URL("search-worker.mjs", BASE), { type: "module" });
   } catch (e) {
@@ -1205,12 +1244,7 @@ if ($("join-form")) {
     $("player-github").value = profile.github;
   refreshSaved()
     .then(() => {
-      text(
-        "session-message",
-        tasks.length
-          ? `${fmt(tasks.length)} hands saved on this device. Ready for another?`
-          : "Waiting for you to make a questionable computational decision.",
-      );
+      text("session-message", tasks.length ? "" : "");
     })
     .catch(() => {
       text(

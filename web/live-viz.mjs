@@ -47,6 +47,8 @@ export function createLiveVisuals(contexts) {
     arcs = [],
     angles = new Map(),
     ball,
+    marker,
+    markerAngle = 0,
     wheelStatus;
   const cells = new Map();
   function mark() {
@@ -64,23 +66,19 @@ export function createLiveVisuals(contexts) {
         `wheel-sector ${i % 2 ? "black" : "red"}${contexts[i].id === active.context ? " selected" : ""}`,
       ),
     );
-    const p = polar(187, angles.get(active.context) ?? -Math.PI / 2);
-    ball.setAttribute("cx", p[0]);
-    ball.setAttribute("cy", p[1]);
+    const degrees =
+      (((angles.get(active.context) ?? -Math.PI / 2) + Math.PI / 2) * 180) /
+      Math.PI;
+    const turn = (((degrees - markerAngle) % 360) + 360) % 360;
+    // Floating-point roundoff must not invent another revolution at rest.
+    if (turn > 1e-7 && turn < 360 - 1e-7) markerAngle += turn;
+    marker.style.transform = `rotate(${markerAngle}deg)`;
     ball.setAttribute("visibility", "visible");
     wheelStatus.textContent = running
       ? `${active.context} IN PLAY`
       : runState === "paused"
         ? "PAUSED"
         : "AT REST";
-    label(
-      "wheel-note",
-      running
-        ? `Playing ${active.context} · batch ${active.block + 1} · weighted by measured cost`
-        : runState === "paused"
-          ? "Tab hidden. The next hand waits for you."
-          : "The table is at rest. Let it ride again whenever.",
-    );
   }
   function wheel() {
     const svg = node("svg", {
@@ -137,7 +135,7 @@ export function createLiveVisuals(contexts) {
       node(
         "text",
         { x: 200, y: 174, "text-anchor": "middle", class: "wheel-small" },
-        "THE JACKPOT",
+        "SUM OF THREE CUBES",
       ),
     );
     svg.append(
@@ -160,7 +158,10 @@ export function createLiveVisuals(contexts) {
       class: "wheel-ball",
       visibility: "hidden",
     });
-    svg.append(ball);
+    marker = node("g", { class: "wheel-marker" });
+    marker.style.transform = `rotate(${markerAngle}deg)`;
+    marker.append(ball);
+    svg.append(marker);
     root.replaceChildren(svg);
     mark();
   }
@@ -185,7 +186,7 @@ export function createLiveVisuals(contexts) {
   function pulse() {
     const el = $("run-pulse");
     if (!el || points.length < 2) return;
-    const W = 760,
+    const W = Math.max(280, Math.min(760, el.clientWidth || 760)),
       H = 190,
       pl = 50,
       pb = 27,
@@ -332,12 +333,8 @@ export function createLiveVisuals(contexts) {
       lastCurves = 0;
       running = true;
       label("filter-cut", "—");
-      $("run-pulse").replaceChildren(
-        html("p", "", "Waiting for the first completed batch."),
-      );
-      $("run-sieve").replaceChildren(
-        html("p", "", "Exact filters will narrow the field here."),
-      );
+      $("run-pulse").replaceChildren(html("p", "", "—"));
+      $("run-sieve").replaceChildren(html("p", "", "—"));
       $("run-stream").replaceChildren();
       paint(true);
     },

@@ -204,7 +204,7 @@ async function harness({
     )
     .replaceAll("import.meta.url", JSON.stringify(appURL.href));
   await vm.runInContext(
-    `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,
+    `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,openBank,submitBankProfile,prepareBank,
     state:()=>({running,starting,busy,worker,tasks,counts}),
     ageRun:()=>{startAt=Date.now()-86400000;}};})()`,
     context,
@@ -316,7 +316,7 @@ async function deliver(worker) {
   assert.equal(h.stores.get("tasks").rows.size, 1);
   assert.equal(worker.terminated, true);
   const stored = [...h.stores.get("tasks").rows.values()][0];
-  assert.equal(stored.contributor.name, "Lifecycle test");
+  assert.equal(stored.contributor.name, "Anonymous");
 }
 
 // Worker construction failure returns to usable controls without an orphan
@@ -363,3 +363,65 @@ async function deliver(worker) {
 console.log(
   "UI lifecycle checks passed: stop/drain, persistence, double start, failure recovery, anonymous unlimited runs and live processor slider. No external posts.",
 );
+
+// Starting never reads identity fields. Bank attribution is chosen later and
+// changes neither the saved exact result nor an earlier prepared bank.
+{
+  const h = await harness({
+    cachedProfile: { name: "Old alias", github: "old-user" },
+  });
+  h.get("player-github").value = "invalid handle";
+  const worker = await ready(h);
+  h.app.stop();
+  await deliver(worker);
+  await waitFor(() => worker.terminated, "anonymous result did not drain");
+  const original = [...h.stores.get("tasks").rows.values()][0],
+    before = JSON.stringify(original);
+  assert.equal(original.contributor.name, "Anonymous");
+  h.app.openBank();
+  assert.equal(h.get("bank-panel").hidden, false);
+  assert.equal(h.get("bank-receipt").hidden, true);
+  h.get("player-name").value = "Later alias";
+  h.get("player-github").value = "bad handle";
+  await h.app.submitBankProfile(event());
+  assert.equal(h.stores.get("banks").rows.size, 0);
+  assert.match(h.get("bank-identity-status").textContent, /valid/);
+  h.get("player-github").value = "@later-user";
+  await h.app.submitBankProfile(event());
+  const first = [...h.stores.get("banks").rows.values()][0];
+  assert.equal(first.payload.contributor.name, "Later alias");
+  assert.equal(first.payload.contributor.github, "later-user");
+  assert.equal(first.payload.tasks[0].digest, original.result.digest);
+  assert.equal(
+    JSON.stringify(h.stores.get("tasks").rows.get(original.id)),
+    before,
+  );
+  await h.app.submitBankProfile(event());
+  assert.equal(
+    h.stores.get("banks").rows.size,
+    1,
+    "same bank identity must retain its prepared digest",
+  );
+  h.get("player-name").value = "Revised alias";
+  await h.app.submitBankProfile(event());
+  assert.equal(h.stores.get("banks").rows.size, 2);
+  assert.equal(
+    h.stores.get("banks").rows.get(first.digest).payload.contributor.name,
+    "Later alias",
+  );
+  assert.equal(
+    JSON.stringify(h.stores.get("tasks").rows.get(original.id)),
+    before,
+  );
+  // A priority result retains its exact task when identity is supplied later.
+  await h.app.prepareBank(original.id);
+  h.get("player-name").value = "Priority alias";
+  await h.app.submitBankProfile(event());
+  const priority = JSON.parse(h.get("bank-body").value);
+  assert.equal(priority.tasks.length, 1);
+  assert.equal(engine.taskId(priority.tasks[0].task), original.id);
+  assert.equal(priority.contributor.name, "Priority alias");
+  console.log(
+    "Deferred attribution checks passed: anonymous start, validation, unchanged exact receipts, stable banks and priority result retention.",
+  );
+}

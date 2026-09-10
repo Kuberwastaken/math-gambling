@@ -2,7 +2,7 @@
 """Static build with pre-rendered Markdown and math; output is dist/math-gambling."""
 from pathlib import Path
 import hashlib, html, json, shutil, subprocess, zipfile
-from coverage_index import read_coverage
+from coverage_index import read_coverage, referenced_files
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'dist'/'math-gambling'
 BASE='/math-gambling/'
@@ -68,7 +68,7 @@ def main():
     if chart.exists(): shutil.copy2(chart, OUT / 'data/readme-progress.svg')
     coverage, _ = read_coverage(ROOT / 'data/coverage')
     shutil.copytree(ROOT / 'data/coverage', OUT / 'data/coverage',
-                    ignore=shutil.ignore_patterns('.*', '*.tmp'))
+                    ignore=shutil.ignore_patterns('.*', '*.tmp', 'retention.json'))
     articles={
       'RESEARCH':'docs/RESEARCH.md','REVIEW_RESPONSE':'docs/REVIEW_RESPONSE.md','CLUSTER':'docs/CLUSTER.md','PROTOCOL':'docs/PROTOCOL.md','ARCHIVE':'docs/ARCHIVE.md',
       'SEARCH_VERDICT':'research/archive/research-2026-09-09/SEARCH_VERDICT.md',
@@ -96,8 +96,8 @@ def main():
         (dest / 'index.html').write_text(shell(article['title'] or slug.replace('_', ' ').title(),
                                                content, article_path, math=True), encoding='utf-8')
     downloads=OUT/'downloads';downloads.mkdir()
-    local_files=['tools/runner.py','tools/search_core.py','tools/coverage_client.py','tools/client_audit.py','data/runner-release.json','data/readme-progress.svg','data/strategy.json','data/site-config.json','docs/PROTOCOL.md','docs/RUNNER_SETUP.md','README.md','LICENSE']
-    local_files += ['data/coverage/index.json'] + ['data/coverage/' + entry['file'] for entry in coverage['shards'].values()]
+    local_files=['tools/runner.py','tools/search_core.py','tools/coverage_client.py','tools/coverage_format.py','tools/client_audit.py','data/runner-release.json','data/readme-progress.svg','data/strategy.json','data/site-config.json','docs/PROTOCOL.md','docs/RUNNER_SETUP.md','README.md','LICENSE']
+    local_files += ['data/coverage/' + name for name in referenced_files(ROOT/'data/coverage', coverage)]
     with zipfile.ZipFile(downloads/'math-gambling-runner.zip','w',zipfile.ZIP_DEFLATED) as z:
         for rel in sorted(set(local_files)):
             # A tagged release must reproduce its ZIP despite checkout mtimes or host permissions.

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The notebook · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<link rel="icon" href="/math-gambling/assets/favicon.svg?v=de2452f5559e" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=de2452f5559e"><link rel="canonical" href="https://kuber.studio/math-gambling/research/">
+<script type="module" src="/math-gambling/app.mjs?v=de2452f5559e"></script></head><body data-page="research/">
+<a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
+<main id="main"><section class="page-intro">
+  <p class="edition">The lab book stays open</p>
+  <h1>Keep the failures.<br />They’re part of the work.</h1>
+  <p class="lede">
+    What we read, what we implemented, what we measured, and what didn’t earn a
+    place in the running search.
+  </p>
+</section>
+<section class="research-list">
+  <a class="research-link" href="/math-gambling/research/review_response/">
+    <div><h2>External critique: what changes, what needs evidence</h2>
+    <p>Coverage, verification cost, leaderboard units and the proposed Huisman bias test.</p></div><span>↗</span>
+  </a>
+  <a class="research-entry" href="/math-gambling/research/search_verdict/"
+    ><span>01</span>
+    <div>
+      <h2>The research verdict</h2>
+      <p>
+        The full synthesis: what remains useful on a Mac, what the literature
+        establishes, and where our confidence ends.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/algorithm_review/"
+    ><span>02</span>
+    <div>
+      <h2>Algorithms, compared</h2>
+      <p>
+        Booker–Sutherland, cubic-field norms, Elkies, elliptic curves and newer
+        approaches. No claim that we have found the globally best one.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/discovery_learning/"
+    ><span>03</span>
+    <div>
+      <h2>Could learning find better places?</h2>
+      <p>
+        Our held-out experiment failed its acceptance gate. Cost learning
+        remains useful; discovery enrichment remains unproved.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/geometry_review/"
+    ><span>04</span>
+    <div>
+      <h2>A different part of the geometry</h2>
+      <p>
+        A complementary region in the cubic field. Preliminary exact checks, no
+        deployed worker and no demonstrated performance gain.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/domain_proof/"
+    ><span>05</span>
+    <div>
+      <h2>What a completed task actually excludes</h2>
+      <p>
+        The exact finite domain, unit separation, class ownership, endpoint
+        conventions and arithmetic bounds for the native campaign.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/protocol/"
+    ><span>06</span>
+    <div>
+      <h2>The public computation protocol</h2>
+      <p>
+        Task definitions, receipts, exact verification, randomized selection and
+        honest overlap accounting.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/cluster/"
+    ><span>07</span>
+    <div>
+      <h2>How the cluster changes its mind</h2>
+      <p>
+        GitHub bank-ins, bounded independent replay, epoch updates and the
+        distinction between a report and verified work.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  ><a class="research-entry" href="/math-gambling/research/archive/"
+    ><span>08</span>
+    <div>
+      <h2>Source, evidence and provenance</h2>
+      <p>
+        Archived implementations, validation results, literature notes and an
+        inventory of what is retained locally.
+      </p>
+    </div>
+    <span>Read ↗</span></a
+  >
+</section>
+<section class="experiment-table">
+  <h2>Decisions with receipts</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Experiment</th>
+          <th>Measured result</th>
+          <th>Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Native execution optimizations</td>
+          <td>≈1.58× earlier release on paired workloads</td>
+          <td>Used in the Mac campaign</td>
+        </tr>
+        <tr>
+          <td>Extra normalized residue sieve</td>
+          <td>About one-third fewer exact tests; no CPU gain</td>
+          <td>Not deployed</td>
+        </tr>
+        <tr>
+          <td>Discovery-directed learning</td>
+          <td>No demonstrated held-out advantage; failed gate</td>
+          <td>Not promoted</td>
+        </tr>
+        <tr>
+          <td>Complementary field geometry</td>
+          <td>Small exact domain audit passed</td>
+          <td>Research proposal only</td>
+        </tr>
+        <tr>
+          <td>Public distributed worker</td>
+          <td>Separate cross-language verification suite</td>
+          <td>Volunteer experiment; new evidence needed</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">
+    Benchmark results belong to their stated workload and implementation. They
+    are not odds of finding a solution.
+  </p>
+</section>
+</main><footer><a class="wordmark" href="/math-gambling/">Math Gambling</a><div><a href="/math-gambling/approach/">The approach</a><a href="/math-gambling/cluster/">The cluster</a><a href="/math-gambling/paper/">The paper</a><a href="/math-gambling/research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
+<noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>

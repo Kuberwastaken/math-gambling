@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scientific archive and Mac observations · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=de2452f5559e"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=de2452f5559e" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=de2452f5559e"><link rel="canonical" href="https://kuber.studio/math-gambling/research/archive/">
+<script type="module" src="/math-gambling/app.mjs?v=de2452f5559e"></script></head><body data-page="research/archive/">
+<a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
+<main id="main"><article class="article research-document"><div class="research-tools"><a href="/math-gambling/research/">← The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/ARCHIVE.md">Markdown source ↗</a></div><h1 id="scientific-archive-and-mac-observations">Scientific archive and Mac observations</h1>
+
+<p>The repository preserves the scientific content of the local three-cubes laboratory: source code, mathematical derivations, parameter definitions, validation results, benchmark evidence, unsuccessful experiments, and literature reviews. It does <strong>not</strong> contain the operational search database or a resumable copy of the Mac's running campaign.</p>
+<p>The current archive contains 158 scientific files, approximately 9.8 MB including the official PARI source distribution. The exhaustive inventory is <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/ARCHIVE_MANIFEST.json">ARCHIVE_MANIFEST.json</a>. Its paths are relative; every included file records its original SHA-256, archived SHA-256, byte counts, and whether sanitization changed the bytes. The archive's creation timestamp identifies the copy. Historical statements such as “running” describe their original observation, not present activity.</p>
+<div class="research-table" role="region" aria-label="Research comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Archive area</th>
+<th>Preserved material</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/README.md">Root</a></td>
+<td>Original norm search, GP and native implementations, orchestration, pilots, benchmark and validation scripts</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/phase2/README.md">Phase2</a></td>
+<td>Offset domains, controller, worker, online cost model, geometry certificate, held-out calibration and completed-run analysis</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/phase3/README.md">Phase3</a></td>
+<td>Optimized checker, migration source, controller, fault tests, historical migration certificate and performance evidence</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/NONOVERLAP.md">Mathematics</a></td>
+<td>Field/class/unit certification, nonoverlap, shell pruning, unit shape and root-recovery analysis</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/experiments/shell/README.md">Experiments</a></td>
+<td>Shell search source, validation, measured performance, modular filters and root-recovery probes</td>
+</tr>
+<tr>
+<td><a href="/math-gambling/research/search_verdict/">Research review</a></td>
+<td>Algorithm, geometry and discovery-learning reviews, normalized-sieve prototype, blind experiment sources and results</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/data/known-curves.json">Regression data</a></td>
+<td>Known-solution numerical fixtures, with upstream source attribution</td>
+</tr>
+<tr>
+<td><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/vendor/pari-2.17.4.tar.gz">Vendor source</a></td>
+<td>Pinned official PARI/GP 2.17.4 source; SHA-256 recorded in the manifest and build adapter</td>
+</tr>
+</tbody>
+</table></div>
+<p>All original mathematical implementation sources are retained. The <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/LICENSE">original license</a> and <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/NOTICE.md">attribution notice</a> accompany them. They specify GNU GPL version 2 or later for the experimental C, GP and Python software; PARI retains its upstream authorship and license. The archive supplies source instead of shipping machine-specific PARI libraries. Linked papers remain at their publishers or preprint repositories; this archive does not redistribute their full text under an invented license.</p>
+<p><strong>Operational files remain local.</strong> At archival inventory, excluded material totaled approximately 6.3 GB and was growing with the active campaign. The manifest itemizes exclusions, including:</p>
+<ul>
+<li>The phase3 SQLite ledger, approximately 5.5 GB, plus its write-ahead log and shared-memory files.</li>
+<li>The phase2 and phase1 ledgers, approximately 373 MB and 319 MB respectively.</li>
+<li>Process records, raw process logs, lock files, stop markers, active stdout journals and discovery-journal directories.</li>
+<li>Compiled executables, debug symbols, native dynamic libraries, bytecode caches and runtime symlinks.</li>
+</ul>
+<p>These sizes are point-in-time inventory values, not transfer requirements. No SQLite file was opened by the archive copier or snapshot exporter. A manifest hash of a historical job prefix is evidence of the recorded audit; it cannot reconstruct the omitted ledger or independently prove that every historical job ran. Full historical-ledger replay requires the separately retained private operational data.</p>
+<p>Personal absolute paths and explicit process identifiers were removed from the copies. Structured process IDs, host identifiers, credentials, session-process metadata and power telemetry are excluded. Internal scientific links are relative; links to omitted runtime state lead here. Original byte hashes preserve provenance across those transformations. The archived <code>SHA256.json</code> remains a historical artifact; use <code>ARCHIVE_MANIFEST.json</code> to verify the sanitized copies.</p>
+<p><strong>Reproduction uses a separate working directory.</strong> Verify the archive without compiling:</p>
+<pre><code class="language-sh">python3 research/build_archive.py --check
+</code></pre>
+<p>Build the archived native implementations from the included PARI source on macOS or Linux:</p>
+<pre><code class="language-sh">python3 research/build_archive.py --build-pari --jobs 2
+</code></pre>
+<p>This requires Python 3, a C compiler, make and the platform's normal development tools. It creates <code>.build/reproduction/</code>, compiles PARI from pinned source, and creates the original relative laboratory layout inside that isolated directory. An existing PARI installation can instead be supplied explicitly:</p>
+<pre><code class="language-sh">python3 research/build_archive.py --pari-prefix /path/to/pari-install
+</code></pre>
+<p>The prefix must provide <code>bin/gp</code>, <code>include/pari/pari.h</code>, and <code>lib/libpari</code>. Historical <code>build.py</code> files are retained as provenance for the original Mac build; the new adapter provides portable dependency and output paths. It compiles eight native targets. No long search starts automatically. Build artifacts, generated test databases and private operational records must remain excluded from version control.</p>
+<p>Validation scripts can be run in the isolated laboratory after building. Some historical integration tests expect prior ledgers or binary hashes; an omitted-ledger test cannot be represented as freshly passed. Original evidence JSON documents the actual historical result and its source identity. Mathematical identities and candidate-exclusion rules are distinct from claims about completeness of historical execution.</p>
+<p><strong>Mac data is an exported observation, not browser computation.</strong> The <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/data/mac.json">public snapshot</a> and <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/data/mac-history.json">bounded history</a> come from an explicitly invoked read-only exporter:</p>
+<pre><code class="language-sh">python3 tools/export_mac.py --source /path/to/three-cubes-lab --output data
+</code></pre>
+<p>There is no implicit home-directory search or process inspection. The exporter reads phase3's status, recognized checkpoints, the latest available audit and a bounded process log. It never connects to, starts, stops or resumes workers. A separate operator may invoke it periodically. The page must display <code>updated_utc</code> and interpret <code>state</code> at that timestamp; <code>is_live</code> is always false. <code>exported_utc</code> records when the public files were created.</p>
+<p>The public schema is version 1:</p>
+<div class="research-table" role="region" aria-label="Research comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>totals</code></td>
+<td>Allowlisted cumulative counters, encoded as exact decimal strings</td>
+</tr>
+<tr>
+<td><code>jobs</code></td>
+<td>Observed complete/running job counts, also decimal strings</td>
+</tr>
+<tr>
+<td><code>solutions</code></td>
+<td>Integer triples independently checked to satisfy the equation with target 114; decimal strings</td>
+</tr>
+<tr>
+<td><code>audit</code></td>
+<td>Latest available audit's own timestamp, integrity flags and job counts; may precede the status</td>
+</tr>
+<tr>
+<td><code>learning</code></td>
+<td>Cost-model gate and throughput holdout metrics; <code>success_probability</code> is always null</td>
+</tr>
+<tr>
+<td><code>throughput</code></td>
+<td>Difference between genuine sampled curve counters divided by their elapsed time; never a solution-rate estimate</td>
+</tr>
+<tr>
+<td><code>limitations</code></td>
+<td>Fixed public explanations of coverage and statistical limits</td>
+</tr>
+<tr>
+<td><code>snapshot_id</code></td>
+<td>Shared identifier linking the two exported files</td>
+</tr>
+</tbody>
+</table></div>
+<p>Phase3 counters include preserved phase2 totals. They do not silently add the separate phase1 counter. A curve-interval count is not necessarily a distinct divisor or root: different quotient bands can revisit the same root without repeating a candidate position.</p>
+<p>History contains at most 300 genuine observations, selected across the recorded time range. It is not padded or interpolated. Log-only observations contain only the counters actually present in that log; missing counters are omitted. Counter regressions or a source older than the existing public snapshot block export. Large integers never pass through floating point. Each file is replaced atomically; consumers loading both should compare <code>snapshot_id</code> and retry if they differ during an update.</p>
+<p>The exporter deliberately provides no private paths, PIDs, hostnames, network details, arbitrary log messages, raw policy records or journal contents. A claimed nonempty solution list must pass exact integer arithmetic before any public file is replaced. <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/tests/test_export.py">Exporter tests</a> include privacy, large counts, source immutability, invalid identities, stale input, audit separation and bounded-history checks.</p>
+</article></main><footer><a class="wordmark" href="/math-gambling/">Math Gambling</a><div><a href="/math-gambling/approach/">The approach</a><a href="/math-gambling/cluster/">The cluster</a><a href="/math-gambling/paper/">The paper</a><a href="/math-gambling/research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
+<noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>

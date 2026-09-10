@@ -1,0 +1,68 @@
+{
+  "completed_evaluations": 30,
+  "history": "learning/mg114-spatial-shadow-v1/1df1bb496828a2dc",
+  "latest_evaluation": {
+    "evaluation_hash": "085f69110f04c4a364a454b1b7b54aa8ed9d31c9c686c69546791af96294d60c",
+    "evaluation_ledger_hash": "7a148f8f916c3f88e9d6096b57b63daa475f31aee5130a10dd59dbb98339918b",
+    "from": 30721,
+    "model_hash": "50f3181859595f938d06f00b2e6e27e6160aca2d29355a52c6a2322edb9063ca",
+    "results": {
+      "future_all": {
+        "mean_absolute_log1p_error": {
+          "context_baseline": {
+            "cpu_ms": 1.616236536468799,
+            "curves": 3.9326801559873696,
+            "exact_tests": 0.3132071466274984,
+            "quotient_points": 8.443455802398029
+          },
+          "spatial": {
+            "cpu_ms": 1.573869798186341,
+            "curves": 3.8670498948776673,
+            "exact_tests": 0.29806048851695943,
+            "quotient_points": 8.368320741579845
+          }
+        },
+        "nonzero_exact_tasks": 113,
+        "tasks": 1024
+      },
+      "future_unseen_geometry": {
+        "mean_absolute_log1p_error": {
+          "context_baseline": {
+            "cpu_ms": 1.4580099917833806,
+            "curves": 3.745651113683129,
+            "exact_tests": 0.28119874387311883,
+            "quotient_points": 8.157195302873069
+          },
+          "spatial": {
+            "cpu_ms": 1.4580099917833806,
+            "curves": 3.745651113683129,
+            "exact_tests": 0.28119874387311883,
+            "quotient_points": 8.157195302873069
+          }
+        },
+        "nonzero_exact_tasks": 22,
+        "tasks": 186
+      }
+    },
+    "through": 31744
+  },
+  "latest_model_hash": "546d87a06479e27ed803265343df9a986b7dfe4d6bfb82e709c4057d3d9489b7",
+  "limitations": [
+    "Arrival order is not dispatch time.",
+    "Held-out errors describe submitted tasks, not an unbiased sampling population.",
+    "Server CPU is not browser cost.",
+    "Counts are correlated within geometry; exact tests are a surrogate only.",
+    "No production exclusions, seed changes, leaderboard changes or automatic promotion."
+  ],
+  "mode": "shadow",
+  "model_count": 31,
+  "next_boundary": 32768,
+  "observed_tasks": 32127,
+  "promotion": {
+    "allowed": false,
+    "reason": "Prediction validation is not controlled search-policy validation. No discovery advantage established."
+  },
+  "schema": "mg114-spatial-shadow-v1",
+  "source_hash": "1df1bb496828a2dc81a210a1acce8c9e9cd8ceb93a342544e467f8473dc62116",
+  "through": 31744
+}

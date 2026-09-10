@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exact domain separation for phase 2 · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=de2452f5559e"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=de2452f5559e" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=de2452f5559e"><link rel="canonical" href="https://kuber.studio/math-gambling/research/domain_proof/">
+<script type="module" src="/math-gambling/app.mjs?v=de2452f5559e"></script></head><body data-page="research/domain_proof/">
+<a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
+<main id="main"><article class="article research-document"><div class="research-tools"><a href="/math-gambling/research/">← The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/archive/phase3/DOMAIN_PROOF.md">Markdown source ↗</a></div><h1 id="exact-domain-separation-for-phase-2">Exact domain separation for phase 2</h1>
+<details class="research-contents"><summary>On this page</summary><ol><li><a href="#1-the-finite-domain-and-its-required-guard">1. The finite domain and its required guard</a></li><li><a href="#2-positive-real-embedding-and-shape-separation">2. Positive real embedding and shape separation</a></li><li><a href="#3-root-ideal-ownership-across-the-three-classes">3. Root ideal ownership across the three classes</a></li><li><a href="#4-separation-from-completed-phase-1">4. Separation from completed phase 1</a></li><li><a href="#5-shells-ratio-bands-and-ledger-composition">5. Shells, ratio bands and ledger composition</a></li><li><a href="#6-arithmetic-limits">6. Arithmetic limits</a></li><li><a href="#7-what-the-learning-reward-can-honestly-mean">7. What the learning reward can honestly mean</a></li></ol></details>
+<p>The 81 configurations below can search candidate positions <code>(D,r,z)</code> that are disjoint from the completed phase 1 production campaign and from one another. This is a mathematical statement about these finite domains, conditional on exact root checks, correct interval endpoints, and nonoverlapping completed ledger reservations. It is not an exhaustive height bound, a proof of a solution, or a discovery probability. Interrupted partial work can be repeated on recovery.</p>
+<p><code>python3 verify_domain.py</code> verifies the numerical inequalities with rational arithmetic, reruns the PARI field/unit certificate, and records evidence in <code>runs/domain-certificate.json</code>. An optional <code>--config FILE</code> checks the complete context table against the fixed geometry. The derivation has independent mathematical review but is not a machine-checked proof of the C and Python implementation.</p>
+<h2 id="1-the-finite-domain-and-its-required-guard">1. The finite domain and its required guard</h2>
+<p>Write <code>alpha³=114</code>, <code>S=10^18</code>, <code>p=4848807585839879338</code>, and <code>q=23510935004498358840</code>. For <code>ell∈{1,5,25}</code>, set</p>
+<pre><code>a0 = (−4b−16c) mod ell, with 0≤a0&lt;ell,
+u  = −p b−q c−a0 S,
+base = a0+ell floor((2u+ell S)/(2ell S)),
+a = base+ell t,
+gamma = a+b alpha+c alpha².
+</code></pre>
+<p>The integer formula rounds to the closest class-lattice point, breaking exact half ties toward positive infinity. Both b and c include every integer in <code>[-H,H]</code>. The three shapes are exactly:</p>
+<div class="research-table" role="region" aria-label="Research comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>H</th>
+<th>t, inclusive</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6,000,000</td>
+<td>8 through 31</td>
+</tr>
+<tr>
+<td>1,500,000</td>
+<td>128 through 511</td>
+</tr>
+<tr>
+<td>375,000</td>
+<td>2,048 through 8,191</td>
+</tr>
+</tbody>
+</table></div>
+<p>Let <code>D0=floor(10^19/54)=185185185185185185</code>. Each shape and ell is paired with all three <strong>lower-exclusive, upper-inclusive</strong> norm shells <code>(D0,2D0]</code>, <code>(2D0,4D0]</code>, <code>(4D0,8D0]</code>, and ratio bands <code>(0,64]</code>, <code>(64,256]</code>, <code>(256,4096]</code> for <code>|z|/D</code>. This gives <code>3×3×3×3=81</code> contexts. The ratio variable is <code>|z|/D</code>, not the integer quotient in <code>z=r+Dq</code>.</p>
+<p>The scheduler and learning model must select identifiers from this fixed table. They must not invent radii, offsets, ell values, shell boundaries, or ratio endpoints. <code>validate_contexts</code> in the verifier checks all 81 geometry tuples, rejects duplicates and out-of-table values, and can be called before launch and after loading saved configuration. Reservations and permutation/index bijections remain separate controller obligations. Geometrically identical contexts with different seeds do not become disjoint domains.</p>
+<h2 id="2-positive-real-embedding-and-shape-separation">2. Positive real embedding and shape separation</h2>
+<p>Cubing the rational endpoints proves</p>
+<pre><code>|alpha−p/S|&lt;1/S,   |alpha²−q/S|&lt;1/S.
+</code></pre>
+<p>Thus the positive real embedding s of gamma obeys</p>
+<pre><code>ell(t−1/2)−epsilon &lt; s &lt; ell(t+1/2)+epsilon,
+epsilon=2H/S.
+</code></pre>
+<p>The smallest lower bound is positive. Consequently <code>Norm(gamma)=s|sigma_complex(gamma)|²&gt;0</code>: this nonzero field element has positive norm, and neither it nor its negative can appear twice through a sign rule. The three real-embedding intervals for the same ell are strictly disjoint, despite their different H. Their combined largest/smallest possible embedding ratio is less than 1093.</p>
+<p>The certified field has integral basis <code>(1,alpha,alpha²)</code>, class group cyclic of order 3 generated by <code>J=(5,alpha−4)</code>, and <code>J²=(25,alpha−4)</code>. Its unit group is generated by −1 and</p>
+<pre><code>beta=4133238949+852423792 alpha+175800705 alpha²,
+beta&gt;4133238949, Norm(beta)=1.
+</code></pre>
+<p>The fresh PARI certificate verifies that beta is fundamental, rather than only a unit. Two generators of the same principal ideal have absolute real-embedding ratio <code>beta^m</code> for integer m. The new range is much shorter than one unit period: equal ideals within a class force m=0, and positive real embeddings then force the generators themselves to be equal. Identical coefficients also force the same b,c,t, so different shapes cannot hide another representation of the same ideal.</p>
+<h2 id="3-root-ideal-ownership-across-the-three-classes">3. Root ideal ownership across the three classes</h2>
+<p>Define</p>
+<pre><code>N=a³+114b³+12996c³−342abc=ell D,
+A=a²−114bc, B=114c²−ab, C=b²−ac.
+</code></pre>
+<p>Every sampled gamma belongs to <code>J^j</code>, where <code>ell=5^j</code>. The root extractor must require <code>gcd(C,D)=1</code> and verify <code>r³≡114 (mod D)</code> for <code>r=B/C mod D</code>.</p>
+<p>For a surviving candidate in these classes, in fact <code>gcd(C,N)=1</code>. The only additional possible bad prime is 5. If <code>j&gt;0</code> and <code>5|C</code>, lattice membership gives <code>a=b−c (mod 5)</code> and <code>b²−bc+c²=0 (mod 5)</code>. This binary quadratic has no nonzero zero over F5; hence a,b,c all vanish modulo 5 and <code>125|N</code>. If <code>5∤D</code>, that contradicts <code>v5(N)=j≤2</code>; if <code>5|D</code>, the existing gcd check already excludes it. For j=0 the two gcd statements coincide.</p>
+<p>The exact polynomial identities</p>
+<pre><code>B³−114C³ = N(114c³−b³),
+B²−AC = cN,
+aC+bB+cA = 0
+</code></pre>
+<p>then prove that <code>R=B/C mod N</code> is a cubic root modulo N and that <code>gamma(R)=0 mod N</code>. Inclusion and equal index give <code>(gamma)=I(N,R)</code>, where <code>I(m,v)=(m,alpha−v)</code>.</p>
+<p>Modulo 5, <code>X³−114=(X−4)(X²+4X+1)</code> and the quadratic is irreducible. The simple root 4 lifts uniquely to every 5-power. Extending that prime-power root and applying CRT away from 5 gives</p>
+<pre><code>(gamma)=J^j I(D,r),
+[I(D,r)]=[J]^(−j).
+</code></pre>
+<p>The three j values therefore own different root-ideal classes: different ell cannot emit the same <code>(D,r)</code>. Within an ell, the unit argument above proves that two new generators cannot emit the same <code>(D,r)</code> unless their coefficients are identical.</p>
+<p>The complementary completeness lemma is also valid: for an actual generator <code>(gamma)=I(D,r)J^j</code>, the quotient <code>O_K/(gamma)</code> is cyclic of order N. If a prime divided C and N, the identities <code>B³−114C³=N(114c³−b³)</code> and <code>A²−114BC=Na</code> would force A,B,C all zero modulo that prime. The multiplication matrix's adjugate would vanish, forcing rank at most one and a cokernel of dimension at least two, contradicting cyclicity. This proves invertibility for the certified ideal-to-generator construction, including at ramified primes. It does not make arbitrary sampled elements complete representatives of all root ideals. The explicit weak-converse counterexample is documented in <code>../unit_shape_proposal.md</code>.</p>
+<h2 id="4-separation-from-completed-phase-1">4. Separation from completed phase 1</h2>
+<p>It suffices to compare generators of the same ell and the same D; other ell are excluded by class ownership. Phase 2 always has <code>D&gt;D0</code>. Let <code>n=ell D</code> and use <code>n_min=ell(D0+1)</code> in lower bounds.</p>
+<p>Phase 1's box radii are <code>(50000,85499,146201)</code> for ell <code>(1,5,25)</code>. Both its absolute real and complex embeddings are at most <code>B=31H+ell−1</code>, including the asymmetric a-lattice boundary. Thus its absolute real embedding satisfies <code>s_box≥n/B²</code> and <code>s_box≤B</code>. If <code>L_new</code> and <code>U_new</code> are the smallest and largest bounds from section 2, exact rational checks give</p>
+<pre><code>1 &lt; n_min/(B² U_new) ≤ s_box/s_new ≤ B/L_new &lt; beta.
+</code></pre>
+<p>The lower ratios for ell 1,5,25 are respectively greater than approximately 9.4097, 3.2180, and <strong>1.1005</strong>. The narrowest margin is positive with the stated constants. The largest upper ratio is less than 206667, far below beta. There is no integer power of beta between these endpoints.</p>
+<p>Phase 1's plane has radius 20,000,000 and five nearest-lattice offsets. It satisfies <code>s_plane&lt;3ell</code> and <code>w_plane&lt;10^9</code>, hence <code>s_plane&gt;n/10^18</code>. Exact checks give</p>
+<pre><code>1 &lt; L_new/(3ell) &lt; s_new/s_plane &lt; U_new·10^18/n_min &lt; beta.
+</code></pre>
+<p>The last upper ratio is below 44235. The new regions therefore lie strictly between the old plane and box in absolute real embedding and cannot differ from either by a unit. The proof applies to all positions in those phase 1 domains, which is stronger than comparison with only their completed sampled prefixes. It does not apply to unrelated campaigns or calibration experiments.</p>
+<h2 id="5-shells-ratio-bands-and-ledger-composition">5. Shells, ratio bands and ledger composition</h2>
+<p>The three D shells have distinct interiors and allocate each shared endpoint only to the lower shell. The ratio bands do the same for <code>|z|/D</code>; the worker must implement this with exact integer comparisons. For a fixed D,r, every integer z has a unique quotient in <code>z=r+Dq</code> with <code>0≤r&lt;D</code>. Therefore repeated root curves in distinct ratio bands correspond to different z positions. A reported curve-check count must still not be described as a count of distinct root curves across bands.</p>
+<p>Combining these endpoint partitions with root-ideal ownership, unit separation, unique row/offset indexing, and disjoint completed reservations proves no repeated <code>(D,r,z)</code> candidate positions within completed phase 2 work or between completed phase 1 and phase 2 work. Worker retries can repeat unfinished partial work; a mathematical domain proof cannot prevent that operational duplication.</p>
+<h2 id="6-arithmetic-limits">6. Arithmetic limits</h2>
+<p>The verifier bounds every proposed a by 170,159,244 in absolute value; <code>|b|,|c|≤6,000,000</code>. A sum-of-absolute-terms bound for the norm polynomial is below <code>2^84</code>, so signed 128-bit norm and difference arithmetic have ample room. <code>114|bc|≤4,104,000,000,000,000&lt;2^63</code>, allowing an exact integer square root on the derivative threshold in a 64-bit implementation. All rounding numerators, adjoint coefficients, row counts, and possible individual coefficient-index counts also fit their documented integer types.</p>
+<p><code>D≤8D0=1481481481481481480&lt;INT64_MAX</code>. The norm <code>ell D</code> can exceed uint64 and must remain in signed 128-bit storage until division by ell. <code>|z|≤4096D</code> fits signed 128 bits, but z cubed and the discriminant do not: final square/cube arithmetic must continue to use PARI arbitrary-precision integers. This section proves bounds for the formulas, not that every C expression has the correct type promotion; native validation remains required.</p>
+<h2 id="7-what-the-learning-reward-can-honestly-mean">7. What the learning reward can honestly mean</h2>
+<p>A reward of <code>sum(D0/D × F_band)/elapsed_time</code> is a density-weighted throughput score. Under the additional model that sampled roots are exchangeable with roots in the asymptotic counting heuristic, a root near D carries mass proportional to <code>1/D</code>, and the geometric ratio-band factor <code>F_band</code> apportions that heuristic mass. This can compare computational effort across shells and bands more sensibly than raw curves per second.</p>
+<p>Exchangeability is unproved for these structured norm families, especially after selecting by unit shape and ideal class. The reward is therefore <strong>not a measured success probability</strong>, and learning a larger value does not demonstrate enrichment for solution-bearing curves. Zero hits provide almost no supervised signal for discovery. Modulus-filter survivors, exact-square near misses and large candidate counts are also not proven predictors of a hit.</p>
+<p>Use actual verified checked-curve weights, complete-worker wall time including overhead, held-out execution measurements, and continued exploration of the finite context table. Treat adaptation as cost optimization until independent evidence establishes a predictive advantage. Failed exact tests exclude the tested positions; the model must not turn statistical pessimism into a mathematical exclusion of untested regions.</p>
+</article></main><footer><a class="wordmark" href="/math-gambling/">Math Gambling</a><div><a href="/math-gambling/approach/">The approach</a><a href="/math-gambling/cluster/">The cluster</a><a href="/math-gambling/paper/">The paper</a><a href="/math-gambling/research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
+<noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>

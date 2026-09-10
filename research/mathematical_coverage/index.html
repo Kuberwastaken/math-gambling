@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mathematical coverage export · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=de2452f5559e"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=de2452f5559e" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=de2452f5559e"><link rel="canonical" href="https://kuber.studio/math-gambling/research/mathematical_coverage/">
+<script type="module" src="/math-gambling/app.mjs?v=de2452f5559e"></script></head><body data-page="research/mathematical_coverage/">
+<a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
+<main id="main"><article class="article research-document"><div class="research-tools"><a href="/math-gambling/research/">← The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md">Markdown source ↗</a></div><h1 id="mathematical-coverage-export">Mathematical coverage export</h1>
+<details class="research-contents"><summary>On this page</summary><ol><li><a href="#run-a-bounded-export">Run a bounded export</a></li><li><a href="#what-an-interval-asserts">What an interval asserts</a></li><li><a href="#files-and-provenance">Files and provenance</a></li><li><a href="#compression-and-overlap">Compression and overlap</a></li><li><a href="#inspect-a-record">Inspect a record</a></li><li><a href="#failures-and-limits">Failures and limits</a></li></ol></details>
+<p><code>tools/math_coverage.py</code> creates a separate, inspectable audit of the mathematical
+intervals searched by independently verified tasks. It does <strong>not</strong> alter the
+canonical receipt ledger, contributor scores, or the completed-task membership
+index in <code>data/coverage/</code>.</p>
+<p>The distinction matters: completing a task can produce <strong>zero curves and zero
+mathematical intervals</strong>. Its task ID is completed, but that does not establish
+that a nonempty part of the <code>(D,r,q)</code> domain was searched.</p>
+<p>The website publishes the index; compressed records live on <code>cluster-data</code>. Resolve each record's <code>file</code> against <code>records_base_url</code> for remote retrieval, or against the local index directory for an offline audit.</p>
+<h2 id="run-a-bounded-export">Run a bounded export</h2>
+<p>From the repository root, with Python 3.11 or newer:</p>
+<pre><code class="language-sh">python3 tools/math_coverage.py --data data --max-tasks 32 --seconds 15
+</code></pre>
+<p>The default output is <code>data/math-coverage/</code>. To make a private local audit without
+changing published data:</p>
+<pre><code class="language-sh">python3 tools/math_coverage.py --data data --output /tmp/math-coverage-audit --max-tasks 32 --seconds 15
+</code></pre>
+<p>The defaults are 32 new attempts and five seconds. <code>--max-tasks</code> accepts 1–4096;
+<code>--seconds</code> accepts a finite positive value up to 3600. These are <strong>upper bounds,
+not promised throughput</strong>. The wall budget includes reading ledger metadata and
+checking prior record hashes. Each new replay runs in a fresh trusted subprocess
+with a timeout of at most four seconds, reduced to the remaining wall budget.
+Final bounded serialization, atomic publication, filesystem operations and
+process teardown can extend the requested wall time. This is not a real-time
+operating-system guarantee.</p>
+<p>Run the same command again to continue. Only the first unexported sequence and
+its successors are eligible; an existing complete record is not replayed. A
+failure at one sequence leaves later sequences pending, keeping the exported
+prefix unambiguous. Increase the budget after a metadata timeout; the exporter
+does not skip unexamined metadata or advertise it as covered.</p>
+<p>Exit code 0 means the run completed normally, including a partial export stopped
+by its task cap or time budget before dispatch. Exit code 2 means a mismatch,
+replay timeout or operational failure was deferred. <code>last-error.json</code> records a
+recoverable error when storage is available. An optional Actions step should
+continue publishing canonical cluster data if this separate export fails.</p>
+<h2 id="what-an-interval-asserts">What an interval asserts</h2>
+<p>Each record supplies canonical decimal strings for:</p>
+<div class="research-table" role="region" aria-label="Research comparison table" tabindex="0"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>D</code></td>
+<td><code>abs(x+y)</code>, positive</td>
+</tr>
+<tr>
+<td><code>r</code></td>
+<td><code>0 &lt;= r &lt; D</code>, with <code>r³ ≡ 114 (mod D)</code></td>
+</tr>
+<tr>
+<td><code>s</code></td>
+<td>The signed value <code>x+y</code>, with <code>abs(s)=D</code></td>
+</tr>
+<tr>
+<td><code>qlo</code>, <code>qhi</code></td>
+<td>Both inclusive; <code>z = r + D*q</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The scope is the kernel's <strong>minimum-|z| candidate subset</strong>:
+<code>abs(z) &lt;= min(abs(x),abs(y))</code>. It is a selected finite norm-coordinate domain,
+not an exhaustive box in <code>(x,y,z)</code>, and not a certificate covering all possible
+representations of a given size. Within a recorded interval, every integer
+quotient was either rejected by an exact necessary-condition sieve or passed
+to the exact candidate check. A solution outside the minimum-|z| condition is
+outside this certificate's scope.</p>
+<p>The pre-curve counters distinguish generators outside a selected shell, invalid
+<code>D</code>, exact signed congruence exclusions, and a noninvertible parametrization.
+The shell and invertibility selections define what this campaign searches;
+they do <strong>not</strong> prove that every omitted norm generator or modular root is
+mathematically impossible. No interval is credited for a generator that never
+reaches <code>scan_curve</code>.</p>
+<p>The curve hook fires only after <code>scan_curve</code> has successfully completed. Before
+publishing anything, the exporter checks that the number and inclusive lengths
+of its callbacks equal the completed result's <code>curves</code> and <code>quotient_points</code>.
+It requires the entire replay result, including its digest, counters and hits,
+to match the verified ledger record. A missing callback, interrupted scan,
+changed digest or mismatching result publishes no coverage for that task.</p>
+<h2 id="files-and-provenance">Files and provenance</h2>
+<p><code>index.json</code> contains:</p>
+<ul>
+<li><code>ledger_watermark</code>: the number of contiguous verified sequences in the
+metadata snapshot read by this run.</li>
+<li><code>exported_through_sequence</code> and <code>exported_task_count</code>: the contiguous prefix
+with completed mathematical records.</li>
+<li><code>status</code>: <code>partial</code> or <code>complete</code> <strong>relative to that observed watermark</strong>.
+New ledger receipts can arrive after the snapshot.</li>
+<li>Empty-task counts and the empty fraction <strong>among exported tasks</strong>, plus
+interval and quotient-position totals. A partial prefix is not necessarily
+representative of the whole ledger.</li>
+<li>One descriptor per exported task: task ID, result digest, ledger fingerprint,
+kernel source hash, immutable record path, compressed-byte SHA256 and counts.</li>
+<li><code>last_run</code>: attempts, newly exported tasks, stop reason, and any deferred error.</li>
+</ul>
+<p>Each immutable object is at
+<code>records/&lt;first-two-hash-characters&gt;/&lt;sha256&gt;.json.gz</code>. Its address is the SHA256
+of the <strong>compressed bytes</strong>. Gzip has an empty filename, timestamp zero, fixed
+compression level and platform-neutral header. The uncompressed JSON is
+canonical ASCII with sorted keys, compact separators and one final newline.
+Compression does not depend on the time of export. Reproducibility assumes the
+same record contents and compression implementation; the byte hash always
+identifies the actual distributed bytes.</p>
+<p>A record includes the canonical task, task ID, verified result digest, replay
+counters, hits, mathematical scope, and SHA256 of the canonical source ledger
+record. It also records the SHA256 of <code>search_core.py</code> and of the exporter.
+The replay compiles the exact kernel bytes whose hash it records, rather than
+relying on a potentially stale Python bytecode cache. Old records retain their
+original kernel hash when instrumentation changes; backfill appends records
+under the code actually used for each replay.</p>
+<p>SHA256 detects changed bytes; it is <strong>not proof that a volunteer spent CPU</strong>,
+nor a formal proof of the kernel's mathematical correctness. The evidence is a
+reproducible finite replay, its reviewed kernel, and the accompanying interval
+list. An independently implemented checker can verify it without trusting a
+contributor's timing or claimed amount of work.</p>
+<h2 id="compression-and-overlap">Compression and overlap</h2>
+<p>Within each task, intervals having the same <code>(D,r,s)</code> are sorted and exactly
+unioned when they overlap or are adjacent. The record provides the original
+<code>raw_scan_interval_count</code>, resulting <code>merged_interval_count</code>, the full replay
+position count, and <code>q_positions_task_local_union</code> after removing overlap
+<strong>within that task only</strong>. <code>interval_columns</code> defines each merged row as
+<code>[D,r,s,qlo,qhi]</code>.</p>
+<p>An empty task has <code>certificate: &quot;empty-task&quot;</code>, an empty interval list, and zero
+mathematical positions. Its generator/exclusion counters are retained to explain
+why. It is never silently converted into a positive-sized region.</p>
+<p>The exporter does <strong>not</strong> compute a union between different tasks or contexts.
+Consequently the summed positions and interval counts are not globally unique
+curves, unique integer triples, or a probability of finding a solution.
+<code>global_union_computed</code> is explicitly false.</p>
+<h2 id="inspect-a-record">Inspect a record</h2>
+<p>This standard-library example verifies the compressed hash before displaying
+the first exported record:</p>
+<pre><code class="language-python">import gzip, hashlib, json
+from pathlib import Path
+
+directory = Path(&quot;data/math-coverage&quot;)
+index = json.loads((directory / &quot;index.json&quot;).read_text())
+entry = index[&quot;records&quot;][0]  # Check that the export is nonempty first.
+raw = (directory / entry[&quot;file&quot;]).read_bytes()
+assert hashlib.sha256(raw).hexdigest() == entry[&quot;sha256&quot;]
+record = json.loads(gzip.decompress(raw))
+print(record[&quot;task_id&quot;], record[&quot;certificate&quot;])
+print(record[&quot;interval_columns&quot;])
+print(record[&quot;intervals&quot;][:10])
+</code></pre>
+<p>For a complete independent audit, replay the stated canonical task against the
+recorded kernel source, compare its completed result digest to the ledger, and
+compare the exact task-local union of completed callback intervals. Do not treat
+an unreferenced file or a partial callback list as covered work.</p>
+<h2 id="failures-and-limits">Failures and limits</h2>
+<p>An encountered identity is independently checked using integer cubes and saved
+immediately under <code>discoveries/</code>, before subsequent candidates or final task
+hashing. It remains evidence if the task later fails or disagrees with its
+receipt. Discovery evidence explicitly claims <strong>no task completion</strong>. These files
+do not automatically change public discovery credit or send a GitHub message.</p>
+<p>Immutable records are written and synced before the index references them. A
+crash between these operations can leave an unreferenced object, which does not
+advance coverage. Previously published records remain available. A local
+single-writer lock prevents competing exporters from regressing the index;
+different-host publishers must also be serialized by the repository workflow.
+On resumption, the exported prefix must still match the canonical ledger, and
+every previously referenced compressed object's checksum is checked. A changed
+ledger or damaged object stops extension instead of silently replacing history.</p>
+<p>This initial audit product performs a linear metadata scan and keeps a linear
+list of descriptors in its mutable manifest, capped at 32 MiB. Each task record
+is capped at 2 MiB uncompressed. It is suited to bounded pilot/backfill work, not
+an unlimited whole-cluster automatic replay. Metadata scans, validation and
+manifest rewrites eventually dominate as the archive grows. Before that point,
+use an indexed sequence source and immutable manifest chunks; do not merely
+raise the cap or describe replayed totals as unique coverage.</p>
+<p>The first local pilot on 11 September 2026 replayed the oldest 32 of 24,665
+verified tasks in about 5.5 seconds including the ledger scan. Of those 32,
+28 were empty and four emitted 1,946 intervals containing 2,718,277 logical
+quotient positions. The per-task gzip records totalled 76,869 bytes. This small
+historical prefix is a functionality check, not a discovery-rate estimate or a
+representative efficiency benchmark. No new solution or contributor credit was
+created by the export.</p>
+<p>Focused fault tests run with:</p>
+<pre><code class="language-sh">PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_math_coverage.py -v
+</code></pre>
+</article></main><footer><a class="wordmark" href="/math-gambling/">Math Gambling</a><div><a href="/math-gambling/approach/">The approach</a><a href="/math-gambling/cluster/">The cluster</a><a href="/math-gambling/paper/">The paper</a><a href="/math-gambling/research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
+<noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>

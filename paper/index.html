@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A paper, unfinished · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=de2452f5559e">
+<link rel="icon" href="/math-gambling/assets/favicon.svg?v=de2452f5559e" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=de2452f5559e"><link rel="canonical" href="https://kuber.studio/math-gambling/paper/">
+<script type="module" src="/math-gambling/app.mjs?v=de2452f5559e"></script></head><body data-page="paper/">
+<a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
+<main id="main"><section class="paper-intro">
+  <div>
+    <p class="edition">A paper with the important part missing</p>
+    <h1>Leave room for a discovery.</h1>
+    <p>
+      This is a living implementation draft, not a completed result or a
+      published paper. The actual finder, date and integer triple remain blank
+      until there is verified evidence.
+    </p>
+  </div>
+  <div class="paper-actions">
+    <button class="button" id="print-paper">Print / save PDF</button
+    ><a
+      class="button quiet"
+      id="download-tex"
+      href="/math-gambling/downloads/math-gambling-draft.tex"
+      download
+      >Download LaTeX ↓</a
+    >
+  </div>
+</section>
+<div class="paper-preview-note" id="paper-preview-note">
+  Add your name when banking work to preview a contribution credit here. A
+  preview is not authorship or a discovery claim.
+</div>
+<article class="manuscript" id="manuscript">
+  <div class="manuscript-topline">
+    <span>math-gambling · working draft</span><span>Result pending</span>
+  </div>
+  <h2>
+    A distributed, verifiable search for<br /><span class="paper-equation"
+      >x³ + y³ + z³ = 114</span
+    >
+  </h2>
+  <p class="authors">
+    Kuber Mehta &amp;
+    <span id="paper-contributor">________________________</span><br />Math
+    Gambling collaboration
+  </p>
+  <p class="paper-date">Draft started September 2026</p>
+  <section>
+    <h3>Abstract</h3>
+    <p>
+      We describe an open volunteer search for integer solutions to x³ + y³ + z³
+      = 114. The implementation combines a cubic-field norm construction, exact
+      arithmetic, modular rejection, bounded client tasks, durable result
+      receipts and independent replay. Scheduling adapts to measured execution
+      cost while preserving exploration. The selected domains are finite and do
+      not constitute an exhaustive height search.
+      <strong>No solution is claimed in this draft.</strong>
+    </p>
+  </section>
+  <section>
+    <h3>1. Problem and motivation</h3>
+    <p>
+      The sums-of-three-cubes problem asks for integer triples representing a
+      prescribed integer. The congruence obstruction modulo 9 excludes values
+      congruent to ±4; 114 passes this necessary test. Its passing the test does
+      not prove the existence of an integer solution. This project makes a
+      previously local computational experiment reproducible and open to
+      volunteer contributions.
+    </p>
+  </section>
+  <section>
+    <h3>2. Search construction</h3>
+    <p>For S = x + y and V = x − y, the defining identity is</p>
+    <div class="paper-formula">3SV² = 4(114 − z³) − S³. <span>(1)</span></div>
+    <p>
+      Writing D = |S| reduces z to roots r of r³ ≡ 114 (mod D), with z = r + Dq.
+      To generate selected roots, let α³ = 114 and use
+    </p>
+    <div class="paper-formula">
+      N(a + bα + cα²) = a³ + 114b³ + 12996c³ − 342abc. <span>(2)</span>
+    </div>
+    <p>
+      Fixed class lattices and finite coefficient domains define each task.
+      Congruence filters precede exact square, integrality and parity checks.
+      Every emitted triple must satisfy the original integer identity. The
+      mathematical domain and implementation limits accompany the source.
+    </p>
+  </section>
+  <section>
+    <h3>3. Volunteer execution and verification</h3>
+    <p>
+      Opt-in browser clients use BigInt arithmetic in a worker; the portable
+      local runner uses Python integers. Bounded deterministic task receipts are
+      banked as GitHub issues. The authenticated issue author supplies
+      attribution; posting establishes submission, not correctness. A scheduled
+      verifier independently replays accepted tasks, deduplicates task
+      identifiers and preserves exact positive identities. Display names are
+      self-reported; leaderboard identity comes from the issue author.
+    </p>
+  </section>
+  <section>
+    <h3>4. Adaptive allocation</h3>
+    <p>
+      The cluster publishes a versioned policy after each epoch of 64 newly
+      verified unique tasks. At least 40% of allocation is reserved for
+      exploration. Observed replay costs inform the remaining allocation. This
+      objective is a throughput proxy under explicit assumptions, not an
+      estimate of the probability of discovering a solution. A separate
+      exploratory discovery-learning experiment failed its predeclared
+      acceptance criterion.
+    </p>
+  </section>
+  <section>
+    <h3>5. Validation and limitations</h3>
+    <p>
+      The preceding native campaign recovered all 662 known-positive fixtures in
+      its regression corpus and included arithmetic-boundary, differential and
+      crash-recovery checks. Those results apply to the archived native release;
+      the portable public client has its own independent cross-language tests.
+      Neither set is a formal proof of the complete software stack. Public
+      receipts only certify the finite task actually replayed. Unknown global
+      coverage and unknown success probability remain central limitations.
+    </p>
+  </section>
+  <section class="unwritten-result">
+    <h3>6. Result <span>(intentionally unfilled)</span></h3>
+    <dl>
+      <div>
+        <dt>Verified solution (x, y, z)</dt>
+        <dd>________________________________________</dd>
+      </div>
+      <div>
+        <dt>Finder / verified contributor</dt>
+        <dd>________________________________________</dd>
+      </div>
+      <div>
+        <dt>Discovery date and receipt</dt>
+        <dd>________________________________________</dd>
+      </div>
+      <div>
+        <dt>Independent reproduction</dt>
+        <dd>________________________________________</dd>
+      </div>
+    </dl>
+    <p>
+      No counters, near misses or local credit preview fill this section. It
+      requires an actual independently verified identity.
+    </p>
+  </section>
+  <section>
+    <h3>7. Reproducibility and attribution</h3>
+    <p>
+      Code, fixed task definitions, verification tests, strategy revisions,
+      research notes and their failed hypotheses are maintained at
+      <a href="https://github.com/Kuberwastaken/math-gambling"
+        >github.com/Kuberwastaken/math-gambling</a
+      >. Final authorship and discovery attribution require evidence and
+      agreement; participation alone does not confer authorship.
+    </p>
+  </section>
+  <section class="references">
+    <h3>References</h3>
+    <ol>
+      <li>
+        A. R. Booker and A. V. Sutherland.
+        <em>On a question of Mordell.</em> PNAS 118 (2021).
+        <a href="https://arxiv.org/abs/2007.01209">arXiv:2007.01209</a>.
+      </li>
+      <li>
+        J. Grantham and P. G. Walsh.
+        <em>Representing integers as a sum of three cubes.</em> (2022).
+        <a href="https://arxiv.org/abs/2211.12149">arXiv:2211.12149</a>.
+      </li>
+      <li>
+        S. G. Huisman. <em>Newer sums of three cubes.</em> (2016).
+        <a href="https://arxiv.org/abs/1604.07746">arXiv:1604.07746</a>.
+      </li>
+      <li>
+        math-gambling. Implementation, campaign evidence and research verdict
+        (2026). Versioned project repository.
+      </li>
+    </ol>
+  </section>
+  <p class="manuscript-footer">Working draft · no result claimed · 1</p>
+</article>
+</main><footer><a class="wordmark" href="/math-gambling/">Math Gambling</a><div><a href="/math-gambling/approach/">The approach</a><a href="/math-gambling/cluster/">The cluster</a><a href="/math-gambling/paper/">The paper</a><a href="/math-gambling/research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
+<noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>

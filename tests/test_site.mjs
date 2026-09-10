@@ -230,6 +230,7 @@ async function harness({
     },
   });
   const source = appSource
+    .replace(/import \{ loadChallenger \} from "\.\/challenger-viz\.mjs";/, "const loadChallenger=async()=>{};")
     .replace(/import \{ createJackpot \} from "\.\/jackpot\.mjs";/,
       "const createJackpot=__jackpot;")
     .replace(/import \{ createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM \} from "\.\/search-session\.mjs";/,

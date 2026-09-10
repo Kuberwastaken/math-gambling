@@ -1,0 +1,16 @@
+name: Bank completed computations
+description: Paste the compact bank copied by the browser or local runner.
+title: '[compute] Bank completed computations'
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Paste a bank copied or exported by the runner. Hourly GitHub Actions independently replays bounded tasks before crediting new coverage to your signed-in GitHub account. A digest alone is not proof that work was done. Never paste passwords, API keys, or private data. Display names are public and self-declared. Keep your local bank until its audit is complete.
+  - type: textarea
+    id: receipt
+    attributes:
+      label: Bank JSON
+      description: One complete bank, at most 256 tasks and 60000 bytes. Do not edit its task digests.
+      render: json
+    validations:
+      required: true

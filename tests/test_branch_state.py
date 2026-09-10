@@ -213,7 +213,7 @@ class BranchStateTests(unittest.TestCase):
                   '```sh\n[literal](tools/example.py)\n```\n')
         rendered = branches.rewrite_readme_links(source, self.repo)
         self.assertIn('/blob/main/docs/BRANCHES.md)', rendered)
-        self.assertIn('/blob/main/data/mac.json)', rendered)
+        self.assertIn('[Mac](data/mac.json)', rendered)
         self.assertIn('/blob/main/tools/trusted.py)', rendered)
         self.assertIn('](data/readme-progress.svg)', rendered)
         self.assertIn('](data/receipts/)', rendered)

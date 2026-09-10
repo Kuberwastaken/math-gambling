@@ -20,9 +20,10 @@ SITE_BRANCH = 'gh-pages'
 GENERATED = (
     'data/cluster.json', 'data/strategy.json', 'data/policy-config.json',
     'data/receipts', 'data/coverage', 'data/readme-progress.svg',
-    'data/learning', 'data/math-coverage',
+    'data/learning', 'data/math-coverage', 'data/mac.json', 'data/mac-history.json',
 )
 DIRECTORIES = {'data/receipts', 'data/coverage', 'data/learning', 'data/math-coverage'}
+OPTIONAL_MAC = {'data/mac.json', 'data/mac-history.json'}
 REQUIRED = {'data/cluster.json', 'data/strategy.json', 'data/coverage/index.json'}
 MAIN_URL = 'https://github.com/Kuberwastaken/math-gambling'
 UA = 'OpenAI File Downloader, XaiImageApiFetch/1.0'
@@ -170,12 +171,19 @@ def overlay(repo, ref):
         export_data(repo, revision, stage)
         # Validate the whole imported coverage closure using trusted main code.
         validate_snapshot(stage / 'data')
+        mac_present = {root for root in OPTIONAL_MAC if (stage / root).exists()}
+        if mac_present and mac_present != OPTIONAL_MAC:
+            raise BranchError('Data branch contains an incomplete Mac snapshot pair')
         for root in GENERATED: ensure_destination(repo, root)
         # A failed replacement must not leave an older successful overlay token
         # authorizing publication from a now-partial working directory.
         state_path(repo).unlink(missing_ok=True)
         for root in GENERATED:
             target, source = repo / root, stage / root
+            # Migration-only optional pair: retain the frozen source snapshot
+            # until the first Mac publication seeds cluster-data. No ledger or
+            # model file is permitted to fall back this way.
+            if root in OPTIONAL_MAC and not mac_present: continue
             if target.is_dir(): shutil.rmtree(target)
             elif target.exists(): target.unlink()
             if source.is_dir(): shutil.copytree(source, target)

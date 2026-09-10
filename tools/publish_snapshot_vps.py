@@ -16,7 +16,7 @@ import sys
 import tempfile
 
 from export_mac import export, sample, compact_history, identities, utc, atomic_json, LIMITATIONS
-from publish_snapshot import git, REMOTE, FILES
+from publish_snapshot import git, REMOTE, BRANCH, FILES
 
 MAX_BYTES = 2_000_000
 REMOTE_COMMAND = 'cd /Users/kuber.mehta/Projects/math-gambling && python3.12 tools/publish_snapshot_vps.py --receive'
@@ -62,42 +62,98 @@ def validate_pair(payload):
 def ensure_newer(snapshot, previous):
     if utc(snapshot['updated_utc']) < utc(previous['updated_utc']):
         raise ValueError('Refusing to replace a newer public snapshot')
-    for key in snapshot['totals'].keys() & previous['totals'].keys():
+    if (utc(snapshot['updated_utc']) == utc(previous['updated_utc'])
+            and utc(snapshot['exported_utc']) < utc(previous['exported_utc'])):
+        raise ValueError('Refusing an older export of the same observation')
+    if not previous['totals'].keys() <= snapshot['totals'].keys():
+        raise ValueError('Refusing to discard a published cumulative counter')
+    for key in previous['totals']:
         if int(snapshot['totals'][key]) < int(previous['totals'][key]):
             raise ValueError('Refusing a cumulative counter regression')
+    if not {tuple(row) for row in previous['solutions']} <= {tuple(row) for row in snapshot['solutions']}:
+        raise ValueError('Refusing to discard a published exact identity')
+
+
+def merge_pair(payload, previous=None):
+    """Retain published observations, compacting only at the documented 300 cap."""
+    snapshot, history = validate_pair(payload)
+    if previous is None:
+        return payload
+    prior_snapshot, prior_history = validate_pair(previous)
+    ensure_newer(snapshot, prior_snapshot)
+    records = {row['updated_utc']: row for row in prior_history['samples']}
+    for row in history['samples']:
+        old = records.get(row['updated_utc'])
+        if old is not None:
+            if any(old['totals'][key] != row['totals'][key]
+                   for key in old['totals'].keys() & row['totals'].keys()):
+                raise ValueError('Conflicting historical counters at the same timestamp')
+            # A sparse log entry must not erase a richer published observation.
+            row = {**row, 'totals': {**old['totals'], **row['totals']},
+                   'jobs': {**old['jobs'], **row['jobs']}}
+        records[row['updated_utc']] = row
+    # The final observation remains exactly the canonical snapshot sample.
+    records[snapshot['updated_utc']] = sample(snapshot)
+    merged = {**history, 'samples': compact_history(list(records.values()))}
+    result = {FILES[0]: snapshot, FILES[1]: merged}
+    validate_pair(result)
+    return result
+
+
+def read_previous(checkout):
+    paths = [checkout / name for name in FILES]
+    for path in paths:
+        if path.is_symlink() or path.parent.is_symlink():
+            raise ValueError('Snapshot paths must be regular files')
+    exists = [path.exists() for path in paths]
+    if not any(exists):
+        return None  # Explicitly permitted first seed of the two optional Mac files.
+    if not all(exists):
+        raise ValueError('Published snapshot pair is incomplete')
+    payload = {}
+    for name, path in zip(FILES, paths):
+        with path.open('rb') as stream:
+            raw = stream.read(MAX_BYTES + 1)
+        if len(raw) > MAX_BYTES:
+            raise ValueError('Published snapshot exceeds limit')
+        payload[name] = json.loads(raw, parse_constant=lambda _: (_ for _ in ()).throw(ValueError('Nonfinite number')))
+    validate_pair(payload)
+    return payload
 
 
 def receive(payload):
-    snapshot, _ = validate_pair(payload)
+    validate_pair(payload)
     with tempfile.TemporaryDirectory(prefix='math-gambling-public-') as temp:
-        checkout = Path(temp)/'repo'
-        git('clone','--quiet','--depth','1',REMOTE,str(checkout))
-        previous = json.loads((checkout/FILES[0]).read_text())
-        ensure_newer(snapshot, previous)
-        if snapshot['snapshot_id'] == previous.get('snapshot_id'):
-            print('Snapshot already published.'); return
-        for name in FILES:
-            atomic_json(checkout/name, payload[name])
-        git('config','user.name','math-gambling snapshot',cwd=checkout)
-        git('config','user.email','Kuberwastaken@users.noreply.github.com',cwd=checkout)
-        git('add','--',*FILES,cwd=checkout)
-        changed = git('diff','--cached','--name-only',cwd=checkout).stdout.splitlines()
-        if sorted(changed) != sorted(FILES):
-            raise ValueError('Expected exactly two changed public files')
-        git('commit','-m','Publish timestamped Mac observation from personal VPS',cwd=checkout)
+        checkout = Path(temp) / 'repo'
+        # A missing data branch is an error: never fall back to the default branch.
+        git('clone', '--quiet', '--depth', '1', '--single-branch', '--branch', BRANCH,
+            REMOTE, str(checkout))
+        git('config', 'user.name', 'math-gambling snapshot', cwd=checkout)
+        git('config', 'user.email', 'Kuberwastaken@users.noreply.github.com', cwd=checkout)
         for attempt in range(3):
+            # Always merge into the latest accepted history, including after a
+            # concurrent ledger or snapshot publisher wins the normal push race.
+            merged = merge_pair(payload, read_previous(checkout))
+            for name in FILES:
+                atomic_json(checkout / name, merged[name])
+            git('add', '--', *FILES, cwd=checkout)
+            changed = git('diff', '--cached', '--name-only', cwd=checkout).stdout.splitlines()
+            if not changed:
+                print('Snapshot already published.'); return
+            if not set(changed) <= set(FILES):
+                raise ValueError('Unexpected staged path outside the public snapshot pair')
+            git('commit', '-m', 'Publish timestamped Mac observation', cwd=checkout)
             try:
-                git('push','origin','HEAD:main',cwd=checkout)
-                print('Published public Mac snapshot through ai-vps.'); return
+                git('push', 'origin', 'HEAD:' + BRANCH, cwd=checkout)
+                print('Published public Mac snapshot to cluster-data.'); return
             except subprocess.CalledProcessError:
-                if attempt == 2: raise
-                git('fetch','origin','main',cwd=checkout)
-                latest = json.loads(git('show','origin/main:'+FILES[0],cwd=checkout).stdout)
-                ensure_newer(snapshot, latest)
-                if latest.get('snapshot_id') == snapshot['snapshot_id']:
-                    print('Snapshot already published.'); return
-                git('rebase','origin/main',cwd=checkout)
-
+                if attempt == 2:
+                    raise
+                git('fetch', '--no-tags', 'origin',
+                    '+refs/heads/' + BRANCH + ':refs/remotes/origin/' + BRANCH, cwd=checkout)
+                # This is our disposable clone. Rebuild the two-file change on
+                # the current tip instead of rebasing stale observation bytes.
+                git('reset', '--hard', 'origin/' + BRANCH, cwd=checkout)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)

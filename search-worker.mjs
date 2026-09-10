@@ -1,4 +1,4 @@
-import {runTask, verifyTriple, ENGINE} from './engine.mjs?v=de2452f5559e';
+import {runTask, verifyTriple, ENGINE} from './engine.mjs?v=5a4349624612';
 
 // A worker accepts one task at a time. The page decides when to queue the next.
 // Stop is a task-boundary instruction; terminating a worker discards only its

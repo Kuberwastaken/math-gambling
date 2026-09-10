@@ -1,18 +1,18 @@
 # Run Math Gambling locally
 
-Release **v0.2.2** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. It does not need Node.js, a compiler, a GPU, extra Python packages or a GitHub login to compute.
+Release **v0.3.0** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. It does not need Node.js, a compiler, a GPU, extra Python packages or a GitHub login to compute.
 
 Use a normal Python **3.11 or newer** installation with SQLite support. Download it from [python.org](https://www.python.org/downloads/) if needed. This is the portable volunteer client; the separate native C/PARI research campaign has different build requirements and performance.
 
 ## 1. Download and extract
 
-[Download runner v0.2.2](https://github.com/Kuberwastaken/math-gambling/releases/download/v0.2.2/math-gambling-runner-v0.2.2.zip). The [GitHub release](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.2.2) includes SHA-256 checksums and the setup guide. The archive contains a `math-gambling` folder with `tools`, `data` and these instructions. Keep that folder together.
+[Download runner v0.3.0](https://github.com/Kuberwastaken/math-gambling/releases/download/v0.3.0/math-gambling-runner-v0.3.0.zip). The [GitHub release](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.3.0) includes SHA-256 checksums and the setup guide. The archive contains a `math-gambling` folder with `tools`, `data` and these instructions. Keep that folder together.
 
 On macOS or Linux, open Terminal. If you saved the ZIP in Downloads:
 
 ```sh
 cd ~/Downloads
-unzip math-gambling-runner-v0.2.2.zip
+unzip math-gambling-runner-v0.3.0.zip
 cd math-gambling
 ```
 
@@ -20,7 +20,7 @@ On Windows, open PowerShell:
 
 ```powershell
 cd "$HOME\Downloads"
-Expand-Archive .\math-gambling-runner-v0.2.2.zip -DestinationPath .\math-gambling-runner
+Expand-Archive .\math-gambling-runner-v0.3.0.zip -DestinationPath .\math-gambling-runner
 cd .\math-gambling-runner\math-gambling
 ```
 
@@ -149,3 +149,7 @@ Each `runs/*.jsonl` file records the actual policy weights, their hash, coverage
 Online mode refreshes the exact published coverage index every 64 completed tasks or 60 seconds. Per-context shards are named by SHA-256; the client checks their bytes, schema, counts, sorted unique task IDs and task bounds before using membership. An index entry excludes only explicit verified task IDs. This is not a Bloom filter and introduces no probabilistic false positives. A missing, corrupt or rolled-back snapshot pauses scheduling while active bounded tasks drain.
 
 A published snapshot is not a live task reservation. Concurrent clients can choose the same task; completed but unbanked or not-yet-published work can overlap too. GitHub verification deduplicates submitted IDs before awarding coverage. Offline mode explicitly accepts the older snapshot bundled with that release.
+
+## Upgrading an existing run
+
+Version 0.3.0 reads both coverage v1 and v2. Older runners pause on the new published coverage and should be upgraded. Stop the old runner, extract the new release, and point `--output` at your existing stopped output folder. Saved tasks and banks remain valid; startup also checks for saved exact discoveries. Operational failures now exit nonzero after preserving results. Keep uncertain bank files for reconciliation rather than posting them repeatedly.

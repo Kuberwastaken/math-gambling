@@ -32,7 +32,7 @@ This ratio uses aggregate yield/cost; it cannot collapse because most individual
 
 ## Exclusions and coverage
 
-Exact norm-shell pruning uses integer bounds and monotone bisection to certify rejected coefficient intervals. Original logical generator and shell-rejection counts remain unchanged, so old receipt hashes and leaderboard credit keep their meaning. A verified task with no curves is a completed coefficient-domain check, not a searched curve or an independent opportunity to win.
+[Exact norm-shell pruning](SHELL_PRUNING.md) uses integer bounds and monotone bisection to certify rejected coefficient intervals. Original logical generator and shell-rejection counts remain unchanged, so old receipt hashes and leaderboard credit keep their meaning. A verified task with no curves is a completed coefficient-domain check, not a searched curve or an independent opportunity to win.
 
 The [mathematical coverage export](MATHEMATICAL_COVERAGE.md) separately publishes completed `(D,r,s,qlo,qhi)` records with explicit signs, endpoints and scope. Its partial backfill watermark must not be confused with the entire ledger. Different parameterizations can still overlap; the exported records enable inspection, not an automatic claim of a gap-free new height bound.
 

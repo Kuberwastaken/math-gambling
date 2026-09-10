@@ -88,12 +88,33 @@ def aggregate(data):
         raise ValueError("verified task count regressed behind frozen policy")
     if not previous:
         previous = initial_strategy()
-    history = read_json(data / "cluster.json", {}).get("calibration_history", [])
-    for update in range(previous["epoch"] + 1, epoch + 1):
-        previous = calibrate(tasks, update)
-        history.append({"epoch": update, "through_verified_tasks": update * EPOCH_SIZE,
-                        "updated_at": now(), "objective": "cost only", "exploration_fraction": EXPLORATION,
-                        "weights": {x["id"]: x["weight"] for x in previous["contexts"]}})
+    recorded = read_json(data / "cluster.json", {}).get("calibration_history", [])
+    if not isinstance(recorded, list):
+        raise ValueError("invalid calibration history")
+    history_by_epoch = {}
+    for entry in recorded:
+        number = entry.get("epoch") if isinstance(entry, dict) else None
+        if (type(number) is not int or not 1 <= number <= epoch or number in history_by_epoch
+                or entry.get("through_verified_tasks") != number * EPOCH_SIZE):
+            raise ValueError("calibration history has a duplicate or unsupported boundary")
+        history_by_epoch[number] = entry
+    # strategy.json and cluster.json are separately atomic. Reconstruct a missing
+    # boundary from the authoritative ledger after interruption between replacements.
+    computed = None
+    history = []
+    for update in range(1, epoch + 1):
+        entry = history_by_epoch.get(update)
+        if entry is None:
+            computed = calibrate(tasks, update)
+            entry = {"epoch": update, "through_verified_tasks": update * EPOCH_SIZE,
+                     "updated_at": tasks[update * EPOCH_SIZE - 1]["verified_at"],
+                     "objective": "cost only", "exploration_fraction": EXPLORATION,
+                     "weights": {x["id"]: x["weight"] for x in computed["contexts"]}}
+        history.append(entry)
+    if previous["epoch"] != epoch:
+        previous = computed if computed and computed["epoch"] == epoch else calibrate(tasks, epoch)
+    if epoch and history[-1]["weights"] != {x["id"]: x["weight"] for x in previous["contexts"]}:
+        raise ValueError("recorded epoch weights disagree with frozen policy")
     atomic_json(data / "strategy.json", previous)
     totals = Counter()
     context_tasks = defaultdict(list)

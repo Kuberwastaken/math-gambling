@@ -11,6 +11,7 @@ import tempfile
 import unittest
 from unittest import mock
 from urllib.parse import parse_qs, urlsplit
+from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import aggregate as ag
@@ -348,6 +349,69 @@ class ClusterTests(unittest.TestCase):
         summary = ag.aggregate(self.data)
         self.assertEqual(summary["totals"]["verified_unique_tasks"], 2)
         self.assertEqual(summary["totals"]["pending_banks"], 1)
+
+    def test_unavailable_pending_source_does_not_block_later_scans(self):
+        for status in (404, 410):
+            data = self.data / str(status)
+            ig.atomic_json(data / "receipts/poll.json", {"pending": [{"number": 1}], "since": None})
+            issue = {"number": 2, "title": "[bank] later", "body": ig.canonical(bank(self.results[:1])),
+                     "user": {"login": "actual-author"}, "updated_at": "2026-09-10T00:00:00Z"}
+            def api(url, token, **kwargs):
+                if url.endswith("/1"):
+                    raise HTTPError(url, status, "Unavailable", {}, None)
+                return [issue]
+            with mock.patch.object(ig, "api_request", side_effect=api):
+                entries, poll = ig.collect_issues("example/test", "unused", data)
+            self.assertEqual([x[1]["number"] for x in entries], [2])
+            self.assertEqual([x["number"] for x in poll["pending"]], [2])
+            audit = ig.read_json(ig.ledger_path(data, "unavailable", "issue:1"))
+            self.assertEqual(audit["http_status"], status)
+            self.assertEqual(ag.aggregate(data)["totals"]["verified_unique_tasks"], 0)
+        with mock.patch.object(ig, "api_request", side_effect=HTTPError("https://api.github.com", 403, "Forbidden", {}, None)):
+            with self.assertRaises(HTTPError):
+                ig.collect_issues("example/test", "unused", self.data)
+
+    def test_positive_rescue_checks_later_hits_and_malformed_task_arrays(self):
+        real_exact = ig.exact_triple
+        hit = {"xyz": ["-159380", "134476", "117367"]}  # Known k=39, not 114.
+        invalid = {"xyz": ["0", "0", "0"]}
+        fixtures = [
+            {"hits": [invalid] * 64 + [hit]},
+            {"tasks": [{"hits": [invalid]}] * 255 + [{"hits": [hit]}]},
+            {"results": [{}] * 8 + [{"hits": [hit]}]},
+        ]
+        for number, receipt in enumerate(fixtures, 1):
+            with mock.patch.object(ig, "exact_triple", side_effect=lambda xyz: real_exact(xyz, k=39)):
+                found = ig.preserve_hits(self.data, receipt, source(number))
+            self.assertEqual(len(found), 1)
+        oversized = {"padding": "x" * (ig.MAX_BODY_BYTES + 1), "hits": [hit]}
+        with mock.patch.object(ig, "exact_triple") as verifier:
+            self.assertEqual(ig.preserve_hits(self.data, oversized, source()), [])
+        verifier.assert_not_called()
+
+    def test_epoch_publication_recovers_after_either_atomic_replacement(self):
+        import readme_snapshot
+        ag.aggregate(self.data)
+        results = [run_task(make_task("c00", 128 * i)) for i in range(64)]
+        self.submit(bank(results))
+        original = ag.atomic_json
+        def interrupted(path, payload):
+            original(path, payload)
+            if Path(path).name == "strategy.json":
+                raise OSError("interrupted after strategy replacement")
+        with mock.patch.object(ag, "atomic_json", side_effect=interrupted):
+            with self.assertRaises(OSError):
+                ag.aggregate(self.data)
+        report = ag.aggregate(self.data)
+        policy = ig.read_json(self.data / "strategy.json")
+        readme_snapshot.validated_state(report, policy)
+        self.assertEqual([x["epoch"] for x in report["calibration_history"]], [1])
+        fingerprint = ig.canonical(report["calibration_history"])
+        # Also recover the reverse mismatch: history survived while strategy is older.
+        ig.atomic_json(self.data / "strategy.json", ag.initial_strategy())
+        rebuilt = ag.aggregate(self.data)
+        readme_snapshot.validated_state(rebuilt, ig.read_json(self.data / "strategy.json"))
+        self.assertEqual(ig.canonical(rebuilt["calibration_history"]), fingerprint)
 
 
 if __name__ == "__main__":

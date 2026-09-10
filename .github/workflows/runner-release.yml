@@ -15,7 +15,7 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2022, macos-14]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 7
+    timeout-minutes: 12
     env:
       PYTHONUTF8: '1'
       MG_RUNNER_ARCHIVE: dist/math-gambling/downloads/math-gambling-runner.zip
@@ -43,7 +43,7 @@ jobs:
     if: github.event.repository.private == false
     needs: compatibility
     runs-on: ubuntu-24.04
-    timeout-minutes: 7
+    timeout-minutes: 12
     permissions:
       contents: write
     env:

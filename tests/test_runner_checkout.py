@@ -29,7 +29,9 @@ class RunnerCheckoutTests(unittest.TestCase):
                        GIT_TERMINAL_PROMPT='0')
             def git(*args, cwd=source):
                 result = subprocess.run(['git', *args], cwd=cwd, env=env,
-                                        capture_output=True, text=True, timeout=30)
+                                        # Real published closure can contain tens of thousands of files.
+                                        # Windows staging/antivirus needs a separate I/O budget.
+                                        capture_output=True, text=True, timeout=180)
                 self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
                 return result.stdout
             git('init', '--quiet', '--initial-branch=main')

@@ -9,7 +9,7 @@ import secrets
 
 from search_core import ENGINE, canonical_json
 
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 RNG_ALGORITHM = 'python-random-mt19937-v1'
 
 
@@ -31,7 +31,7 @@ class RunAudit:
                    budgets=budgets, started_at=now.isoformat())
 
     def write(self, event, **fields):
-        with self.path.open('a', encoding='utf-8') as handle:
+        with self.path.open('a', encoding='utf-8', newline='\n') as handle:
             handle.write(canonical_json({'event': event, **fields}) + '\n')
             handle.flush()
             os.fsync(handle.fileno())

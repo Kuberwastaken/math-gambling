@@ -3,8 +3,10 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - '.gitattributes'
       - 'tools/runner.py'
       - 'tools/search_core.py'
+      - 'tools/ingest.py'
       - 'tools/client_audit.py'
       - 'tools/coverage_client.py'
       - 'tools/build_site.py'
@@ -13,6 +15,7 @@ on:
       - 'package-lock.json'
       - 'tests/test_runner_portability.py'
       - 'tests/test_runner_client.py'
+      - 'tests/test_runner_checkout.py'
       - 'data/runner-release.json'
       - 'docs/RUNNER_SETUP.md'
       - '.github/workflows/runner-portability.yml'

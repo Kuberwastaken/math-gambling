@@ -59,7 +59,9 @@ def atomic_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(value, indent=2, sort_keys=True, ensure_ascii=True, allow_nan=False) + "\n")
+    # Coverage filenames hash these exact bytes. Platform text-mode newline
+    # translation must not make a Windows publisher emit a different shard.
+    temporary.write_bytes((json.dumps(value, indent=2, sort_keys=True, ensure_ascii=True, allow_nan=False) + "\n").encode("utf-8"))
     temporary.replace(path)
 
 

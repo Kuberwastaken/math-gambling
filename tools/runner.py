@@ -63,7 +63,7 @@ def initialize_worker():
 def atomic_json(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix+'.tmp')
-    with temporary.open('w', encoding='utf-8') as handle:
+    with temporary.open('w', encoding='utf-8', newline='\n') as handle:
         handle.write(canonical_json(data)+'\n')
         handle.flush(); os.fsync(handle.fileno())
     os.replace(temporary, path)
@@ -164,7 +164,7 @@ def preserve_result(out, db, result):
         digest = hashlib.sha256(canonical_json(hit['xyz']).encode()).hexdigest()
         atomic_json(out/'discoveries'/f'{digest}.json', {'engine': ENGINE, 'result': result, 'hit': hit})
     line = canonical_json(result)
-    with (out/'results.jsonl').open('a', encoding='utf-8') as handle:
+    with (out/'results.jsonl').open('a', encoding='utf-8', newline='\n') as handle:
         handle.write(line+'\n'); handle.flush(); os.fsync(handle.fileno())
     db.execute('UPDATE tasks SET result=? WHERE id=?', (line, result['id']))
     db.commit()

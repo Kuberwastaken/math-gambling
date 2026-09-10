@@ -1,0 +1,17 @@
+# Source and documentation use the same line endings on every platform.
+* text=auto eol=lf
+
+# These files are addressed or inventoried by hashes of their exact bytes.
+# Do not apply Git clean/smudge newline conversion, including on Windows.
+data/coverage/** -text
+research/archive/** -text
+
+*.zip -text
+*.gz -text
+*.pdf -text
+*.png -text
+*.jpg -text
+*.jpeg -text
+*.webp -text
+*.woff -text
+*.woff2 -text

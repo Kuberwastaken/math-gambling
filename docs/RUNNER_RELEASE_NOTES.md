@@ -1,6 +1,8 @@
-# Math Gambling runner v0.2.0
+# Math Gambling runner v0.2.1
 
 A portable Python 3.11+ client for the community search for x³ + y³ + z³ = 114.
+
+Version 0.2.0 passed the Ubuntu and macOS checks but was withheld when the Windows build detected changed coverage-shard bytes. Git’s Windows newline conversion changed LF to CRLF, so the SHA-256 validation correctly rejected the checkout. Version 0.2.1 preserves hash-addressed coverage and archived research bytes during checkout and emits explicit UTF-8/LF protocol files. The original tag remains unchanged; this release must pass the full three-platform checks again.
 
 - Standard-library client for macOS, Windows and Linux, with bounded multiprocessing and resumable exact task receipts.
 - `--login` uses the GitHub CLI browser sign-in and reads the authenticated account. Add `--submit` to authorize automatic bank issues every 256 completed tasks by default; adjust with `--bank-every 1..256`.

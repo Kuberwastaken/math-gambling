@@ -34,4 +34,4 @@ The reviewed exporter reads the Mac campaign locally and sends only the two publ
 
 Run `npm test`, `python3 tools/build_site.py`, and `python3 tools/check_site.py` before publication. Keep the original ledgers, journals and source identity records locally. The scientific archive documents its intentional omission of multi-gigabyte runtime data. Its original/source hashes provide provenance; sanitized archived bytes have their own hashes.
 
-For a suspected solution, stop scheduling that client, preserve its receipts and journals, verify the full integer identity independently, and record the signed submission and discovery evidence. Do not fill the paper's result or finder fields from a counter, near miss, unverified bank, or locally entered name.
+For a suspected solution, stop scheduling that client, preserve its receipts and journals, verify the full integer identity independently, and record the authenticated submission and discovery evidence. Do not fill the paper's result or finder fields from a counter, near miss, unverified bank, or locally entered name.

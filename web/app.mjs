@@ -369,7 +369,7 @@ async function loadCluster() {
     text(
       "cluster-note",
       Number(t.verified_unique_tasks)
-        ? "Only independently replayed tasks enter this ledger. Signed GitHub submitters receive first-submission credit for unique tasks."
+        ? "Only independently replayed tasks enter this ledger. Authenticated GitHub submitters receive credit when their unique task results are first accepted."
         : "The volunteer ledger starts at zero. Be the first to bank a verified computation.",
     );
     const body = $("contributors");

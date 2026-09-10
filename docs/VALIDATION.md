@@ -17,7 +17,7 @@ This records checks actually run on 10 September 2026. It is not a formal verifi
 
 The browser ran and stopped real computation: 434 finished tasks remained saved locally, and a 256-task bank was prepared from them. They were not silently posted. A separate Node VM harness executes the actual page code with controlled DOM, worker and storage hosts; it checks stopping while a task is in flight, draining before restart, delayed storage writes, double-start prevention, constructor failure, malformed saved profiles and time-budget expiry. This harness is not a substitute for real browser/storage testing.
 
-Desktop and 390-pixel mobile layouts were visually inspected. The mobile home page had no horizontal document overflow. The working paper remained visibly labeled as a draft with blank result fields. Source links, internal anchors, the downloadable runner's required files and download checksums passed the static build audit.
+Desktop and 390-pixel mobile layouts were visually inspected. After HTTPS publication, a separate live-origin browser run completed and durably saved 736 tasks, 1,378,304 coefficient inputs, 89,013 root intervals, and 263 exact tests before a clean manual stop. Those QA receipts remain unbanked; they are not included in public totals. The mobile home page had no horizontal document overflow. The working paper remained visibly labeled as a draft with blank result fields. Source links, internal anchors, the downloadable runner's required files and download checksums passed the static build audit.
 
 ## Research and Mac snapshot
 

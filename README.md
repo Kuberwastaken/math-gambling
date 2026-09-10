@@ -141,3 +141,41 @@ The [working paper](paper/math-gambling-draft.tex) records implementation and ev
 The mathematical approaches are credited to Booker–Sutherland, Grantham–Walsh and the primary sources in the [research verdict](research/archive/research-2026-09-09/SEARCH_VERDICT.md). This independent project is not endorsed by those authors. Original project software is GPL-2.0-or-later; upstream material retains its notices.
 
 [September audit corrections](docs/AUDIT_FIXES.md): immediate discovery recovery, bounded warmed replay, exact chunked coverage and the v0.3.1 runner.
+
+
+<!-- LEARNING:START -->
+
+## Experimental task learning
+
+Frozen through **15,360 verified tasks**; **15 models** and **14 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+
+The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.
+
+```mermaid
+flowchart TD
+    Receipts[Independently replayed receipts] --> Ledger[Canonical ledger]
+    Ledger --> Production[Existing cost policy: 40 percent exploration]
+    Ledger --> Freeze[Freeze each 1024 task boundary]
+    Freeze --> Spatial[Train spatial challenger excluding held-out geometry]
+    Spatial --> Future[Score next 1024 accepted tasks]
+    Future --> Report[Publish errors and immutable model hashes]
+    Report --> Gate[Controlled policy benchmark still required]
+    Gate --> NoPromotion[No automatic discovery-policy promotion]
+```
+
+Latest evaluation: tasks 14,337–15,360. Lower mean absolute log1p prediction error is better.
+
+| Quantity | Context baseline | Spatial challenger |
+| --- | ---: | ---: |
+| cpu_ms | 1.1750 | 1.1481 |
+| quotient_points | 9.0431 | 8.9963 |
+| curves | 4.0724 | 4.0350 |
+| exact_tests | 0.3343 | 0.3237 |
+
+Unseen-geometry evaluation: 158 tasks. Full errors and nonzero-count support are in the report.
+
+Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.
+
+[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/learning/mg114-spatial-shadow-v1/77c206ff26f8b0ee/) · [Design and promotion protocol](docs/LEARNING.md)
+
+<!-- LEARNING:END -->

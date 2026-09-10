@@ -40,6 +40,13 @@ jobs:
         id: replay
         continue-on-error: true
         run: python3 tools/ingest.py --issues
+      - name: Fit frozen spatial challenger and score later arrivals
+        id: learning
+        continue-on-error: true
+        timeout-minutes: 2
+        run: |
+          python3 -m unittest discover -s tests -p test_strategy_model.py
+          python3 tools/strategy_model.py
       - name: Commit verified data without modifying source
         shell: bash
         run: |
@@ -47,9 +54,10 @@ jobs:
           python3 tools/coverage_index.py --prune
           python3 tools/readme_charts.py
           python3 tools/readme_snapshot.py
+          python3 tools/learning_readme.py
           git config user.name 'math-gambling verifier'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- data/cluster.json data/strategy.json data/receipts data/coverage data/readme-progress.svg README.md
+          git add -- data/cluster.json data/strategy.json data/receipts data/coverage data/readme-progress.svg data/learning README.md
           if ! git diff --cached --quiet; then
             git commit -m 'Record verified community receipts and frozen cost calibration'
             for attempt in 1 2 3; do
@@ -62,4 +70,10 @@ jobs:
         if: steps.replay.outcome == 'failure'
         run: |
           echo 'Receipt replay had an operational error. Verified progress was committed; affected banks remain pending.' >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+      - name: Surface challenger failure without discarding verified coverage
+        if: steps.learning.outcome == 'failure'
+        run: |
+          echo 'Challenger learning failed; existing production policy retained. See learning step logs.' >> "$GITHUB_STEP_SUMMARY"
           exit 1

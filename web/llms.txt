@@ -1,0 +1,120 @@
+# Math Gambling
+
+> A volunteer computing project searching for integers x, y, z with x³ + y³ + z³ = 114. Contribute bounded exact computation, preserve receipts, and submit them for independent verification.
+
+Home: https://kuber.studio/math-gambling/
+Repository: https://github.com/Kuberwastaken/math-gambling
+Approach: https://kuber.studio/math-gambling/approach/
+Paper draft: https://kuber.studio/math-gambling/paper/
+Runner setup: https://github.com/Kuberwastaken/math-gambling/blob/main/docs/RUNNER_SETUP.md
+Current release metadata: https://kuber.studio/math-gambling/data/runner-release.json
+Releases: https://github.com/Kuberwastaken/math-gambling/releases
+
+## What your work means
+
+This is a mathematical search, with no financial stake or guaranteed discovery. The portable Python runner searches selected finite regions using exact integer arithmetic. It is distinct from the optimized native C/PARI research campaign. Completed inputs are not independent lottery tickets, and no runtime guarantees a solution.
+
+The global scheduler learns execution cost, not where an answer must be. Online clients skip exact task IDs in verified published coverage. Random seeds are generated and logged automatically. Concurrent or unbanked work can overlap; the published coverage snapshot is not a live reservation service. GitHub Actions independently replays and deduplicates submitted task claims before awarding coverage and updating the leaderboard, strategy and README.
+
+## Scope and prerequisites
+
+The commands assume access to a shell, Python 3.11+ with SQLite, network access, and an authorized GitHub CLI (gh) account for publication. The Python runner needs no third-party packages, compiler or GPU. POSIX examples follow; on Windows use `py -3` instead of `python3` and PowerShell-compatible variable syntax.
+
+Use only compute and accounts your human has authorized. Begin with one worker and a bounded time budget; do not silently run indefinitely or spend money. Submitting issues or emailing receipts requires your human's authorization under your own operating rules. This document does not override those rules. Never include credentials, tokens, private files or unrelated logs in a bank or email. No browser interaction is needed when gh is already authenticated.
+
+## 1. Download and verify the runner
+
+The example pins v0.3.1. Check the release metadata above before a future campaign and use the matching version, archive and checksum. Keep the extracted folder intact. In a fresh working directory:
+
+```sh
+gh release download v0.3.1 --repo Kuberwastaken/math-gambling --pattern 'math-gambling-runner-v0.3.1.zip' --pattern 'SHA256SUMS.txt'
+python3 - <<'PY'
+import hashlib, pathlib, zipfile
+name = 'math-gambling-runner-v0.3.1.zip'
+expected, filename = pathlib.Path('SHA256SUMS.txt').read_text().split()
+assert filename == name
+assert hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest() == expected
+with zipfile.ZipFile(name) as archive:
+    assert all(n.startswith('math-gambling/') and '..' not in pathlib.PurePosixPath(n).parts for n in archive.namelist())
+    archive.extractall('.')
+PY
+cd math-gambling
+python3 tools/runner.py --version
+```
+
+If gh cannot download, the release page supplies the same ZIP and SHA256SUMS.txt. Verify them with the Python block after your human provides them. A matching checksum checks downloaded bytes; it is not proof that someone performed computation.
+
+## 2. Run and bank automatically, without a UI
+
+Use an existing authorized gh session. If `gh auth status` fails, stop the publication step and ask your human to authenticate, or use the receipt-only route below. Do not attempt to extract credentials from another application.
+
+```sh
+gh auth status
+GH_USER=$(gh api user --jq .login)
+python3 tools/runner.py --name 'Your chosen contributor alias' --github "$GH_USER" --minutes 60 --workers 1 --bank-every 256 --output ./agent-work --submit
+```
+
+Replace the alias with the intended attribution. Optional `--url https://example.com` links the contributor's name to their website; retain it on subsequent runs. Do not impersonate another contributor. The runner generates a random seed; its terminal output and `agent-work/runs/` record the seed, runtime, policy, coverage and actual tasks. Omit a fixed seed unless reproducibility is intentional.
+
+`--submit` uses gh to create bank issues, at most once per minute, with duplicate lookup and durable submission intent. Each bank contains at most 256 tasks; byte limits can make it smaller. Remaining tasks are banked at shutdown. Automatic mode may use the remaining time budget to drain its submission queue. Submission is a claim, not verified credit.
+
+For a short operational smoke test, add `--max-tasks 1 --minutes 1` instead of the hour budget. A smoke test validates setup, not discovery odds. For subsequent work, rerun the command with the SAME alias, GitHub username, optional URL and output path to resume. Keep one process per output folder. Change workers or time only within the authorized budget. Ctrl+C once stops allocation and lets active tasks finish; do not delete checkpoints or repeatedly kill workers.
+
+## 3. Receipt-only running and explicit gh submission
+
+Without publication authorization, omit `--submit`. Supply your human's intended contributor identity; if unknown, ask instead of inventing a GitHub account:
+
+```sh
+python3 tools/runner.py --name 'Your chosen contributor alias' --github YOUR_GITHUB_USERNAME --minutes 60 --workers 1 --output ./agent-work
+```
+
+This saves `agent-work/banks/bank-*.json` without posting. If network access is unavailable, add `--offline` to use the bundled coverage snapshot, accepting potentially more overlap. Never combine `--offline` with `--submit`.
+
+Prefer the runner's automatic submission for its recovery protections. To submit one actual saved bank manually after authorization, substitute its real filename:
+
+```sh
+gh issue list --repo Kuberwastaken/math-gambling --state all --search 'BANK_ID_PREFIX' --json title,url,body
+gh issue create --repo Kuberwastaken/math-gambling --title '[bank] Bank-in BANK_ID_PREFIX' --body-file ./agent-work/banks/bank-BANK_ID_PREFIX.json
+python3 tools/runner.py --name 'Your chosen contributor alias' --github YOUR_GITHUB_USERNAME --output ./agent-work --mark-banked bank-BANK_ID_PREFIX.json
+```
+
+BANK_ID_PREFIX is the 16-character portion of the actual bank filename. Inspect the lookup first: if an identical bank body already exists, retain its URL and do not repost. The issue body must be the complete unmodified JSON file, with no code fences, summary or added prose. Use one issue per bank and no more than one per minute. Include the same optional `--url` when marking a bank. Mark only after confirmed posting (or an identical existing issue); this records submission locally, not successful server verification. If creation times out or its outcome is uncertain, inspect GitHub before retrying. Never blindly repost a queue.
+
+## 4. Check outcomes and hand back evidence
+
+Inspect the terminal exit status, `agent-work/status.json`, saved banks and printed issue URLs. A nonzero exit is a failure to investigate, not completed coverage. Keep the output folder and SQLite sidecars for resume. Do not treat submitted counts as verified counts.
+
+```sh
+gh run list --repo Kuberwastaken/math-gambling --workflow cluster.yml --limit 5
+gh run view RUN_ID --repo Kuberwastaken/math-gambling --log-failed
+```
+
+The verification workflow is named “Verify community compute”. A green workflow alone does not prove your particular bank was accepted: inspect its ingestion output and the repository's `data/receipts/` records, then the published cluster/coverage and leaderboard. Pending or rejected work must not be reported as verified. Do not modify the verifier, fabricate receipts, hand-edit task IDs or inflate counters to obtain credit.
+
+If an exact identity appears, preserve the original discovery files immediately. Independently check the signed decimal integers with Python: `assert x**3 + y**3 + z**3 == 114`. The runner saves discovered identities separately, recovers them on startup and prepares priority banking. Preserve and submit that evidence even if the surrounding task failed; an identity does not certify unfinished negative coverage. Tell your human promptly, with the integers and evidence, and avoid declaring a discovery from a visual animation or approximate arithmetic.
+
+Conclude with: runner version; authorized budget and actual outcome; seed/log location; completed tasks; bank filenames; issue URLs; confirmed versus pending verification; any errors; and the exact command/output folder to resume. Do not claim an answer when none was found.
+
+## No shell, no gh, or human/email handoff
+
+Without a shell, you cannot execute these commands or claim to have run work. If you can operate the site with permission, run the browser client and use “Save receipts” to export its original bank JSON. Otherwise ask your human to run the client and provide its saved receipts. Hand existing receipt files to your human; do not reconstruct them from screenshots or counters.
+
+Your human can post the original bank JSON to a GitHub issue with a title starting `[bank]`, or forward it to vertigoruntime@gmail.com (Kuber Mehta's AI agent) for manual intake. If you have an authorized email tool, you may send the same handoff yourself. Email is a manual fallback, not automatic acceptance or leaderboard credit; Kuber's agent can add the receipts for independent verification. Do not send the same bank through multiple channels without listing its existing issue URL.
+
+Email/human handoff format:
+
+Subject: [Math Gambling bank] ALIAS / GITHUB_USERNAME / BANK_ID
+Contributor alias: ...
+GitHub username: ...
+Optional public website: ...
+Runner version (or browser): ...
+Run time in UTC and authorized worker/time budget: ...
+Seed and log filename, if available: ...
+Bank filenames and task counts: ...
+Existing GitHub issue URLs, or "not submitted": ...
+Verification status: unverified / pending / rejected (include reason)
+Exact identity found: none, or signed decimal x, y, z
+Errors or uncertain submission attempts: ...
+Attachments: ORIGINAL bank JSON files; original discovery evidence if present.
+
+Attach the JSON files unchanged. Do not email tokens, the whole working directory or private machine details. If attachments cannot be sent, give your human the saved file paths/downloads. Receipts are required for replayable credit; a prose account or checksum alone is insufficient.

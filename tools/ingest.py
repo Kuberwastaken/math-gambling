@@ -8,10 +8,12 @@ import json
 import math
 import os
 from pathlib import Path
+import queue
 import re
 import subprocess
 import sys
 import time
+import threading
 import unicodedata
 from datetime import datetime, timezone
 from urllib.parse import urlencode, urlsplit
@@ -179,6 +181,161 @@ def replay_task(task):
     return payload["result"], max(float(timing), 0.01)
 
 
+class WarmReplay:
+    """One trusted warmed worker, retired after a bounded number of exact tasks.
+
+    The parent owns wall/output deadlines; POSIX children also arm a fresh CPU
+    timer per task. A worker is discarded after any timeout or protocol error.
+    """
+    def __init__(self, max_tasks=256, wall_seconds=6, command=None):
+        if type(max_tasks) is not int or not 1 <= max_tasks <= 256:
+            raise ValueError("worker batch must contain 1..256 tasks")
+        if not isinstance(wall_seconds, (int, float)) or not math.isfinite(wall_seconds) or not 0 < wall_seconds <= 6:
+            raise ValueError("worker wall deadline must be in (0, 6]")
+        self.command = command or [sys.executable, str(Path(__file__).resolve()), "--replay-stream"]
+        self.max_tasks, self.wall_seconds = max_tasks, wall_seconds
+        self.process = self.reader = self.events = None
+        self.completed = 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
+    @staticmethod
+    def _read_lines(process, events):
+        try:
+            while True:
+                line = process.stdout.readline(65537)
+                events.put(line, timeout=0.25)
+                if not line:
+                    return
+        except (OSError, ValueError, queue.Full):
+            # Bound unsolicited stdout even if a faulty trusted worker floods it.
+            if process.poll() is None:
+                try:
+                    process.kill()
+                except ProcessLookupError:
+                    pass
+
+    def _message(self, deadline):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise subprocess.TimeoutExpired(self.command, self.wall_seconds)
+        try:
+            line = self.events.get(timeout=remaining)
+        except queue.Empty:
+            raise subprocess.TimeoutExpired(self.command, self.wall_seconds) from None
+        if not line or len(line) > 65536 or not line.endswith(b"\n"):
+            raise subprocess.CalledProcessError(1, self.command, stderr="bounded replay stream ended or exceeded its output limit")
+        try:
+            message = parse_json(line.decode("utf-8"), 65536)
+        except (ValueError, UnicodeError, RecursionError) as exc:
+            raise subprocess.CalledProcessError(1, self.command, stderr="invalid replay JSON") from exc
+        return message, len(line)
+
+    def _start(self):
+        from search_core import ENGINE
+        self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                        stderr=subprocess.DEVNULL)
+        self.events = queue.Queue(maxsize=8)
+        self.reader = threading.Thread(target=self._read_lines, args=(self.process, self.events), daemon=True)
+        self.reader.start()
+        message, _ = self._message(time.monotonic() + 6)
+        if message != {"schema": "math-gambling-replay-ready-v1", "engine": ENGINE}:
+            raise subprocess.CalledProcessError(1, self.command, stderr="wrong trusted worker handshake")
+        self.completed = 0
+
+    def close(self):
+        process, reader = self.process, self.reader
+        if process is not None:
+            if process.poll() is None:
+                try:
+                    process.kill()
+                except ProcessLookupError:
+                    pass
+            process.wait(timeout=2)
+            if reader is not None:
+                reader.join(timeout=1)
+            for handle in (process.stdin, process.stdout):
+                try:
+                    handle.close()
+                except OSError:
+                    pass
+        self.process = self.reader = self.events = None
+        self.completed = 0
+
+    def __call__(self, task, on_hit=None):
+        from search_core import task_id, validate_task
+        task = validate_task(task)
+        try:
+            if self.process is None or self.process.poll() is not None or self.completed >= self.max_tasks:
+                self.close()
+                self._start()
+            request_id = self.completed + 1
+            deadline = time.monotonic() + self.wall_seconds
+            payload = (canonical({"request_id": request_id, "task": task}) + "\n").encode("ascii")
+            if len(payload) > 2048:
+                raise ValueError("trusted task descriptor exceeded stream cap")
+            try:
+                self.process.stdin.write(payload)
+                self.process.stdin.flush()
+            except (OSError, ValueError) as exc:
+                raise subprocess.CalledProcessError(1, self.command, stderr="trusted worker input closed") from exc
+            output_bytes = 0
+            while True:
+                message, size = self._message(deadline)
+                output_bytes += size
+                if (output_bytes > 65536 or not isinstance(message, dict)
+                        or type(message.get("request_id")) is not int or message["request_id"] != request_id):
+                    raise subprocess.CalledProcessError(1, self.command, stderr="unexpected or oversized replay response")
+                if set(message) == {"request_id", "hit"}:
+                    if on_hit is not None:
+                        on_hit(message["hit"])
+                    continue
+                if set(message) != {"request_id", "result", "cpu_ms"}:
+                    raise subprocess.CalledProcessError(1, self.command, stderr="unexpected replay response fields")
+                result, timing = message["result"], message["cpu_ms"]
+                if (not isinstance(result, dict) or result.get("task") != task or result.get("id") != task_id(task)
+                        or isinstance(timing, bool) or not isinstance(timing, (int, float))
+                        or not math.isfinite(timing) or timing < 0 or timing > 4100):
+                    raise subprocess.CalledProcessError(1, self.command, stderr="invalid trusted task identity or CPU accounting")
+                self.completed += 1
+                return result, max(float(timing), 0.01)
+        except BaseException:
+            self.close()
+            raise
+
+
+def replay_stream():
+    """Data-only internal protocol. This entry point cannot import submitted code."""
+    import inspect
+    import signal
+    from search_core import ENGINE, _filters, run_task, validate_task
+    _filters(114)
+    callback_supported = "on_hit" in inspect.signature(run_task).parameters
+    print(canonical({"schema": "math-gambling-replay-ready-v1", "engine": ENGINE}), flush=True)
+    for _ in range(256):
+        raw = sys.stdin.buffer.readline(2049)
+        if not raw:
+            return
+        request = parse_json(raw.decode("ascii"), 2048)
+        if (not raw.endswith(b"\n") or not isinstance(request, dict) or set(request) != {"request_id", "task"}
+                or type(request["request_id"]) is not int or not 1 <= request["request_id"] <= 256):
+            raise ValueError("invalid trusted stream request")
+        task = validate_task(request["task"])
+        emit = lambda hit: print(canonical({"request_id": request["request_id"], "hit": hit}), flush=True)
+        if hasattr(signal, "ITIMER_PROF"):
+            signal.setitimer(signal.ITIMER_PROF, 4)
+        started = time.process_time()
+        result = run_task(task, on_hit=emit) if callback_supported else run_task(task)
+        elapsed = 1000 * (time.process_time() - started)
+        if hasattr(signal, "ITIMER_PROF"):
+            signal.setitimer(signal.ITIMER_PROF, 0)
+        print(canonical({"request_id": request["request_id"], "result": result, "cpu_ms": elapsed}), flush=True)
+
+
 class RetryLater(Exception):
     pass
 
@@ -259,7 +416,12 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
                     expected, cpu_ms = saved["result"], saved["server_replay_cpu_ms"]
                 else:
                     budget.charge()
-                    expected, cpu_ms = replay(task)
+                    if isinstance(replay, WarmReplay):
+                        def retain_early(hit):
+                            discoveries.extend(preserve_hits(data, {"contributor": receipt["contributor"], "hits": [hit]}, source))
+                        expected, cpu_ms = replay(task, on_hit=retain_early)
+                    else:
+                        expected, cpu_ms = replay(task)
                     discoveries.extend(preserve_hits(data, {"contributor": receipt["contributor"], "results": [expected]}, source))
                 if bank:
                     matching = claimed["digest"] == expected["digest"] and ("hits" not in claimed or canonical(claimed["hits"]) == canonical(expected["hits"]))
@@ -459,9 +621,13 @@ def main():
     parser.add_argument("--issues", action="store_true", help="Read queued [compute]/[bank] GitHub issues")
     parser.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", "Kuberwastaken/math-gambling"))
     parser.add_argument("--replay-one", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--replay-stream", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.input and args.data.resolve() == (ROOT / "data").resolve():
         raise ValueError("fixture ingestion requires a separate --data directory")
+    if args.replay_stream:
+        replay_stream()
+        return
     if args.replay_one:
         if sys.platform != "win32":
             import resource
@@ -486,17 +652,18 @@ def main():
         entries = []
     budget = Budget()  # Replay receives its own 120 seconds after bounded API collection.
     completed = set()
-    for receipt, source in entries:
-        record = process_receipt(receipt, source, args.data, budget)
-        summary["processed_receipts"] += 1
-        if record["complete"]:
-            completed.add(source.get("number"))
-        else:
-            summary["deferred"] = True
-            if record.get("deferred_reason") == "replay_failed":
-                summary["operational_errors"] += 1
-                continue
-            break
+    with WarmReplay() as replay:
+        for receipt, source in entries:
+            record = process_receipt(receipt, source, args.data, budget, replay=replay)
+            summary["processed_receipts"] += 1
+            if record["complete"]:
+                completed.add(source.get("number"))
+            else:
+                summary["deferred"] = True
+                if record.get("deferred_reason") == "replay_failed":
+                    summary["operational_errors"] += 1
+                    continue
+                break
     if poll is not None:
         poll["pending"] = [x for x in poll["pending"] if x["number"] not in completed]
         atomic_json(args.data / "receipts" / "poll.json", poll)

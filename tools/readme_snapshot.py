@@ -141,7 +141,7 @@ def render_snapshot(report, policy, config=None):
         lines += ["", "No participants have independently verified work yet."]
     if 'zero_curve_tasks' in report['totals']:
         empty = integer(report['totals']['zero_curve_tasks'])
-        lines += [f"**{empty:,} / {total:,} verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.", "",
+        lines += ["", f"**{empty:,} / {total:,} verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.", "",
                   "[Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](docs/MATHEMATICAL_COVERAGE.md)", ""]
     lines += ["", "Rank is based on replayed coefficient inputs. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.", "",
               "### The current allocation", "",

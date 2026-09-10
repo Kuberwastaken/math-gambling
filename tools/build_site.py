@@ -73,6 +73,9 @@ def main():
         (OUT/'data/learning').mkdir()
         for name in ['latest.json','visuals.json','evolution.svg','pilot.svg']:
             if (learning/name).exists(): shutil.copy2(learning/name, OUT/'data/learning'/name)
+    if (ROOT/'data/math-coverage/index.json').exists():
+        (OUT/'data/math-coverage').mkdir()
+        shutil.copy2(ROOT/'data/math-coverage/index.json', OUT/'data/math-coverage/index.json')
     coverage, _ = read_coverage(ROOT / 'data/coverage')
     shutil.copytree(ROOT / 'data/coverage', OUT / 'data/coverage',
                     ignore=shutil.ignore_patterns('.*', '*.tmp', 'retention.json'))
@@ -82,6 +85,7 @@ def main():
       'ALGORITHM_REVIEW':'research/archive/research-2026-09-09/ALGORITHM_REVIEW.md',
       'GEOMETRY_REVIEW':'research/archive/research-2026-09-09/GEOMETRY_REVIEW.md',
       'DISCOVERY_LEARNING':'research/archive/research-2026-09-09/DISCOVERY_LEARNING.md',
+      'GEOMETRIC_POLICY':'docs/GEOMETRIC_POLICY.md','MATHEMATICAL_COVERAGE':'docs/MATHEMATICAL_COVERAGE.md',
       'DOMAIN_PROOF':'research/archive/phase3/DOMAIN_PROOF.md'}
     articles = {slug: rel for slug, rel in articles.items() if (ROOT / rel).exists()}
     rendered = render_research(articles)

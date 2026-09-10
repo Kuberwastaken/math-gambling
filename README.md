@@ -6,7 +6,7 @@ $$x^3+y^3+z^3=114,\qquad x,y,z\in\mathbb{Z}.$$
 
 The coordinates may be positive or negative, and enormous cubes can nearly cancel. An answer is one exactly verified integer triple. There is no known small search bound that guarantees our campaign will contain one.
 
-Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. A cost model changes how compute is allocated after each 64 verified tasks, while preserving 40% uniform exploration. It has not learned where a solution is likely to be.
+Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. Measured cost and a declared geometric prior adjust allocation after each 64 verified tasks, while preserving 40% uniform task proposals. It has not learned where a solution is likely to be.
 
 This is an open computational research project by Kuber Mehta. The gamble is spare processor time for a possible mathematical discovery. We publish the algorithms, finite search definitions, unsuccessful experiments, verification records and evolving model so the work can be inspected and reproduced.
 
@@ -14,84 +14,13 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 <!-- MATH_GAMBLING_SNAPSHOT:START -->
 
-## Current verified campaign
+## The live campaign
 
-Published observation: **2026-09-10 20:27:26 UTC**. This section updates after trusted receipt processing.
+[Live leaderboard, current totals and evolving Mermaid allocation](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/README.md) · [Play on the website](https://kuber.studio/math-gambling/)
 
-| Quantity | Verified total |
-| --- | ---: |
-| Unique finite tasks | 28,543 |
-| Coefficient-generator inputs | 53,500,928 |
-| Bounded curve intervals | 3,926,230 |
-| Logical quotient positions | 5,618,060,572 |
-| Exact integer square tests | 11,622 |
-| Independently verified identities for 114 | 0 |
+![Verified work and changing allocation](https://raw.githubusercontent.com/Kuberwastaken/math-gambling/cluster-data/data/readme-progress.svg)
 
-![Verified work and changing allocation](data/readme-progress.svg)
-
-These are actual fixed-task units from independent replay, not claimed client seconds or independent chances of discovery. The separate [Mac snapshot](data/mac.json) uses different domains and is not added to these totals.
-
-### Global leaderboard
-
-| Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
-| ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 51,753,984 | 27,609 |
-| 2 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 512 |
-| 3 | Pierre | [@pcrooks](https://github.com/pcrooks) | 482,304 | 256 |
-| 4 | [Kuber](<https://kuber.studio>) | [@Kuberwastaken](https://github.com/Kuberwastaken) | 238,592 | 128 |
-| 5 | Parth | [@PARTHANAND0009](https://github.com/PARTHANAND0009) | 71,680 | 38 |
-
-Rank is based on replayed coefficient inputs. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.
-
-### The current allocation
-
-**Epoch 445**, frozen from **28,480 verified tasks**. The next policy update needs **1 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
-
-```mermaid
-flowchart TD
-    H0["Epoch 442: 28,288 tasks; c00 1.23%"]
-    H1["Epoch 443: 28,352 tasks; c00 1.23%"]
-    H0 --> H1
-    H2["Epoch 444: 28,416 tasks; c00 1.23%"]
-    H1 --> H2
-    H3["Epoch 445: 28,480 tasks; c00 1.23%"]
-    H2 --> H3
-    Policy["Current policy: epoch 445"]
-    H3 --> Policy
-    Policy --> Explore["40% uniform exploration across 81 contexts"]
-    Policy --> Cost["60% weighted by measured replay efficiency"]
-    Explore --> Mix["Combined task-selection weights"]
-    Cost --> Mix
-    Mix --> C0["c00: 1.23%"]
-    Mix --> C1["c01: 1.23%"]
-    Mix --> C2["c02: 1.23%"]
-    Mix --> Rest["Other 78 contexts: 96.30% combined"]
-    C0 --> Check["Skip completed IDs; run exact bounded task"]
-    C1 --> Check
-    C2 --> Check
-    Rest --> Check
-    Check --> Replay["Bank result; independently replay"]
-    Replay --> Gate["64 new verified tasks completes an epoch"]
-    Gate --> Policy
-```
-
-Weights describe allocation, not the probability that a lane contains a solution. Median replay efficiency, a minimum observation count and clipped scores limit noisy updates; at least 40% uniform exploration remains.
-
-### Model history and evidence
-
-| Epoch | Verified-task boundary | Largest allocation | Weight |
-| ---: | ---: | --- | ---: |
-| 441 | 28,224 | c00 | 1.2346% |
-| 442 | 28,288 | c00 | 1.2346% |
-| 443 | 28,352 | c00 | 1.2346% |
-| 444 | 28,416 | c00 | 1.2346% |
-| 445 | 28,480 | c00 | 1.2346% |
-
-Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
-
-[Current policy](data/strategy.json) · [Complete model history and bank audits](data/cluster.json) · [Verified task records](data/receipts/tasks/) · [Exact completed-task index](data/coverage/index.json) · [Working paper](https://kuber.studio/math-gambling/paper/)
-
-The separate discovery-learning experiment failed its promotion gate. This campaign currently learns execution cost; it has not established a discovery predictor.
+Generated receipts, coverage and policy histories live on `cluster-data`. `main` holds reviewed code and research; `gh-pages` holds the built website. Routine Pages refreshes run every 20 minutes. Existing source-branch data is a frozen bootstrap snapshot for reproducible offline builds, not the latest campaign.
 
 <!-- MATH_GAMBLING_SNAPSHOT:END -->
 
@@ -109,25 +38,31 @@ These finite generators and ratio bands do not cover every integer triple, every
 
 ## What the model learns
 
-Every 64 new verified tasks completes an epoch. The next frozen policy compares median logical quotient positions per trusted replay CPU millisecond, requires three observations for local adaptation, clips scores, and reserves **40% uniform exploration** across all contexts. The objective is execution efficiency. It is not a probability of discovery, a proof of mathematical fertility, or a claim of global optimality.
+Every 64 verified tasks freezes a policy. The production method combines a declared geometric band/shell prior with measured curve yield and aggregate CPU, including empty tasks. It keeps 40% uniform task proposals; those are selection shares, not CPU budgets or discovery probabilities.
 
-A separate discovery-learning experiment held out whole target numbers and a larger divisor range. Learned and uniform mixtures both found the same representation for 69. The learned policy failed its preregistered promotion gate and was not promoted. Patterns in available solution catalogues can suggest experiments, but selection and scale effects prevent treating them as an established location advantage; no new bias significance or discovery probability is claimed here.
+```mermaid
+flowchart TD
+    Source[Reviewed source on main] --> Replay[Independently replay banked tasks]
+    Replay --> Ledger[Canonical receipts on cluster-data]
+    Ledger --> Geometry[Geometry prior plus measured curve yield and cost]
+    Ledger --> Shadow[Spatial challenger: frozen predictions and later errors]
+    Geometry --> Policy[Versioned production policy]
+    Shadow --> Evidence[Report evidence; no automatic promotion]
+    Policy --> Pages[Build gh-pages every 20 minutes]
+    Evidence --> Pages
+    Pages --> Clients[Independent local seeds and exact coverage checks]
+    Clients --> Replay
+```
 
-| Research decision | Evidence and scope |
-| --- | --- |
-| Retain the validated norm generator | [Algorithm comparison](research/archive/research-2026-09-09/ALGORITHM_REVIEW.md) reviews Booker–Sutherland, Grantham–Walsh, Elkies and alternatives |
-| Retain measured execution optimizations | [Phase 3 performance](research/archive/phase3/PERFORMANCE.md) reports workload-specific gains |
-| Reject the stronger sieve for production | [Paired timings](research/archive/research-2026-09-09/normalized-sieve-benchmark.json) found fewer exact tests without an overall CPU gain |
-| Do not promote a discovery predictor | [Held-out experiment](research/archive/research-2026-09-09/DISCOVERY_LEARNING.md) failed its acceptance gate |
-| Keep complementary geometry as research | [Derived tube bounds](research/archive/research-2026-09-09/GEOMETRY_REVIEW.md) have small-domain checks, not a proven frontier speedup |
+[Policy equations and limitations](docs/GEOMETRIC_POLICY.md) · [Mathematical coverage scope](docs/MATHEMATICAL_COVERAGE.md) · [Branch and deployment design](docs/BRANCHES.md)
 
-An optimization must preserve exact witnesses and its declared finite coverage, then show an end-to-end cost improvement or a properly held-out discovery advantage. Negative experiments stay in the [archive](docs/ARCHIVE.md) so that failures are evidence too. The [working paper](paper/math-gambling-draft.tex) leaves the result and discovery attribution blank.
+The initial discovery-learning experiment failed its promotion test. The new geometric preference is uncalibrated for our selected norm families. A stronger sieve, reduced duplicate work and better cost predictions are useful, but none establishes the likelihood of finding 114.
 
 ## What verified work means
 
 Browser workers use `BigInt`; the portable Python kernel uses arbitrary-precision integers. Each result has a fixed task descriptor and deterministic digest. GitHub ingestion independently replays every unseen task, compares the full result digest, and credits the actual issue creator once. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
 
-The [shared completed-task index](data/coverage/index.json) contains exact task IDs in SHA-256 checked, immutable hash-routed chunks. Runners v0.3.1 and newer read coverage v2; older runners need an upgrade. Clients skip IDs in their checked snapshot and local completed records. There is no probabilistic membership filter that could discard unvisited work. Simultaneous clients can still select the same unfinished task, and stale or offline snapshots cannot know about later completions; the server deduplicates accepted work.
+The [shared completed-task index](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/data/coverage/index.json) contains exact task IDs in SHA-256 checked, immutable hash-routed chunks. Runners v0.3.1 and newer read coverage v2; older runners need an upgrade. Clients skip IDs in their checked snapshot and local completed records. There is no probabilistic membership filter that could discard unvisited work. Simultaneous clients can still select the same unfinished task, and stale or offline snapshots cannot know about later completions; the server deduplicates accepted work.
 
 A digest detects changed bytes, but does not prove who physically supplied CPU time. Full negative replay is the current trust model and creates a central cost. Expected analytic counts and conservation checks are useful diagnostics; they do not prove that each candidate was visited. See the [protocol](docs/PROTOCOL.md), [cluster design](docs/CLUSTER.md), and [response to the external critique](docs/REVIEW_RESPONSE.md).
 
@@ -148,40 +83,10 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **27,648 verified tasks**; **27 models** and **26 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+The spatial model learns cost and arithmetic counts from verified task geometry. It remains in shadow; improved prediction error has not demonstrated better discovery odds.
 
-The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.
+![Frozen challenger evaluations](https://raw.githubusercontent.com/Kuberwastaken/math-gambling/cluster-data/data/learning/evolution.svg)
 
-```mermaid
-flowchart TD
-    Receipts[Independently replayed receipts] --> Ledger[Canonical ledger]
-    Ledger --> Production[Existing cost policy: 40 percent exploration]
-    Ledger --> Freeze[Freeze each 1024 task boundary]
-    Freeze --> Spatial[Train spatial challenger excluding held-out geometry]
-    Spatial --> Future[Score next 1024 accepted tasks]
-    Future --> Report[Publish errors and immutable model hashes]
-    Report --> Gate[Controlled policy benchmark still required]
-    Gate --> NoPromotion[No automatic discovery-policy promotion]
-```
-
-
-![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
-
-Latest evaluation: tasks 26,625–27,648. Lower mean absolute log1p prediction error is better.
-
-| Quantity | Context baseline | Spatial challenger |
-| --- | ---: | ---: |
-| cpu_ms | 1.1435 | 1.1075 |
-| quotient_points | 8.5387 | 8.4704 |
-| curves | 3.9365 | 3.8808 |
-| exact_tests | 0.3288 | 0.3175 |
-
-Unseen-geometry evaluation: 187 tasks. Full errors and nonzero-count support are in the report.
-
-![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
-
-Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.
-
-[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/learning/mg114-spatial-shadow-v1/bf9d0c3c663c9a4e/) · [Design and promotion protocol](docs/LEARNING.md)
+[Live learning report](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/README.md#experimental-task-learning) · [Design and promotion gates](docs/LEARNING.md)
 
 <!-- LEARNING:END -->

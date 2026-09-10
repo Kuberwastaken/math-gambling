@@ -33,6 +33,10 @@ jobs:
       - run: python tools/build_site.py
       - name: Check exact arithmetic, spawn, resume, banking, seed logs and coverage
         run: python -m unittest discover -s tests -p 'test_runner*.py' -v
+      - name: Check exact shell pruning against frozen baseline
+        run: |
+          python -m unittest discover -s tests -p test_shell_pruning.py -v
+          node --test tests/test_shell_pruning.mjs
       - name: Check mathematical positive fixtures and independent search kernel
         run: python -m unittest discover -s tests -p test_search.py -v
   release:

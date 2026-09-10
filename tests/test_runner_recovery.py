@@ -288,6 +288,24 @@ class RunnerRecoveryTests(unittest.TestCase):
                 runner.maybe_submit(db, 'fixture/repository', -float('inf'))
                 self.assertEqual(runner.bank_queue(db)['uncertain'], 1)
 
+    def test_atomic_json_retries_only_bounded_windows_sharing_failures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'identity.json'
+            error = PermissionError('Windows sharing race')
+            error.winerror = 5
+            with patch.object(runner.os, 'replace', side_effect=[error, None]) as replace, patch.object(runner.time, 'sleep'):
+                runner.atomic_json(path, {'hit': True})
+                self.assertEqual(replace.call_count, 2)
+            with patch.object(runner.os, 'replace', side_effect=error) as replace, patch.object(runner.time, 'sleep'):
+                with self.assertRaises(PermissionError):
+                    runner.atomic_json(path, {'hit': True})
+                self.assertEqual(replace.call_count, 8)
+            with patch.object(runner.os, 'replace', side_effect=PermissionError('ordinary permission failure')) as replace:
+                with self.assertRaises(PermissionError):
+                    runner.atomic_json(path, {'hit': True})
+                self.assertEqual(replace.call_count, 1)
+            self.assertEqual(list(path.parent.glob('*.tmp')), [])
+
     def test_atomic_json_concurrent_writers_have_independent_temporary_files(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)/'same-identity.json'

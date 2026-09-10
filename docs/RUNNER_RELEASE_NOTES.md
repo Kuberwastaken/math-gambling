@@ -1,4 +1,4 @@
-# Math Gambling runner v0.3.0
+# Math Gambling runner v0.3.1
 
 This release addresses the 10 September audit. Existing task identities and receipt digests stay valid.
 

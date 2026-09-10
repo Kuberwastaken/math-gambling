@@ -1,6 +1,6 @@
 # September 2026 audit corrections
 
-The full-stack audit found failure paths that passing ordinary tests had missed. Runner v0.3.0 and the corresponding site/server updates address them without changing canonical search tasks, receipt hashes, or the requirement for full independent negative replay.
+The full-stack audit found failure paths that passing ordinary tests had missed. Runner v0.3.1 and the corresponding site/server updates address them without changing canonical search tasks, receipt hashes, or the requirement for full independent negative replay.
 
 | Finding | Correction | Regression evidence |
 | --- | --- | --- |
@@ -38,6 +38,6 @@ flowchart TD
     Epoch --> README[Website and README snapshot]
 ```
 
-Unreferenced coverage files are kept for at least 24 hours before retirement. Current referenced files are never retired. A very old suspended client must refresh when an expired file is unavailable; unavailable coverage cannot silently exclude work. Offline ZIPs contain every referenced file. Upgrade older runners to v0.3.0 while retaining their output folders and valid banks.
+Unreferenced coverage files are kept for at least 24 hours before retirement. Current referenced files are never retired. A very old suspended client must refresh when an expired file is unavailable; unavailable coverage cannot silently exclude work. Offline ZIPs contain every referenced file. Upgrade older runners to v0.3.1 while retaining their output folders and valid banks.
 
 These corrections do not establish exhaustive coverage, calibrated winning odds, or a globally optimal algorithm. The portable runner remains a different implementation from the optimized native C/PARI research campaign. Any compiled-kernel or discovery-policy promotion still requires independent validation on identical held-out work.

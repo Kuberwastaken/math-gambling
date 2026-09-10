@@ -4,18 +4,18 @@ import argparse
 import html
 import json
 from pathlib import Path
+from readme_snapshot import CONTEXTS, validated_state
 
 ROOT = Path(__file__).resolve().parents[1]
 
 def render(data):
     report = json.loads((data / 'cluster.json').read_text(encoding='utf-8'))
     policy = json.loads((data / 'strategy.json').read_text(encoding='utf-8'))
-    total = report['totals']['verified_unique_tasks']
-    history = report.get('calibration_history', [])
+    total, epoch, _, _, exploration, current, history, stamp = validated_state(report, policy)
     points = [(0, 0)] + [(int(h['epoch']), int(h['through_verified_tasks'])) for h in history]
     max_x = max([p[0] for p in points] + [1])
     max_y = max([p[1] for p in points] + [1])
-    weights = [float(c['weight']) for c in policy['contexts']]
+    weights = [float(current[context]) for context in CONTEXTS]
     max_weight = max(max(weights), 1/81) * 1.08
     out = ['<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">',
         '<title id="title">Verified work and the current cost allocation</title>',
@@ -23,7 +23,7 @@ def render(data):
         '<rect width="1000" height="460" fill="white"/>',
         '<style>text{font-family:Arial,sans-serif;fill:#111}.tick{font-size:12px;fill:#555}.grid{stroke:#ddd;stroke-width:1}</style>',
         '<text x="38" y="38" font-size="23">Math Gambling: verified work, visible decisions</text>',
-        f'<text x="38" y="65" font-size="14">{total:,} unique tasks verified · policy epoch {policy["epoch"]} · {html.escape(report.get("updated_at") or "No timestamp")}</text>',
+        f'<text x="38" y="65" font-size="14">{total:,} unique tasks verified · policy epoch {epoch} · {html.escape(stamp)}</text>',
         '<text x="38" y="105" font-size="17">Verified task count at each frozen model epoch</text>',
         '<text x="540" y="105" font-size="17">Current allocation across 81 lanes</text>']
     for j in range(5):

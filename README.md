@@ -1,68 +1,88 @@
 # Math Gambling
 
-Pool spare compute to search for integer solutions of
+The sum-of-three-cubes problem asks which integers can be written as three integer cubes. Our target is **114**, an unresolved case in the literature reviewed for this campaign:
 
-$$x^3+y^3+z^3=114.$$
+$$x^3+y^3+z^3=114,\qquad x,y,z\in\mathbb{Z}.$$
 
-**[Let It Ride →](https://kuber.studio/math-gambling/)** · [Local runner setup](docs/RUNNER_SETUP.md) · [Research verdict](research/archive/research-2026-09-09/SEARCH_VERDICT.md) · [Working paper](https://kuber.studio/math-gambling/paper/)
+The coordinates may be positive or negative, and enormous cubes can nearly cancel. An answer is one exactly verified integer triple. There is no known small search bound that guarantees our campaign will contain one.
 
-An open computational mathematics experiment by Kuber Mehta. The stake is processor time; the possible reward is a mathematical discovery. No solution to 114 has been found by this project. A fast counter is not evidence that a discovery is approaching.
+Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. A cost model changes how compute is allocated after each 64 verified tasks, while preserving 40% uniform exploration. It has not learned where a solution is likely to be.
 
-## From a random proposal to verified coverage
+This is an open computational research project by Kuber Mehta. The gamble is spare processor time for a possible mathematical discovery. We publish the algorithms, finite search definitions, unsuccessful experiments, verification records and evolving model so the work can be inspected and reproduced.
+
+**[Contribute in your browser →](https://kuber.studio/math-gambling/)** · [Run on your own computer](docs/RUNNER_SETUP.md) · [Read the research verdict](research/archive/research-2026-09-09/SEARCH_VERDICT.md) · [Read the working paper](https://kuber.studio/math-gambling/paper/)
+
+<!-- MATH_GAMBLING_SNAPSHOT:START -->
+
+## Current verified campaign
+
+Published observation: **2026-09-10 12:38:32 UTC**. This section updates after trusted receipt processing.
+
+| Quantity | Verified total |
+| --- | ---: |
+| Unique finite tasks | 128 |
+| Coefficient-generator inputs | 238,592 |
+| Bounded curve intervals | 20,891 |
+| Logical quotient positions | 33,121,245 |
+| Exact integer square tests | 56 |
+| Independently verified identities for 114 | 0 |
+
+![Verified work and changing allocation](data/readme-progress.svg)
+
+These are actual fixed-task units from independent replay, not claimed client seconds or independent chances of discovery. The separate [Mac snapshot](data/mac.json) uses different domains and is not added to these totals.
+
+### Global leaderboard
+
+| Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
+| ---: | --- | --- | ---: | ---: |
+| 1 | Kuber | [@Kuberwastaken](https://github.com/Kuberwastaken) | 238,592 | 128 |
+
+Rank is based on replayed coefficient inputs. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.
+
+### The current allocation
+
+**Epoch 2**, frozen from **128 verified tasks**. The next policy update needs **64 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    Seed["Recorded random seed and frozen cost policy"] --> Propose["Propose a bounded task in one of 81 contexts"]
-    Index["SHA-256 checked shared completed-task index"] --> Check{"Already completed locally or in this snapshot?"}
-    Propose --> Check
-    Check -->|Yes| Propose
-    Check -->|No| Sieve["Exact norm bounds, congruences and modular square sieve"]
-    Sieve --> Exact["Integer square test and exact three-cube identity"]
-    Exact --> Save["Durable local task result and digest"]
-    Save --> Bank["Volunteer banks a receipt through GitHub"]
-    Bank --> Replay["Trusted Python implementation independently replays new tasks"]
-    Replay --> Ledger["Verified unique-task ledger"]
-    Ledger --> Index
-    Ledger --> Board["Leaderboard and coverage chart"]
-    Ledger --> Epoch["Each 64 verified tasks: frozen cost-policy update"]
-    Epoch --> Seed
-    Exact -->|Any candidate identity| Discovery["Independent exact verification and preserved discovery evidence"]
-    Replay -->|Any candidate identity| Discovery
+    H0["Epoch 1: 64 tasks; c50 1.76%"]
+    H1["Epoch 2: 128 tasks; c50 3.22%"]
+    H0 --> H1
+    Policy["Current policy: epoch 2"]
+    H1 --> Policy
+    Policy --> Explore["40% uniform exploration across 81 contexts"]
+    Policy --> Cost["60% weighted by measured replay efficiency"]
+    Explore --> Mix["Combined task-selection weights"]
+    Cost --> Mix
+    Mix --> C0["c50: 3.22%"]
+    Mix --> C1["c29: 3.03%"]
+    Mix --> C2["c00: 1.31%"]
+    Mix --> Rest["Other 78 contexts: 92.44% combined"]
+    C0 --> Check["Skip completed IDs; run exact bounded task"]
+    C1 --> Check
+    C2 --> Check
+    Rest --> Check
+    Check --> Replay["Bank result; independently replay"]
+    Replay --> Gate["64 new verified tasks completes an epoch"]
+    Gate --> Policy
 ```
 
-The browser uses `BigInt`; the portable Python kernel uses arbitrary-precision integers. Every task has fixed bounds and a stable ID. Floating point selects work and measures cost; it never decides whether a solution is valid. The local runner can use multiple processes with an explicit worker and time budget.
+Weights describe allocation, not the probability that a lane contains a solution. Median replay efficiency, a minimum observation count and clipped scores limit noisy updates; at least 40% uniform exploration remains.
 
-Receipts are claims until replayed. GitHub ingestion recomputes each unseen task with the trusted Python kernel, compares its deterministic digest, and credits the authenticated issue creator once. Submitted seconds and submitted counters do not determine the leaderboard. A SHA-256 digest detects changed bytes; it does not prove who donated a CPU. Exact candidate identities receive a separate check even when their surrounding receipt is invalid.
+### Model history and evidence
 
-## Recorded progress
+| Epoch | Verified-task boundary | Largest allocation | Weight |
+| ---: | ---: | --- | ---: |
+| 1 | 64 | c50 | 1.7604% |
+| 2 | 128 | c50 | 3.2247% |
 
-![Verified community work and task allocation](data/readme-progress.svg)
+Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
-This chart is generated from the accepted replay ledger. “Verified inputs” means the fixed coefficient-generator positions checked by those tasks. It is not a count of independent discovery chances. The separate [Mac campaign snapshot](data/mac.json) has different domains and accounting; its counts are not added to community counts or converted into interchangeable reference-core-days.
+[Current policy](data/strategy.json) · [Complete model history and bank audits](data/cluster.json) · [Verified task records](data/receipts/tasks/) · [Exact completed-task index](data/coverage/index.json) · [Working paper](https://kuber.studio/math-gambling/paper/)
 
-| Quantity | What it records |
-| --- | --- |
-| Verified unique tasks | Distinct canonical finite tasks accepted after independent replay |
-| Generator inputs | Coefficient positions processed by those verified tasks |
-| Quotient positions | The bounded integer positions attached to eligible generated roots |
-| Exact square tests | Candidates reaching the arbitrary-precision square check |
-| Solutions | Triples passing exact integer cube addition |
+The separate discovery-learning experiment failed its promotion gate. This campaign currently learns execution cost; it has not established a discovery predictor.
 
-## Exact shared skip list
-
-[`data/coverage/index.json`](data/coverage/index.json) publishes an exact completed-task index. Its `revision` and `verified_task_count` are the number of accepted unique tasks. Each of the 81 contexts has a shard, including empty contexts:
-
-```text
-index: {schema, engine, revision, verified_task_count, updated_at, shards}
-shards.c00: {file: "c00-<sha256>.json", sha256: "<sha256>", count: N}
-shard: {schema, engine, context: "c00", tasks: [sorted canonical task IDs]}
-```
-
-The schemas are `math-gambling-coverage-v1` and `math-gambling-coverage-shard-v1`; the engine is `mg114-offset-v1`. Hashes cover the exact published file bytes, including JSON formatting and its final newline. Clients fetch the index and only the context shards they need, check each hash, and test exact membership. There is no Bloom filter that could incorrectly exclude unvisited work. Malformed, incompatible, oversized or unavailable required coverage stops online dispatch. The native runner's explicit `--offline` mode uses the bundled snapshot and cannot know about later work.
-
-The publisher retains immutable SHA-named files for clients holding older manifests. It writes all new shards before atomically replacing the index, rejects removal or replacement of any previously published task ID, and preserves the same revision and timestamp when coverage has not changed. Version 1 is bounded to a 128 KiB index and 8 MiB / 100,000 IDs per context. Exceeding those limits requires a reviewed format change, never silent truncation.
-
-**This avoids work already known to the client; it is not an exclusive assignment service.** Two devices can choose the same unfinished task, and a stale or offline snapshot can miss recent completions. The server still deduplicates every accepted task. Seeds help audit randomized proposals, but a seed alone does not reproduce an adaptive run: policy revisions, coverage snapshots and the dispatched task records also matter.
+<!-- MATH_GAMBLING_SNAPSHOT:END -->
 
 ## The mathematical search
 
@@ -92,23 +112,20 @@ A separate discovery-learning experiment held out whole target numbers and a lar
 
 An optimization must preserve exact witnesses and its declared finite coverage, then show an end-to-end cost improvement or a properly held-out discovery advantage. Negative experiments stay in the [archive](docs/ARCHIVE.md) so that failures are evidence too. The [working paper](paper/math-gambling-draft.tex) leaves the result and discovery attribution blank.
 
-## Run the site locally
+## What verified work means
 
-Requires Python 3.11+ and Node.js 22+. Pinned npm packages render Markdown and equations at build time; the published research includes its fonts and works without a rendering service.
+Browser workers use `BigInt`; the portable Python kernel uses arbitrary-precision integers. Each result has a fixed task descriptor and deterministic digest. GitHub ingestion independently replays every unseen task, compares the full result digest, and credits the actual issue creator once. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
 
-```sh
-npm ci --ignore-scripts
-python3 tools/build_site.py
-python3 -m http.server 4173 --directory dist
-```
+The [shared completed-task index](data/coverage/index.json) contains exact task IDs in SHA-256 checked, immutable context shards. Clients skip IDs in their checked snapshot and local completed records. There is no probabilistic membership filter that could discard unvisited work. Simultaneous clients can still select the same unfinished task, and stale or offline snapshots cannot know about later completions; the server deduplicates accepted work.
 
-Visit http://localhost:4173/math-gambling/. The build preserves the GitHub Pages project subpath. For the standalone compute program, use the [local runner instructions](docs/RUNNER_SETUP.md).
+A digest detects changed bytes, but does not prove who physically supplied CPU time. Full negative replay is the current trust model and creates a central cost. Expected analytic counts and conservation checks are useful diagnostics; they do not prove that each candidate was visited. See the [protocol](docs/PROTOCOL.md), [cluster design](docs/CLUSTER.md), and [response to the external critique](docs/REVIEW_RESPONSE.md).
 
-```sh
-npm test
-python3 tools/check_site.py
-```
+## Participate, reproduce and review
+
+Use the [browser](https://kuber.studio/math-gambling/) or the [local runner](docs/RUNNER_SETUP.md) to contribute. Keep your saved receipts until the published audit confirms them. The [source archive](docs/ARCHIVE.md), [validation record](docs/VALIDATION.md), [developer setup](docs/DEVELOPMENT.md), and [release evidence](docs/RELEASE_STATUS.md) support independent review.
+
+The [working paper](paper/math-gambling-draft.tex) records implementation and evidence. Its result and discovery attribution remain blank pending an independently verified and reviewed identity.
 
 ## Attribution and license
 
-The mathematical approaches are credited to Booker–Sutherland, Grantham–Walsh and the primary sources in the [research verdict](research/archive/research-2026-09-09/SEARCH_VERDICT.md). This independent project is not endorsed by those authors. Original project software is GPL-2.0-or-later; upstream material retains its notices. See [cluster operation](docs/CLUSTER.md), [archive scope](docs/ARCHIVE.md), and [release evidence](docs/RELEASE_STATUS.md).
+The mathematical approaches are credited to Booker–Sutherland, Grantham–Walsh and the primary sources in the [research verdict](research/archive/research-2026-09-09/SEARCH_VERDICT.md). This independent project is not endorsed by those authors. Original project software is GPL-2.0-or-later; upstream material retains its notices.

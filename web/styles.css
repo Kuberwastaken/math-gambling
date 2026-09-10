@@ -3358,3 +3358,13 @@ body[data-page="home"] .game-area .session-counts {
 .lane-domain-wrap { margin: 20px 0; overflow-x: auto; }
 .lane-domain-wrap table { min-width: 740px; font-size: 14px; }
 .lane-domain-wrap th, .lane-domain-wrap td { padding: 10px; }
+
+/* Keep automatic darkening from splitting SVG fills and HTML text colors.
+   High-contrast forced-colors remains available; this is not an accessibility opt-out. */
+:root {
+  color-scheme: only light;
+  background-color: #fff;
+  color: #111;
+}
+body { background-color: #fff; color: #111; }
+.run-wheel, .run-wheel svg { color-scheme: only light; }

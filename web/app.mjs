@@ -7,6 +7,7 @@ import {
   validateTask,
 } from "./engine.mjs";
 import { createLiveVisuals } from "./live-viz.mjs";
+import { renderModelEvolution } from "./model-viz.mjs";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -60,19 +61,18 @@ function showRun(method, value) {
     );
   }
 }
+const DUTIES = [25, 50, 90],
+  DUTY_NAMES = ["Casual", "Committed", "All in"];
 function processorDuty() {
-  const value = Number($("run-duty")?.value);
-  return Math.min(90, Math.max(5, Number.isFinite(value) ? value : 25)) / 100;
+  return (DUTIES[Number($("run-duty")?.value)] ?? 25) / 100;
 }
 function updateProcessor() {
-  const percent = Math.round(processorDuty() * 100);
-  text(
-    "duty-readout",
-    `${percent}% · ${percent === 90 ? "All in" : percent >= 60 ? "Feeling lucky" : percent >= 40 ? "A little more" : "Taking it easy"}`,
-  );
+  const index = DUTIES.indexOf(Math.round(processorDuty() * 100)),
+    percent = DUTIES[index];
+  text("duty-readout", `${percent}% · ${DUTY_NAMES[index]}`);
   $("run-duty")?.setAttribute(
     "aria-valuetext",
-    `${percent} percent of one worker${percent === 90 ? ", All in" : ""}`,
+    `${DUTY_NAMES[index]}, ${percent} percent of one worker`,
   );
 }
 $("run-duty")?.addEventListener("input", updateProcessor);
@@ -181,7 +181,7 @@ function lineChart(el, points, { label, format = small, height = 170 } = {}) {
     );
     return;
   }
-  const W = 1000,
+  const W = Math.max(340, Math.min(1000, el.clientWidth || 1000)),
     H = height,
     pl = 75,
     pr = 12,
@@ -257,7 +257,8 @@ function calibrationScatter(mac) {
   }
   const ns = "http://www.w3.org/2000/svg",
     svg = document.createElementNS(ns, "svg");
-  svg.setAttribute("viewBox", "0 0 1000 340");
+  const width = Math.max(340, Math.min(1000, el.clientWidth || 1000));
+  svg.setAttribute("viewBox", `0 0 ${width} 340`);
   svg.setAttribute("role", "img");
   svg.setAttribute(
     "aria-label",
@@ -269,7 +270,7 @@ function calibrationScatter(mac) {
     ]),
     lo = Math.floor(Math.min(...values)),
     hi = Math.ceil(Math.max(...values)),
-    X = (v) => 80 + ((v - lo) / (hi - lo)) * 860,
+    X = (v) => 80 + ((v - lo) / (hi - lo)) * (width - 115),
     Y = (v) => 290 - ((v - lo) / (hi - lo)) * 260;
   function node(tag, attrs, value) {
     const e = document.createElementNS(ns, tag);
@@ -279,7 +280,13 @@ function calibrationScatter(mac) {
     return e;
   }
   for (let i = lo; i <= hi; i++) {
-    node("line", { x1: 80, y1: Y(i), x2: 940, y2: Y(i), class: "chart-grid" });
+    node("line", {
+      x1: 80,
+      y1: Y(i),
+      x2: width - 35,
+      y2: Y(i),
+      class: "chart-grid",
+    });
     node(
       "text",
       { x: 70, y: Y(i) + 4, "text-anchor": "end", class: "chart-label" },
@@ -294,7 +301,7 @@ function calibrationScatter(mac) {
   node("line", {
     x1: 80,
     y1: 290,
-    x2: 940,
+    x2: width - 35,
     y2: 30,
     stroke: "#b5c5b8",
     "stroke-dasharray": "4 5",
@@ -313,7 +320,7 @@ function calibrationScatter(mac) {
   }
   node(
     "text",
-    { x: 510, y: 338, "text-anchor": "middle", class: "chart-label" },
+    { x: width / 2, y: 338, "text-anchor": "middle", class: "chart-label" },
     "Predicted throughput score",
   );
   node(
@@ -368,6 +375,17 @@ async function loadMac() {
         label:
           "Recorded cumulative curve-interval checks in the native Mac campaign. The vertical axis is cropped to the observed range.",
       });
+      const rates = [];
+      for (let i = 1; i < points.length; i++) {
+        const elapsed = (points[i].x - points[i - 1].x) / 1000,
+          delta = points[i].y - points[i - 1].y;
+        if (elapsed > 0 && delta >= 0)
+          rates.push({ ...points[i], y: delta / elapsed });
+      }
+      lineChart($("mac-rate-chart"), rates, {
+        label:
+          "Native Mac curve intervals per second, averaged between real snapshots. Vertical axis cropped to the observed range.",
+      });
     } else
       text(
         "mac-history-chart",
@@ -411,7 +429,8 @@ function renderAllocation() {
       0.12,
       Math.min(0.7, ((Number(entry.weight) || 0) / max) * 0.7),
     );
-    b.style.backgroundColor = `rgb(223 189 114 / ${intensity})`;
+    b.style.backgroundColor = `rgb(0 0 0 / ${intensity})`;
+    b.style.color = intensity > 0.45 ? "white" : "black";
     b.addEventListener("click", () => {
       for (const c of grid.children) c.setAttribute("aria-pressed", "false");
       b.setAttribute("aria-pressed", "true");
@@ -449,6 +468,10 @@ async function loadStrategy() {
     strategy = s;
     showRun("policy", strategy);
     renderAllocation();
+    if (clusterData)
+      try {
+        renderModelEvolution(clusterData, strategy);
+      } catch {}
   } catch {
     strategy = null;
     showRun("policy", null);
@@ -460,7 +483,12 @@ async function loadStrategy() {
 }
 async function loadCluster() {
   try {
-    clusterData = await fetchJSON("data/cluster.json");
+    const [report, config] = await Promise.all([
+      fetchJSON("data/cluster.json"),
+      fetchJSON("data/site-config.json").catch(() => ({})),
+    ]);
+    clusterData = report;
+    const aliases = config.display_aliases || {};
     const t = clusterData.totals || {};
     text("cluster-reported", fmt(t.reported_tasks));
     text("cluster-inputs", fmt(t.verified_computations));
@@ -487,32 +515,51 @@ async function loadCluster() {
           y = BigInt(b.verified_computations || 0);
         return y > x ? 1 : y < x ? -1 : 0;
       });
-      if (!people.length) {
+      for (const [rank, p] of people.entries()) {
+        const row = body.insertRow(),
+          alias = row.insertCell(),
+          place = document.createElement("span"),
+          name = document.createElement("span");
+        place.className = "rank-number";
+        place.textContent = String(rank + 1).padStart(2, "0");
+        const user = String(p.submitter || ""),
+          display = Object.hasOwn(aliases, user.toLowerCase())
+            ? aliases[user.toLowerCase()]
+            : null;
+        name.textContent =
+          (typeof display === "string" && display.trim() ? display : p.name) ||
+          user ||
+          "Contributor";
+        alias.append(place, name);
+        const account = row.insertCell();
+        if (/^[A-Za-z0-9-]{1,39}$/.test(user)) {
+          const a = document.createElement("a");
+          a.href = `https://github.com/${user}`;
+          a.textContent = `@${user}`;
+          account.append(a);
+        } else account.textContent = "Unattributed";
+        row.insertCell().textContent = fmt(p.verified_computations);
+      }
+      // Empty ranks invite participation without fabricating people or work.
+      for (let rank = people.length; rank < 10; rank++) {
         const row = body.insertRow();
-        const cell = row.insertCell();
-        cell.colSpan = 3;
-        cell.textContent =
-          "No independently verified volunteer contributions yet.";
-      } else
-        for (const [rank, p] of people.entries()) {
-          const row = body.insertRow();
-          const alias = row.insertCell();
-          const place = document.createElement("span");
-          place.className = "rank-number";
-          place.textContent = String(rank + 1).padStart(2, "0");
-          const name = document.createElement("span");
-          name.textContent = p.name || p.submitter || "Contributor";
-          alias.append(place, name);
-          const user = String(p.submitter || "");
-          const cell = row.insertCell();
-          if (/^[A-Za-z0-9-]{1,39}$/.test(user)) {
-            const a = document.createElement("a");
-            a.href = `https://github.com/${user}`;
-            a.textContent = `@${user}`;
-            cell.append(a);
-          } else cell.textContent = "Unattributed";
-          row.insertCell().textContent = `${fmt(p.verified_computations)} inputs · ${fmt(p.verified_tasks)} tasks`;
-        }
+        row.className = "empty-rank";
+        const first = row.insertCell();
+        const place = document.createElement("span");
+        place.className = "rank-number";
+        place.textContent = String(rank + 1).padStart(2, "0");
+        first.append(place, document.createTextNode("—"));
+        row.insertCell().textContent = "—";
+        row.insertCell().textContent = "—";
+      }
+    }
+    try {
+      renderModelEvolution(clusterData, strategy);
+    } catch {
+      text(
+        "model-detail",
+        "Model display unavailable. The published policy is still linked on the cluster page.",
+      );
     }
     const hist = clusterData.calibration_history || [];
     if (hist.length > 1)
@@ -1178,5 +1225,6 @@ setInterval(() => {
   if (!document.hidden) {
     loadMac();
     loadCluster();
+    loadStrategy();
   }
 }, 60000);

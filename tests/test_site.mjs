@@ -63,7 +63,7 @@ async function harness({
     if (!elements.has(id)) elements.set(id, new Element(id));
     return elements.get(id);
   };
-  get("run-duty").value = "50";
+  get("run-duty").value = "1";
   get("join-form").querySelectorAll = () =>
     ["player-name", "player-github", "run-duty"].map(get);
   const listeners = new Map();
@@ -190,6 +190,10 @@ async function harness({
     },
   });
   const source = appSource
+    .replace(
+      /import \{ renderModelEvolution \} from "\.\/model-viz\.mjs";/,
+      "const renderModelEvolution=()=>{};",
+    )
     .replace(
       /^import\s*\{([^}]+)\}\s*from\s*['"]\.\/engine\.mjs['"];?/,
       "const {$1} = __engine;",
@@ -342,12 +346,12 @@ async function deliver(worker) {
   assert.equal(h.app.state().running, true);
   assert.equal(worker.terminated, false);
   assert.equal(h.get("run-duty").disabled, false);
-  h.get("run-duty").value = "90";
+  h.get("run-duty").value = "2";
   h.app.updateProcessor();
   assert.equal(h.app.processorDuty(), 0.9);
   assert.match(h.get("duty-readout").textContent, /All in/);
-  h.get("run-duty").value = "5";
-  assert.equal(h.app.processorDuty(), 0.05);
+  h.get("run-duty").value = "0";
+  assert.equal(h.app.processorDuty(), 0.25);
   h.app.stop();
   await deliver(worker);
   await waitFor(() => worker.terminated, "unlimited run did not stop safely");

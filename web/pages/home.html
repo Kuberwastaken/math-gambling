@@ -1,23 +1,27 @@
+<div class="table-title">
+  <h1>Math Gambling</h1>
+  <p>Take a seat.</p>
+</div>
 <section class="casino-start" id="play">
   <div class="seat">
-    <h1>Math Gambling</h1>
-    <p class="table-invitation">Take a seat.</p>
+    <h2>A little compute. A very long shot.</h2>
     <form id="join-form">
       <div class="processor-label">
         <label for="run-duty">Processor use</label
-        ><output id="duty-readout" for="run-duty">25% · Taking it easy</output>
+        ><output id="duty-readout" for="run-duty">25% · Casual</output>
       </div>
       <input
         id="run-duty"
         type="range"
-        min="5"
-        max="90"
-        step="5"
-        value="25"
+        min="0"
+        max="2"
+        step="1"
+        value="0"
         aria-describedby="processor-note"
       />
       <div class="slider-ends">
-        <span>Just a little</span><span>All in</span>
+        <span>Casual · 25%</span><span>Committed · 50%</span
+        ><span>All in · 90%</span>
       </div>
       <div class="form-row seat-names">
         <div>
@@ -103,7 +107,7 @@
       <span><strong id="run-rate">—</strong> intervals / sec</span>
     </div>
     <div id="run-pulse" class="run-pulse">
-      <p>The graph starts with your first completed batch.</p>
+      <p class="empty-state">No hands yet.</p>
     </div>
     <div class="sync-line">
       <span id="sync-state" role="status">Loading local receipts…</span
@@ -159,7 +163,7 @@
     aria-labelledby="leaderboard-heading"
   >
     <div class="section-heading">
-      <h2 id="leaderboard-heading">Leaderboard</h2>
+      <h2 id="leaderboard-heading">Global leaderboard</h2>
       <span class="suit" aria-hidden="true">♠</span>
     </div>
     <p><strong id="cluster-inputs">—</strong> verified inputs on the table.</p>
@@ -174,7 +178,7 @@
         </thead>
         <tbody id="contributors">
           <tr>
-            <td colspan="3">Loading the high rollers…</td>
+            <td colspan="3">Loading verified scores…</td>
           </tr>
         </tbody>
       </table>
@@ -193,11 +197,48 @@
     </div>
   </section>
 </div>
+<section class="house-section">
+  <div class="section-heading">
+    <h2>The house is still looking.</h2>
+    <span id="mac-updated" class="table-note"
+      >Fetching the latest Mac report.</span
+    >
+  </div>
+  <p>
+    My Mac’s contribution to the cause. These graphs come from the actual
+    campaign ledger.
+  </p>
+  <div class="campaign-reading">
+    <div>
+      <strong id="mac-curves">—</strong><span>curve intervals checked</span>
+    </div>
+    <div><strong id="mac-exact">—</strong><span>exact square tests</span></div>
+    <div><strong id="mac-hits">—</strong><span>solutions</span></div>
+  </div>
+  <div class="mac-plots">
+    <figure>
+      <figcaption>Curve intervals checked · cumulative</figcaption>
+      <div id="mac-history-chart" class="history-chart">
+        <p>Loading recorded computation history…</p>
+      </div>
+    </figure>
+    <figure>
+      <figcaption>Search pace · intervals per second</figcaption>
+      <div id="mac-rate-chart" class="history-chart"></div>
+    </figure>
+  </div>
+  <div class="house-caption">
+    <span id="mac-state">Loading report</span
+    ><a href="{{BASE}}cluster/"
+      >Cost model, calibration &amp; the full ledger ↗</a
+    >
+  </div>
+</section>
 <section class="live-table-section" aria-label="Live search visualizations">
   <div class="live-table-grid">
     <div class="number-layout">
       <div class="plot-heading">
-        <h2>Where your chips land</h2>
+        <h2>Search activity</h2>
         <span id="lane-total">0 / 81 lanes played</span>
       </div>
       <div id="run-lanes" class="run-lanes"></div>
@@ -208,7 +249,7 @@
     </div>
     <div class="sieve-layout">
       <div class="plot-heading">
-        <h2>The arithmetic eats first.</h2>
+        <h2>The rejection sieve</h2>
         <span id="filter-cut">—</span>
       </div>
       <div id="run-sieve" class="run-sieve">
@@ -227,75 +268,120 @@
     >
   </div>
   <div id="run-stream" class="run-stream">
-    <p>Real batches, real outcomes. Nothing rolls until you start.</p>
+    <p>No hands yet.</p>
   </div>
   <p id="viz-state" class="table-note"></p>
 </section>
-<section class="house-section">
-  <div class="section-heading">
-    <h2>The house is still looking.</h2>
-    <span id="mac-updated" class="table-note"
-      >Fetching the latest Mac report.</span
-    >
-  </div>
-  <p>My Mac’s contribution to the cause:</p>
-  <div class="campaign-reading">
-    <div>
-      <strong id="mac-curves">—</strong><span>curve intervals checked</span>
-    </div>
-    <div><strong id="mac-exact">—</strong><span>exact square tests</span></div>
-    <div><strong id="mac-hits">—</strong><span>solutions</span></div>
-  </div>
-  <div id="mac-history-chart" class="history-chart">
-    <p>Loading recorded computation history…</p>
-  </div>
-  <div class="house-caption">
-    <span id="mac-state">Loading report</span
-    ><a href="{{BASE}}cluster/"
-      >Cost model, calibration &amp; the full ledger ↗</a
-    >
-  </div>
-</section>
 <section class="table-story">
   <div>
-    <h2>A wonderfully unreasonable project.</h2>
+    <h2>How I ended up here.</h2>
     <p>
       I’m Kuber Mehta, a 19-year-old college student. I worked on an optimized
-      search and started looking for 114 on my Mac. Then I saw the compute
-      estimates. Even winning Powerball twice has calculable odds. We can’t
-      honestly calculate ours. That’s math gambling.
+      search and started looking for 114 on my Mac. Then I looked at the compute
+      estimates. A day of work for a chance this small? That’s math gambling.
     </p>
     <p>
       So here we are. Bring a computer and lower your expectations. We might
       find something extraordinary.
     </p>
-    <a class="text-link" href="{{BASE}}research/"
-      >Read the increasingly elaborate attempt ↗</a
-    >
+    <a href="{{BASE}}research/">Read the increasingly elaborate attempt ↗</a>
   </div>
   <div class="odds-board">
-    <h2>At least the lottery knows its odds.</h2>
-    <dl>
-      <div>
-        <dt>One Powerball jackpot</dt>
-        <dd>1 in 292,201,338</dd>
-      </div>
-      <div>
-        <dt>Two jackpots in two independent draws</dt>
-        <dd>1 in 85.4 quadrillion</dd>
-      </div>
-      <div class="unknown-odds">
-        <dt>Finding 114 with this search</dt>
-        <dd>Unknown.</dd>
-      </div>
-    </dl>
+    <h2>Okay, give me an estimate.</h2>
+    <p class="odds-number">≈ 1 in 1.7 million</p>
+    <p>per extra core-day, in an idealized reference-engine search.</p>
     <p class="table-note">
-      <a href="https://www.powerball.com/powerball-prize-chart" rel="noreferrer"
-        >Official jackpot odds</a
-      >; twice means one ticket in each independent draw. These are reference
-      points, not an estimate of our chances.
+      A back-of-envelope benchmark, not measured odds for this browser. It
+      assumes the published density model, fresh frontier coverage, and the
+      speed of our reference calibration. Our selective search may differ
+      drastically.
     </p>
+    <details>
+      <summary>Show the assumptions &amp; the maths</summary>
+      <p>
+        We use ρ = 0.0584593, a historical-region cost of ≈270 core-years, and
+        P(t) = 1 − exp[−ρ ln(1 + t/270)], with t in core-years. One core-day
+        gives ≈0.0000593%. Doubling that whole region gives ≈4%; a tenfold
+        region gives ≈12.6%.
+      </p>
+      <p>
+        This is a conditional Poisson extrapolation. Historical coverage is not
+        independently certified here; the finite norm sampler is not equivalent
+        to a full frontier extension. These are guesses under stated
+        assumptions, not a lower bound or a guarantee.
+      </p>
+      <p>
+        <a href="https://arxiv.org/abs/2007.01209"
+          >Booker–Sutherland density model</a
+        >
+        ·
+        <a href="{{BASE}}research/algorithm_review/"
+          >Our measured calibration and limitations</a
+        >
+      </p>
+    </details>
   </div>
+</section>
+<section class="evolving-model" id="learning">
+  <div class="section-heading">
+    <h2>The evolving ML approach</h2>
+    <span id="strategy-epoch">Epoch —</span>
+  </div>
+  <p>
+    Learn which batches buy more exact search per second. Keep exploring the
+    rest.
+  </p>
+  <div class="model-summary">
+    <div><strong>64</strong><span>verified batches per update</span></div>
+    <div><strong>40%</strong><span>uniform exploration</span></div>
+    <div>
+      <strong id="model-trained">—</strong
+      ><span>lanes with enough observations</span>
+    </div>
+  </div>
+  <div class="model-controls">
+    <label for="model-epoch">Replay the model’s evolution</label
+    ><input
+      type="range"
+      id="model-epoch"
+      min="0"
+      max="0"
+      value="0"
+      step="1"
+      disabled
+    /><output id="model-selected">Waiting for the ledger</output>
+  </div>
+  <div id="model-history" class="history-chart"></div>
+  <p id="model-detail" class="table-note">
+    Each bar is one search context. The dashed line is uniform allocation.
+    Select a bar for its weight.
+  </p>
+  <p id="model-progress-note" class="table-note"></p>
+  <progress
+    id="model-progress"
+    max="64"
+    value="0"
+    aria-label="Verified batches toward the next model epoch"
+  ></progress>
+  <p class="table-note">
+    Median replay efficiency; at least three observations before changing a
+    lane’s score; scores limited to ¼–4× the baseline. We learn execution cost.
+    Our separate attempt to predict discoveries failed its acceptance test.
+  </p>
+  <p>
+    <a href="{{BASE}}cluster/">Inspect every context and epoch ↗</a> ·
+    <a href="{{BASE}}research/discovery_learning/"
+      >Read the failed experiment ↗</a
+    >
+  </p>
+  <h3>Did my Mac’s model predict actual performance?</h3>
+  <p id="mac-calibration-note" class="table-note"></p>
+  <div id="mac-calibration" class="history-chart"></div>
+  <p class="table-note">
+    Recorded holdout: predicted versus observed throughput on logarithmic axes.
+    Diagonal = perfect prediction. This is the native Mac model, separate from
+    the volunteer learner above.
+  </p>
 </section>
 <section class="method-strip">
   <div>
@@ -327,10 +413,15 @@
     >
     <a class="text-link" href="{{BASE}}approach/#local">Setup ↗</a>
   </div>
-  <div class="paper-invitation">
-    <h2>A paper with room for your name.</h2>
-    <p id="teaser-name">________________________</p>
-    <p>The implementation is written. The answer is still blank.</p>
-    <a href="{{BASE}}paper/">Open the unfinished paper ↗</a>
+</section>
+<section class="paper-on-table" id="paper-preview">
+  <div class="section-heading">
+    <h2>The paper, with the important bit missing.</h2>
+    <a href="{{BASE}}paper/">Full page / LaTeX / print ↗</a>
   </div>
+  <p id="paper-preview-note" class="table-note">
+    Working implementation draft. The answer and finder stay blank until
+    verified.
+  </p>
+  {{PAPER_PREVIEW}}
 </section>

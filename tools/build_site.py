@@ -11,10 +11,10 @@ def shell(title, body, active=''):
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{"Math Gambling" if not active else html.escape(title)+" · Math Gambling"}</title><meta name="description" content="An open search for x³ + y³ + z³ = 114. Contribute processor time, watch exact computations, and help test our strategy. The odds are unknown.">
-<meta name="theme-color" content="#132d25"><meta property="og:title" content="Math Gambling — let it ride"><meta property="og:description" content="An open mathematical long shot. Real computation. Unknown odds."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.svg">
+<meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling — let it ride"><meta property="og:description" content="An open mathematical long shot. Real computation. Unknown odds."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.svg">
 <link rel="icon" href="{BASE}assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="{BASE}styles.css?v={VERSION}"><link rel="canonical" href="https://kuber.studio{BASE}{active}">
 <script type="module" src="{BASE}app.mjs?v={VERSION}"></script></head><body data-page="{active or 'home'}">
-<a class="skip" href="#main">Skip to content</a>{'<div class="back-to-table"><a href="'+BASE+'">← Back to the table</a></div>' if active else ''}
+<a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="{BASE}">Home</a><a href="{BASE}#leaderboard">Leaderboard</a><a href="{BASE}approach/">Approach</a><a href="{BASE}#learning">Learning</a><a href="{BASE}paper/">Paper</a><a href="{BASE}research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
 <main id="main">{body}</main><footer><a class="wordmark" href="{BASE}">Math Gambling</a><div><a href="{BASE}approach/">The approach</a><a href="{BASE}cluster/">The cluster</a><a href="{BASE}paper/">The paper</a><a href="{BASE}research/">The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub ↗</a></div></footer>
 <noscript><p class="noscript">The research is readable without JavaScript. Browser computation requires JavaScript and starts only when you choose to run it.</p></noscript></body></html>'''
 
@@ -54,7 +54,7 @@ def main():
     # A returning browser must not combine new markup with a cached old worker UI.
     for module in OUT.glob('*.mjs'):
         content=module.read_text()
-        for asset in ('engine.mjs','live-viz.mjs','search-worker.mjs'):
+        for asset in ('engine.mjs','live-viz.mjs','model-viz.mjs','search-worker.mjs'):
             for prefix in ('./',''):
                 for quote in ('"', "'"):
                     content=content.replace(quote+prefix+asset+quote, quote+prefix+asset+'?v='+VERSION+quote)
@@ -63,7 +63,12 @@ def main():
         source=ROOT/'web'/'pages'/f'{name}.html'
         if not source.exists():continue
         dest=OUT/path;dest.mkdir(parents=True,exist_ok=True)
-        (dest/'index.html').write_text(shell(title,source.read_text().replace('{{BASE}}',BASE),path))
+        body=source.read_text()
+        if '{{PAPER_PREVIEW}}' in body:
+            paper=(ROOT/'web/pages/paper.html').read_text()
+            manuscript=paper[paper.index('<article class="manuscript"'):paper.index('</article>')+10]
+            body=body.replace('{{PAPER_PREVIEW}}',manuscript)
+        (dest/'index.html').write_text(shell(title,body.replace('{{BASE}}',BASE),path))
     (OUT/'data').mkdir()
     for name in ['site-config.json','mac.json','mac-history.json','cluster.json','strategy.json']:
         p=ROOT/'data'/name

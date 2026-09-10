@@ -46,7 +46,7 @@ class RunnerCheckoutTests(unittest.TestCase):
             coverage_dir = source/'data/coverage'
             coverage_dir.mkdir(parents=True)
             original, _ = coverage_index.read_coverage(ROOT/'data/coverage')
-            names = ['index.json', *(entry['file'] for entry in original['shards'].values())]
+            names = coverage_index.referenced_files(ROOT/'data/coverage', original)
             for name in names:
                 shutil.copyfile(ROOT/'data/coverage'/name, coverage_dir/name)
             git('-c', 'core.autocrlf=false', 'add', '.')

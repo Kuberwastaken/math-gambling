@@ -273,34 +273,48 @@ Optional `contributor.url` links the display alias to an http(s) website. It is 
 
 ## Exact shared completed-task index
 
-`data/coverage/index.json` has schema `math-gambling-coverage-v1`, engine
+`data/coverage/index.json` has schema `math-gambling-coverage-v2`, engine
 `mg114-offset-v1`, integer `revision`, equal `verified_task_count`, UTC
-`updated_at`, and a `shards` object containing all contexts `c00` through `c80`.
-A revision is the accepted unique-task count, not a scheduling epoch. Policy
-epochs still advance only at 64-task boundaries.
+`updated_at`, and descriptors for all 81 fixed contexts. A revision counts
+accepted unique tasks; policy epochs still advance at 64-task boundaries.
 
-Each context descriptor contains `file`, `sha256`, and integer `count`. Its
-immutable filename is `<context>-<sha256>.json`, relative to the index's
-directory. The shard has schema `math-gambling-coverage-shard-v1`, the same
-engine, its `context`, and `tasks`: every accepted canonical task ID in that
-context, sorted lexicographically without duplicates. Empty contexts have
-explicit empty shards. The counts of all 81 shards sum to the revision.
+Each descriptor contains `file`, `sha256` and `count`, with immutable filename
+`<context>-<sha256>.json`. It identifies a `math-gambling-coverage-context-v2`
+file containing `engine`, `context`, and `buckets`. The first two lowercase hex
+digits of SHA-256 of the ASCII canonical task ID select one of 256 buckets.
+Each nonempty bucket holds an ordered list of chunk descriptors. A chunk is
+`<context>-b<bucket>-<sha256>.json`, with schema
+`math-gambling-coverage-chunk-v2`, engine, context, bucket, and at most 256
+lexicographically sorted unique canonical task IDs in `tasks`.
 
-SHA-256 is computed over the exact file bytes, including JSON whitespace and
-the final newline. Clients must hash received bytes, not parse and reserialize
-them before hashing. They validate the engine, fixed context set, counts,
-canonical IDs, sorted uniqueness, filename and digest before using exact
-membership. The manifest is capped at 128 KiB; each context at 8 MiB and
-100,000 IDs. Invalid or unavailable required online data pauses dispatch.
-The publisher also enforces these limits and never silently truncates coverage.
+Chunk membership is determined by accepted sequence order within its bucket,
+then sorted within each chunk. Full chunks never change; only the final partial
+chunk grows. This avoids reshuffling old chunks when a randomly selected ID is
+accepted. Empty buckets have no entries. All chunk counts sum to their context
+count; all context counts sum to the published revision. The publisher checks
+every ID and rejects cross-chunk duplicates or loss of previously accepted work.
 
-Only independent accepted replay records enter this index. New immutable
-shards are written before the manifest is atomically replaced, and old shards
-are retained so older manifests still resolve. Publication rejects a regressed
-count or removal or replacement of a previously recorded ID. No mathematical
-candidate is excluded merely because of a low model score or a failed proposal.
-The index covers completed deterministic tasks, not every generator domain or
-all historical searches.
+Hashes cover exact bytes, including JSON formatting and the final newline.
+Clients validate descriptors and hashes before relying on exact membership.
+The publisher enforces full historical monotonicity. Bounded clients additionally
+reject changes to sealed chunks and compare partial tails when the old validated
+IDs remain cached; they never require retired files to validate a current snapshot.
+They download only the selected hash bucket's chunks and keep bounded caches.
+The main index is capped at 128 KiB, context indexes at 8 MiB, and chunks at
+32 KiB/256 IDs. The old 100,000-ID per-context limit no longer applies; index
+byte limits remain explicit operational bounds and never silently truncate work.
+
+New bytes are written first and the root manifest replaced atomically last.
+Unreferenced files remain available for at least 24 hours before retirement.
+Clients refresh every minute; a very old suspended client must refresh if an
+expired file is unavailable. Missing or corrupt required data pauses dispatch,
+never excludes unvisited work. Standalone runner archives include every file
+referenced by their bundled snapshot and do not depend on remote retention.
+
+New clients can read legacy v1 snapshots. Runners older than v0.3.0 must upgrade
+to read published v2 coverage; they fail closed instead of ignoring unknown
+coverage. Existing tasks, receipt digests and previously banked credit are unchanged.
+The index certifies only accepted finite tasks, not an exhaustive height search.
 
 Issue opened, edited and reopened events trigger the trusted verifier for
 `[bank]` and `[compute]` titles, alongside hourly reconciliation. Submitted
@@ -312,7 +326,9 @@ calibration rule. Published feedback waits for verification and Pages delivery.
 A fresh random seed is scheduling provenance, not proof of useful compute.
 Browser results retain the seed, PRNG algorithm, policy epoch and checked
 coverage revision outside the immutable mathematical result digest. The native
-runner also keeps a local audit trail. Reproducing an adaptive selection needs
+runner also keeps a local audit trail. An explicit seed resumes its saved PRNG
+cursor in the same output folder and exact Python runtime; a fresh output folder
+restarts that seed. Changing the runtime requires a new seed or its original Python version. Reproducing an adaptive selection needs
 its policy and coverage history and actual dispatched tasks, not only its seed.
 Concurrent or offline clients can repeat work they cannot yet know is complete.
 

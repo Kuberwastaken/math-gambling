@@ -90,8 +90,8 @@ class CoverageTests(unittest.TestCase):
             coverage.publish_coverage(self.data, [verified(1), verified(2, row=128)])
         self.assertEqual((self.directory / "index.json").read_bytes(), original)
         shard.write_bytes(shard.read_bytes()[:-1])
-        with mock.patch.object(coverage, "MAX_SHARD_TASKS", 1):
-            with self.assertRaisesRegex(ValueError, "capacity"):
+        with mock.patch.object(coverage, "MAX_INDEX_BYTES", 10):
+            with self.assertRaisesRegex(ValueError, "capacity|size"):
                 coverage.publish_coverage(self.data, [verified(1), verified(2, row=128)])
         self.assertEqual((self.directory / "index.json").read_bytes(), original)
         with tempfile.TemporaryDirectory() as fresh, mock.patch.object(coverage, "MAX_SHARD_BYTES", 10):
@@ -113,6 +113,48 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(recovered, first)
         self.assertEqual(len(completed["c00"]), 1)
         self.assertEqual(coverage.publish_coverage(self.data, [verified(1), verified(2, row=128)])["revision"], 2)
+
+    def test_chunk_extension_reuses_sealed_bytes_and_clients_check_exact_membership(self):
+        from coverage_format import bucket_for
+        from coverage_client import CoverageIndex
+        import json
+        chosen = []
+        for row in range(0, 20000000, 128):
+            if bucket_for(task_id(make_task('c00', row))) == '00':
+                chosen.append(row)
+                if len(chosen) == 257: break
+        self.assertEqual(len(chosen), 257)
+        tasks = [verified(i+1, row=row) for i,row in enumerate(chosen)]
+        first = coverage.publish_coverage(self.data, tasks[:256])
+        node = json.loads((self.directory/first['shards']['c00']['file']).read_bytes())
+        sealed = node['buckets']['00'][0]
+        original = (self.directory/sealed['file']).read_bytes()
+        with mock.patch.object(coverage, 'MAX_SHARD_TASKS', 1):
+            second = coverage.publish_coverage(self.data, tasks)
+        node2 = json.loads((self.directory/second['shards']['c00']['file']).read_bytes())
+        self.assertEqual(node2['buckets']['00'][0], sealed)
+        self.assertEqual((self.directory/sealed['file']).read_bytes(), original)
+        self.assertEqual(len(node2['buckets']['00']), 2)
+        client = CoverageIndex(self.directory, self.data/'cache', offline=True)
+        client.refresh()
+        self.assertTrue(client.contains(make_task('c00', chosen[0])))
+        self.assertTrue(client.contains(make_task('c00', chosen[-1])))
+        self.assertFalse(client.contains(make_task('c00', 20000000)))
+        self.assertLessEqual(len(client.loaded), 64)
+
+    def test_retirement_grace_and_current_snapshot_survive_cleanup(self):
+        from datetime import datetime, timezone, timedelta
+        first = coverage.publish_coverage(self.data, [verified(1)])
+        old = self.directory/first['shards']['c00']['file']
+        second = coverage.publish_coverage(self.data, [verified(1), verified(2,row=128)])
+        stamp = datetime(2026,9,10,tzinfo=timezone.utc)
+        self.assertEqual(coverage.prune_retired(self.data, observed=stamp), 0)
+        self.assertTrue(old.exists())
+        coverage.prune_retired(self.data, observed=stamp+timedelta(hours=23))
+        self.assertTrue(old.exists())
+        self.assertGreater(coverage.prune_retired(self.data, observed=stamp+timedelta(hours=25)), 0)
+        self.assertFalse(old.exists())
+        self.assertEqual(coverage.read_coverage(self.directory)[0], second)
 
     def test_aggregation_exports_only_independently_accepted_ids(self):
         result = run_task(make_task("c00", 0))

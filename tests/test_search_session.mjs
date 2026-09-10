@@ -28,7 +28,7 @@ function clientHost(start) {
       return new Response(current.files.get(name) ?? 'missing', {status:current.files.has(name)?200:404});
     },
   });
-  return {client,calls,set(next){current=next;clock+=61000;}};
+  return {client,calls,set(next,elapsed=61000){current=next;clock+=elapsed;}};
 }
 test('random 256-bit seeds and stable unbiased bounded SHA-256 streams',async()=>{
   assert.match(newSeed(), /^[0-9a-f]{64}$/);
@@ -73,4 +73,84 @@ test('even correctly hashed shards cannot erase old IDs or contain duplicate IDs
   h.set(fixture({c00:[b,c]}));
   await assert.rejects(h.client.has(makeTask('c00',0)),/removed/);
   await assert.rejects(clientHost(fixture({c00:[a,a]})).client.has(makeTask('c00',0)),/duplicate/);
+});
+
+test('Python-published v2 chunks support browser membership, extension and missing-file failure',async()=>{
+  const {execFileSync} = await import('node:child_process');
+  const build = (rows) => {
+    const script = `import sys,json,tempfile\nfrom pathlib import Path\nsys.path.insert(0,'tools')\nfrom coverage_index import publish_coverage\nfrom search_core import make_task,task_id\nwith tempfile.TemporaryDirectory() as tmp:\n tasks=[]\n for i,row in enumerate(json.loads(sys.argv[1])):\n  t=make_task('c00',row);tasks.append(dict(schema='math-gambling-verified-task-v1',sequence=i+1,result=dict(task=t,id=task_id(t))))\n manifest=publish_coverage(Path(tmp),tasks)\n print(json.dumps({'index':manifest,'files':{p.name:p.read_text() for p in (Path(tmp)/'coverage').glob('*.json')}}))`;
+    const result = JSON.parse(execFileSync('python3',['-c',script,JSON.stringify(rows)],{encoding:'utf8'}));
+    return {index:result.index,files:new Map(Object.entries(result.files))};
+  };
+  const first=build([0]), next=build([0,128]);
+  const h=clientHost(first);
+  assert.equal(await h.client.has(makeTask('c00',0)),true);
+  assert.equal(await h.client.has(makeTask('c00',128)),false);
+  h.set(next);
+  assert.equal(await h.client.has(makeTask('c00',128)),true);
+  assert.equal(await h.client.has(makeTask('c00',256)),false);
+  const broken=build([0]);
+  for(const name of broken.files.keys()) if(name.startsWith('c00-b')) broken.files.delete(name);
+  await assert.rejects(clientHost(broken).client.has(makeTask('c00',0)),/unavailable/);
+  const oldClient=clientHost(fixture({c00:[taskId(makeTask('c00',0))]}));
+  assert.equal(await oldClient.client.has(makeTask('c00',0)),true);
+  oldClient.set(first);
+  assert.equal(await oldClient.client.has(makeTask('c00',0)),true,'same-count v1 to v2 upgrade');
+});
+
+function chunkedFixture(tasks) {
+  const files = new Map(), shards = {};
+  const write = (prefix, payload, count) => {
+    const bytes = JSON.stringify(payload, null, 2) + '\n', sha256 = digest(bytes);
+    const file = `${prefix}-${sha256}.json`;
+    files.set(file, bytes);
+    return {file, sha256, count};
+  };
+  for (const context of CONTEXTS) {
+    const buckets = {};
+    for (const task of tasks.filter(task => task.context === context.id)) {
+      const id = taskId(task), bucket = digest(id).slice(0, 2);
+      (buckets[bucket] ||= []).push(id);
+    }
+    for (const [bucket, ids] of Object.entries(buckets)) {
+      buckets[bucket] = [write(`${context.id}-b${bucket}`, {
+        schema: 'math-gambling-coverage-chunk-v2', engine: ENGINE,
+        context: context.id, bucket, tasks: ids.sort(),
+      }, ids.length)];
+    }
+    shards[context.id] = write(context.id, {
+      schema: 'math-gambling-coverage-context-v2', engine: ENGINE, context: context.id, buckets,
+    }, tasks.filter(task => task.context === context.id).length);
+  }
+  const index = {schema: 'math-gambling-coverage-v2', engine: ENGINE, revision: tasks.length,
+    verified_task_count: tasks.length, updated_at: '2026-09-10T00:00:00Z', shards};
+  files.set('index.json', JSON.stringify(index));
+  return {index, files};
+}
+
+test('suspended v2 readers resume after retired tails disappear, while cached membership stays guarded', async () => {
+  const first = makeTask('c00', 0), same = [first], bucket = digest(taskId(first)).slice(0, 2);
+  let other;
+  for (let row = 128; row < 128 * 10000 && same.length < 3; row += 128) {
+    const task = makeTask('c00', row);
+    if (digest(taskId(task)).slice(0, 2) === bucket) same.push(task);
+    else other ||= task;
+  }
+  assert.equal(same.length, 3);
+  const original = chunkedFixture(same.slice(0, 1)), updated = chunkedFixture(same.slice(0, 2));
+  const oldTail = [...original.files.keys()].find(file => file.startsWith('c00-b'));
+  const h = clientHost(original);
+  assert.equal(await h.client.has(other), false, 'load the old context without caching its tail');
+  assert.equal(h.calls.includes(oldTail), false);
+  h.set(updated, 25 * 3600 * 1000);
+  assert.equal(updated.files.has(oldTail), false, 'retired files are absent from the current host');
+  assert.equal(await h.client.has(same[0]), true);
+  assert.equal(await h.client.has(same[1]), true);
+  assert.equal(await h.client.has(same[2]), false);
+  assert.equal(h.calls.includes(oldTail), false, 'a fresh manifest cannot require a retired download');
+
+  const cached = clientHost(original);
+  assert.equal(await cached.client.has(first), true);
+  cached.set(chunkedFixture(same.slice(1)), 25 * 3600 * 1000);
+  await assert.rejects(cached.client.has(same[1]), /removed completed work/);
 });

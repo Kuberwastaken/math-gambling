@@ -8,6 +8,7 @@ import re
 from urllib.request import Request, urlopen
 
 from search_core import CONTEXTS, ENGINE, make_task, task_id
+from coverage_format import bucket_for, validate_context, validate_chunk, CHUNK_BYTES
 
 UA = 'OpenAI File Downloader, XaiImageApiFetch/1.0'
 INDEX_URL = 'https://kuber.studio/math-gambling/data/coverage/index.json'
@@ -39,7 +40,7 @@ def validate_index(raw):
         if len(raw) > INDEX_LIMIT:
             raise ValueError('byte cap')
         value = json.loads(raw)
-        if value.get('schema') != 'math-gambling-coverage-v1' or value.get('engine') != ENGINE:
+        if value.get('schema') not in ('math-gambling-coverage-v1', 'math-gambling-coverage-v2') or value.get('engine') != ENGINE:
             raise ValueError('schema/engine')
         revision = value['revision']
         if type(revision) is not int or revision < 0 or type(value['verified_task_count']) is not int or value['verified_task_count'] != revision:
@@ -55,7 +56,7 @@ def validate_index(raw):
                 raise ValueError('digest')
             if shard['file'] != f'{context}-{digest}.json':
                 raise ValueError('filename')
-            if type(shard['count']) is not int or not 0 <= shard['count'] <= SHARD_COUNT_LIMIT:
+            if type(shard['count']) is not int or not 0 <= shard['count'] <= (SHARD_COUNT_LIMIT if value['schema'].endswith('-v1') else 2**53-1):
                 raise ValueError('count')
             total += shard['count']
         if total != revision:
@@ -108,6 +109,7 @@ class CoverageIndex:
         self.index = None
         self.index_digest = None
         self.loaded = OrderedDict()
+        self.contexts = OrderedDict()
         self.known_skips = 0
         if not offline and (self.cache / 'index.json').exists():
             try:
@@ -124,7 +126,7 @@ class CoverageIndex:
         candidate = validate_index(raw)
         if self.index and candidate['revision'] < self.index['revision']:
             raise CoverageError('Published coverage revision moved backwards; scheduling paused')
-        if self.index and candidate['revision'] == self.index['revision'] and candidate['shards'] != self.index['shards']:
+        if self.index and candidate['revision'] == self.index['revision'] and candidate['shards'] != self.index['shards'] and not (self.index['schema'].endswith('-v1') and candidate['schema'].endswith('-v2')):
             raise CoverageError('Published coverage changed without a new revision; scheduling paused')
         if not self.offline:
             cache_bytes(self.cache / 'index.json', raw)
@@ -146,7 +148,44 @@ class CoverageIndex:
         context = task['context']
         entry = self.index['shards'][context]
         # An index entry with zero records cannot exclude any candidate.
-        if entry['count'] == 0:
+        if entry['count'] == 0 and not (self.index['schema'] == 'math-gambling-coverage-v2' and context in self.contexts):
+            return False
+        if self.index['schema'] == 'math-gambling-coverage-v2':
+            previous = self.contexts.get(context)
+            node = previous[1] if previous and previous[0] == entry['sha256'] else None
+            if node is None:
+                node = self._load(entry, lambda raw: validate_context(raw, context, entry), SHARD_LIMIT)
+                if previous:
+                    for bucket, old in previous[1]['buckets'].items():
+                        next_chunks = node['buckets'].get(bucket, [])
+                        if len(next_chunks) < len(old): raise CoverageError('Published coverage removed completed work')
+                        for i, before in enumerate(old):
+                            after = next_chunks[i]
+                            if before == after: continue
+                            if i != len(old)-1 or before['count'] == 256 or after['count'] < before['count']:
+                                raise CoverageError('Published coverage replaced a sealed chunk')
+                            # Historical guards cover retained observations only.
+                            # Never fetch an old tail: publication can retire it
+                            # after 24h. The publisher checks full ledger monotonicity.
+                            old_ids = self.loaded.get(before['file'])
+                            if old_ids is None:
+                                old_ids = self._cached(before, lambda raw: validate_chunk(raw, context, bucket, before), CHUNK_BYTES)
+                            if old_ids is not None:
+                                new_ids = self._load(after, lambda raw: validate_chunk(raw, context, bucket, after), CHUNK_BYTES)
+                                if not old_ids.issubset(new_ids): raise CoverageError('Published coverage removed completed work')
+                self.contexts[context] = (entry['sha256'], node)
+                while len(self.contexts) > 8: self.contexts.popitem(last=False)
+            bucket = bucket_for(tid)
+            for chunk in node['buckets'].get(bucket, []):
+                ids = self.loaded.get(chunk['file'])
+                if ids is None:
+                    ids = self._load(chunk, lambda raw: validate_chunk(raw, context, bucket, chunk), CHUNK_BYTES)
+                    self.loaded[chunk['file']] = ids
+                self.loaded.move_to_end(chunk['file'])
+                while len(self.loaded) > 64: self.loaded.popitem(last=False)
+                if tid in ids:
+                    self.known_skips += 1
+                    return True
             return False
         key = entry['file']
         if key in self.loaded:
@@ -174,3 +213,21 @@ class CoverageIndex:
             self.known_skips += 1
             return True
         return False
+
+    def _cached(self, entry, validator, cap):
+        for base in ([self.bundled] if self.offline else [self.cache, self.bundled]):
+            try:
+                with (base/entry['file']).open('rb') as handle:
+                    return validator(handle.read(cap + 1))
+            except (ValueError, KeyError, TypeError, OSError): pass
+        return None
+
+    def _load(self, entry, validator, cap):
+        cached = self._cached(entry, validator, cap)
+        if cached is not None: return cached
+        if self.offline: raise CoverageError('Bundled coverage chunk missing or corrupt')
+        raw = self.fetch(self.index_url.rsplit('/',1)[0]+'/'+entry['file'], cap)
+        try: value = validator(raw)
+        except (ValueError, KeyError, TypeError) as exc: raise CoverageError(str(exc)) from None
+        cache_bytes(self.cache/entry['file'], raw)
+        return value

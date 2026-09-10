@@ -51,7 +51,7 @@ async function boundedBytes(response, cap) {
 }
 const decode = bytes => JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(bytes));
 export function validateManifest(index) {
-  if (index?.schema !== 'math-gambling-coverage-v1' || index.engine !== ENGINE ||
+  if (!['math-gambling-coverage-v1','math-gambling-coverage-v2'].includes(index?.schema) || index.engine !== ENGINE ||
       !Number.isSafeInteger(index.revision) || index.revision < 0 ||
       index.verified_task_count !== index.revision || !index.shards ||
       Object.keys(index.shards).sort().join() !== CONTEXTS.map(c => c.id).sort().join())
@@ -61,7 +61,7 @@ export function validateManifest(index) {
     const s = index.shards[c.id];
     if (!s || !/^[0-9a-f]{64}$/.test(s.sha256) ||
         s.file !== `${c.id}-${s.sha256}.json` || !Number.isSafeInteger(s.count) ||
-        s.count < 0 || s.count > 100000) throw Error('Invalid shared coverage shard descriptor');
+        s.count < 0 || s.count > (index.schema.endsWith('-v1') ? 100000 : Number.MAX_SAFE_INTEGER)) throw Error('Invalid shared coverage shard descriptor');
     total += s.count;
   }
   if (total !== index.revision) throw Error('Shared coverage counts disagree');
@@ -69,12 +69,88 @@ export function validateManifest(index) {
 }
 export function createCoverageClient(base, {fetcher = fetch, now = Date.now} = {}) {
   let index = null, checked = 0, refreshPromise = null;
-  const cache = new Map();
+  const cache = new Map(), nodes = new Map(), chunks = new Map();
   async function read(file, cap, mode) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000);
     try { return await boundedBytes(await fetcher(new URL(file, base), {cache:mode, signal:controller.signal}), cap); }
     finally { clearTimeout(timeout); }
+  }
+  async function checkedFile(entry, cap) {
+    const bytes = await read(`data/coverage/${entry.file}`, cap, 'force-cache');
+    if (hex(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))) !== entry.sha256)
+      throw Error('Shared coverage checksum failed');
+    return decode(bytes);
+  }
+  async function chunkIds(context, bucket, entry) {
+    let ids = chunks.get(entry.file);
+    if (!ids) {
+      const value = await checkedFile(entry, 32768);
+      if (value.schema !== 'math-gambling-coverage-chunk-v2' || value.engine !== ENGINE ||
+          value.context !== context || value.bucket !== bucket || !Array.isArray(value.tasks) || value.tasks.length !== entry.count)
+        throw Error('Invalid shared coverage chunk');
+      ids = new Set(); let previous = '';
+      for (const id of value.tasks) {
+        if (typeof id !== 'string' || id <= previous) throw Error('Unsorted or duplicate coverage identity');
+        const parts = id.split(':');
+        if (parts.length !== 4 || parts[0] !== ENGINE || parts[1] !== context ||
+            !/^(0|[1-9][0-9]*)$/.test(parts[3]) || taskId(makeTask(context, parts[2], Number(parts[3]))) !== id)
+          throw Error('Invalid coverage identity');
+        const routed = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(id)))).slice(0,2);
+        if (routed !== bucket) throw Error('Misrouted coverage identity');
+        ids.add(id); previous = id;
+      }
+    }
+    chunks.delete(entry.file); chunks.set(entry.file, ids);
+    while (chunks.size > 64) chunks.delete(chunks.keys().next().value);
+    return ids;
+  }
+  async function chunkedHas(task, descriptor) {
+    let node = nodes.get(task.context);
+    if (!node || node.sha256 !== descriptor.sha256) {
+      const value = await checkedFile(descriptor, SHARD_CAP);
+      if (value.schema !== 'math-gambling-coverage-context-v2' || value.engine !== ENGINE ||
+          value.context !== task.context || !value.buckets || Array.isArray(value.buckets)) throw Error('Invalid coverage context');
+      let total = 0;
+      for (const [bucket, entries] of Object.entries(value.buckets)) {
+        if (!/^[0-9a-f]{2}$/.test(bucket) || !Array.isArray(entries) || !entries.length) throw Error('Invalid coverage bucket');
+        const files = new Set();
+        for (const entry of entries) {
+          if (!entry || !/^[0-9a-f]{64}$/.test(entry.sha256) || entry.file !== `${task.context}-b${bucket}-${entry.sha256}.json` ||
+              !Number.isSafeInteger(entry.count) || entry.count < 1 || entry.count > 256 || files.has(entry.file))
+            throw Error('Invalid coverage chunk descriptor');
+          files.add(entry.file); total += entry.count;
+        }
+      }
+      if (total !== descriptor.count) throw Error('Coverage chunk counts disagree');
+      if (node) {
+        for (const [bucket, old] of Object.entries(node.buckets)) {
+          const next = value.buckets[bucket];
+          if (!next || next.length < old.length) throw Error('Shared coverage removed completed work');
+          for (let i=0; i<old.length; i++) {
+            if (old[i].sha256 === next[i].sha256 && old[i].count === next[i].count) continue;
+            if (i !== old.length-1 || old[i].count === 256 || next[i].count < old[i].count)
+              throw Error('Shared coverage replaced a sealed chunk');
+            // Historical tail files expire after the publisher's grace period.
+            // Check retained observations without fetching retired versions;
+            // otherwise validate current membership as a fresh reader does.
+            // Full ledger monotonicity is enforced by the publisher.
+            const before = chunks.get(old[i].file);
+            if (before) {
+              const after = await chunkIds(task.context, bucket, next[i]);
+              if ([...before].some(id => !after.has(id))) throw Error('Shared coverage removed completed work');
+            }
+          }
+        }
+      }
+      node = {sha256:descriptor.sha256, buckets:value.buckets};
+      nodes.delete(task.context); nodes.set(task.context, node);
+      while (nodes.size > 8) nodes.delete(nodes.keys().next().value);
+    }
+    const id = taskId(task);
+    const bucket = hex(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(id)))).slice(0,2);
+    for (const entry of node.buckets[bucket] || []) if ((await chunkIds(task.context, bucket, entry)).has(id)) return true;
+    return false;
   }
   return {
     get revision() { return index?.revision ?? null; },
@@ -85,7 +161,7 @@ export function createCoverageClient(base, {fetcher = fetch, now = Date.now} = {
         const fresh = validateManifest(decode(await read('data/coverage/index.json', INDEX_CAP, 'no-cache')));
         if (index && fresh.revision < index.revision) throw Error('Shared coverage index moved backwards');
         if (index && fresh.revision === index.revision &&
-            JSON.stringify(fresh.shards) !== JSON.stringify(index.shards)) throw Error('Shared coverage changed without a new revision');
+            JSON.stringify(fresh.shards) !== JSON.stringify(index.shards) && !(index.schema.endsWith('-v1') && fresh.schema.endsWith('-v2'))) throw Error('Shared coverage changed without a new revision');
         index = fresh; checked = now(); return index;
       })();
       try { return await refreshPromise; } finally { refreshPromise = null; }
@@ -93,6 +169,7 @@ export function createCoverageClient(base, {fetcher = fetch, now = Date.now} = {
     async has(task) {
       if (!index || now() - checked >= 60000) await this.refresh();
       const descriptor = index.shards[task.context];
+      if (index.schema === 'math-gambling-coverage-v2') return chunkedHas(task, descriptor);
       let shard = cache.get(task.context);
       if (!shard || shard.sha256 !== descriptor.sha256) {
         const bytes = await read(`data/coverage/${descriptor.file}`, SHARD_CAP, 'force-cache');

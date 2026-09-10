@@ -64,6 +64,39 @@ class ClusterTests(unittest.TestCase):
         self.assertEqual(int(person["verified_computations"]), self.results[0]["counters"]["generators"])
         self.assertEqual(report["banks"][0]["bank_digest"], hashlib.sha256(ig.canonical(receipt).encode()).hexdigest())
 
+    def test_profile_link_updates_only_from_credited_work(self):
+        receipt = bank(self.results[:1], name="First alias")
+        receipt["contributor"]["url"] = "https://example.org/me?q=1&b=2"
+        self.assertEqual(self.submit(receipt)["status"], "accepted")
+        person = ag.aggregate(self.data)["contributors"][0]
+        self.assertEqual(person["url"], receipt["contributor"]["url"])
+        copied = copy.deepcopy(receipt)
+        copied["contributor"] = dict(name="Imposter", github="", url="https://evil.example")
+        self.submit(copied, number=2, author="someone-else")
+        self.assertEqual(ag.aggregate(self.data)["contributors"][0]["name"], "First alias")
+        updated = bank(self.results[1:2], name="New alias")
+        updated["contributor"]["url"] = "https://new.example/profile"
+        self.submit(updated, number=3)
+        person = ag.aggregate(self.data)["contributors"][0]
+        self.assertEqual(person["name"], "New alias")
+        self.assertEqual(person["url"], "https://new.example/profile")
+        self.assertEqual(person["verified_tasks"], 2)
+        self.submit(bank(self.results[2:3], name="No link"), number=4)
+        self.assertNotIn("url", ag.aggregate(self.data)["contributors"][0])
+
+    def test_unsafe_profile_links_are_stripped_without_losing_work(self):
+        invalid = ["javascript:alert(1)", "data:text/html,hi", "//example.com",
+                   "https://user:password@example.com", "https://example.com/\\evil",
+                   "https://example.com/\nfoo", "https://example.com/with space",
+                   "https://", "https://example.com:99999", "https://example.com/" + "a"*2048]
+        for value in invalid:
+            with self.subTest(url=value):
+                self.assertNotIn("url", ig.contributor({"contributor": {"name": "X", "url": value}}))
+        receipt = bank(self.results[:1])
+        receipt["contributor"]["url"] = invalid[0]
+        self.assertEqual(self.submit(receipt)["status"], "accepted")
+        self.assertNotIn("url", ag.aggregate(self.data)["contributors"][0])
+
     def test_partial_bank_resumes_without_double_credit(self):
         receipt = bank(self.results[:3])
         first = self.submit(receipt, budget=ig.Budget(count=1))

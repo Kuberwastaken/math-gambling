@@ -8,6 +8,8 @@ import {
 } from "./engine.mjs";
 import { createLiveVisuals } from "./live-viz.mjs";
 import { renderModelEvolution } from "./model-viz.mjs";
+import { setupRunnerDownload } from "./runner-setup.mjs";
+setupRunnerDownload();
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -77,7 +79,15 @@ function updateProcessor() {
 }
 $("run-duty")?.addEventListener("input", updateProcessor);
 updateProcessor();
-let profile = { name: "", github: "" };
+function safeProfileURL(value) {
+  if (typeof value !== "string" || value.length > 2048 ||
+      /[\s\u0000-\u001f\u007f\\]/u.test(value) || !/^https?:\/\//i.test(value)) return "";
+  try {
+    const url = new URL(value);
+    return url.hostname && !url.username && !url.password ? value : "";
+  } catch { return ""; }
+}
+let profile = { name: "", github: "", url: "" };
 try {
   profile = JSON.parse(localStorage.getItem("mg-profile") || "null") || profile;
 } catch {}
@@ -85,6 +95,7 @@ profile = {
   name: typeof profile?.name === "string" ? profile.name.slice(0, 60) : "",
   github:
     typeof profile?.github === "string" ? profile.github.slice(0, 39) : "",
+  url: safeProfileURL(profile?.url),
 };
 function profilePreview() {
   const name =
@@ -519,7 +530,11 @@ async function loadCluster() {
         const row = body.insertRow(),
           alias = row.insertCell(),
           place = document.createElement("span"),
-          name = document.createElement("span");
+          name = document.createElement(safeProfileURL(p.url) ? "a" : "span");
+        if (safeProfileURL(p.url)) {
+          name.href = safeProfileURL(p.url);
+          name.rel = "nofollow ugc noopener noreferrer";
+        }
         place.className = "rank-number";
         place.textContent = String(rank + 1).padStart(2, "0");
         const user = String(p.submitter || ""),
@@ -746,7 +761,8 @@ function validProfile(p) {
     p.name.length <= 60 &&
     typeof p.github === "string" &&
     (!p.github ||
-      /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(p.github))
+      /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(p.github)) &&
+    (!p.url || Boolean(safeProfileURL(p.url)))
   );
 }
 async function prepareBank(priorityId = null, attribution = null) {
@@ -769,7 +785,8 @@ async function prepareBank(priorityId = null, attribution = null) {
           b.ids.every((id) => !observed.has(id)) &&
           (!attribution ||
             (b.payload.contributor.name === attribution.name &&
-              b.payload.contributor.github === attribution.github)),
+              b.payload.contributor.github === attribution.github &&
+              (b.payload.contributor.url || "") === (attribution.url || ""))),
       );
   let bank = previous;
   if (!bank) {
@@ -833,6 +850,7 @@ function openBank() {
   $("bank-receipt").hidden = true;
   $("player-name").value = profile.name === "Anonymous" ? "" : profile.name;
   $("player-github").value = profile.github;
+  $("player-url").value = profile.url || "";
   text("bank-identity-status", "");
   $("bank-panel").scrollIntoView({
     behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -846,7 +864,12 @@ async function submitBankProfile(e) {
   if (banking) return;
   const github = $("player-github").value.trim().replace(/^@/, ""),
     name = $("player-name").value.trim() || github || "Anonymous";
-  const attribution = { name, github };
+  const url = $("player-url").value.trim();
+  if (url && !safeProfileURL(url)) {
+    text("bank-identity-status", "Use a full http:// or https:// link without spaces or login details.");
+    return;
+  }
+  const attribution = { name, github, ...(url ? { url } : {}) };
   if (!validProfile(attribution)) {
     text("bank-identity-status", "Enter a valid optional GitHub username.");
     return;
@@ -971,11 +994,24 @@ function nextTask() {
   }
   throw Error("Could not allocate a fresh local task");
 }
+function counter(id, value) {
+  const el = $(id);
+  if (!el) return;
+  const exact = fmt(value);
+  let display = exact.length > 7 ? small(value) : exact;
+  if (display.length > 9) display = new Intl.NumberFormat("en-US", {
+    notation: "scientific", maximumFractionDigits: 2,
+  }).format(BigInt(value));
+  el.textContent = display;
+  el.title = exact;
+  el.setAttribute("aria-label", exact);
+  el.setAttribute("tabindex", "0");
+}
 function renderCounts() {
-  text("local-inputs", fmt(counts.generators));
-  text("local-curves", fmt(counts.curves));
-  text("local-exact", fmt(counts.exact_tests));
-  text("local-tasks", fmt(counts.tasks));
+  counter("local-inputs", counts.generators);
+  counter("local-curves", counts.curves);
+  counter("local-exact", counts.exact_tests);
+  counter("local-tasks", counts.tasks);
 }
 function finishStop() {
   if (busy) return;
@@ -1242,6 +1278,7 @@ if ($("join-form")) {
   if (typeof profile.name === "string") $("player-name").value = profile.name;
   if (typeof profile.github === "string")
     $("player-github").value = profile.github;
+  $("player-url").value = profile.url || "";
   refreshSaved()
     .then(() => {
       text("session-message", tasks.length ? "" : "");

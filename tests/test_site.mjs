@@ -190,6 +190,8 @@ async function harness({
     },
   });
   const source = appSource
+    .replace(/import \{ setupRunnerDownload \} from "\.\/runner-setup\.mjs";/,
+      "const setupRunnerDownload=()=>{};")
     .replace(
       /import \{ renderModelEvolution \} from "\.\/model-viz\.mjs";/,
       "const renderModelEvolution=()=>{};",
@@ -204,7 +206,7 @@ async function harness({
     )
     .replaceAll("import.meta.url", JSON.stringify(appURL.href));
   await vm.runInContext(
-    `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,openBank,submitBankProfile,prepareBank,
+    `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,openBank,submitBankProfile,prepareBank,safeProfileURL,counter,
     state:()=>({running,starting,busy,worker,tasks,counts}),
     ageRun:()=>{startAt=Date.now()-86400000;}};})()`,
     context,
@@ -387,10 +389,17 @@ console.log(
   assert.equal(h.stores.get("banks").rows.size, 0);
   assert.match(h.get("bank-identity-status").textContent, /valid/);
   h.get("player-github").value = "@later-user";
+  for (const url of ["javascript:alert(1)", "https://user:pass@example.com", "//example.com", "https://example.com:99999", "https://example.com/with space"]) {
+    h.get("player-url").value = url;
+    await h.app.submitBankProfile(event());
+    assert.equal(h.stores.get("banks").rows.size, 0);
+  }
+  h.get("player-url").value = "https://example.com/about";
   await h.app.submitBankProfile(event());
   const first = [...h.stores.get("banks").rows.values()][0];
   assert.equal(first.payload.contributor.name, "Later alias");
   assert.equal(first.payload.contributor.github, "later-user");
+  assert.equal(first.payload.contributor.url, "https://example.com/about");
   assert.equal(first.payload.tasks[0].digest, original.result.digest);
   assert.equal(
     JSON.stringify(h.stores.get("tasks").rows.get(original.id)),
@@ -424,4 +433,16 @@ console.log(
   console.log(
     "Deferred attribution checks passed: anonymous start, validation, unchanged exact receipts, stable banks and priority result retention.",
   );
+}
+
+// Display scaling never loses the exact integer value exposed to assistive tools.
+{
+  const h = await harness();
+  for (const value of [0n, 123456789n, 999999999999999999999999999999999n]) {
+    h.app.counter("local-inputs", value);
+    const el = h.get("local-inputs");
+    assert.ok(el.textContent.length <= 9);
+    assert.equal(el.title, new Intl.NumberFormat("en-US").format(value));
+    assert.equal(el.getAttribute("aria-label"), el.title);
+  }
 }

@@ -264,3 +264,5 @@ research challenge.
 ### Attribution after browser computation
 
 The browser starts anonymously. At banking time, the participant can select a display alias and an optional claimed GitHub handle. This metadata belongs to the bank; it does not modify the exact saved task result or its digest. A newly named bank has a new canonical bank digest, while previous prepared banks remain available locally. Actual leaderboard identity still comes from the authenticated GitHub issue author, and task identifiers are credited at most once.
+
+Optional `contributor.url` links the display alias to an http(s) website. It is omitted when empty and is never part of a mathematical task digest. The collector strips malformed URLs, credentials, whitespace and control characters without discarding valid computation. The latest uniquely credited task may update the alias and link for its authenticated submitter; duplicate claims cannot update another participant or earn more credit. Website ownership is self-declared.

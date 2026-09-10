@@ -3028,3 +3028,284 @@ body[data-page="home"] .game-area .session-counts {
   min-height: 34px;
   padding: 5px 10px;
 }
+
+/* Title, play surface and ordinary research tables. */
+.table-title {
+  padding: 30px 0 20px;
+}
+.table-title h1 {
+  font-size: clamp(44px, 6.2vw, 76px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -2px;
+  margin-bottom: 18px;
+}
+.table-title p {
+  font: 15px/1.5 var(--font);
+  color: #444;
+  margin: 0 auto;
+  max-width: 580px;
+}
+.game-proposition {
+  max-width: 750px;
+  margin-bottom: 32px;
+}
+.game-proposition strong {
+  display: block;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.wheel-track {
+  fill: none;
+  stroke: #999;
+  stroke-width: 0.5;
+}
+.wheel-inner {
+  stroke: #111;
+  stroke-width: 0.65;
+}
+.wheel-divider {
+  stroke: #999;
+  stroke-width: 0.5;
+}
+.wheel-jackpot {
+  font: 600 80px Georgia, serif;
+  letter-spacing: 0;
+}
+.wheel-small {
+  font: 10px var(--font);
+  letter-spacing: 1px;
+}
+.wheel-stage {
+  display: grid;
+  place-items: center;
+}
+.game-area .session-counts div {
+  min-width: 0;
+  container-type: inline-size;
+}
+.game-area .session-counts dd {
+  font-size: clamp(20px, 14cqi, 29px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.8px;
+  white-space: nowrap;
+  max-width: 100%;
+  margin-left: 0;
+}
+.game-area .session-counts dd:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 3px;
+}
+.game-area .session-counts dd:focus::after {
+  content: attr(aria-label);
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font: 12px/1.5 var(--mono);
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+.bank-explanation {
+  margin: 10px 0 0;
+  font: 13px/1.5 var(--font);
+  color: #444;
+}
+.bank-profile-link {
+  grid-column: 1/-1;
+}
+.leaderboard-section .leaderboard-table,
+.leaderboard-table {
+  background: #fff;
+  color: #111;
+  border: 0;
+  font: 15px/1.5 var(--font);
+}
+.leaderboard-section .leaderboard-table th,
+.leaderboard-table th {
+  color: #444;
+  font: 600 14px/1.5 var(--font);
+  text-transform: none;
+  letter-spacing: 0;
+  border-top: 1px solid #bbb;
+}
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+.leaderboard-table th:last-child,
+.leaderboard-table td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.leaderboard-table a { color: #0000ee; }
+.leaderboard-table a:visited { color: #551a8b; }
+.leaderboard-section > p { font-size: 15px; }
+.leaderboard-section .table-note,
+.leaderboard-section .text-link { font-size: 14px; }
+.leaderboard-table .rank-number {
+  color: #666;
+  font-variant-numeric: tabular-nums;
+  margin-right: 8px;
+}
+.leaderboard-section .empty-rank td {
+  height: 42px;
+  color: #999;
+}
+.runner-dialog {
+  width: min(720px, calc(100vw - 32px));
+  max-height: 90dvh;
+  overflow: auto;
+  margin: auto;
+  padding: 28px;
+  color: #111;
+  background: #fff;
+  border: 1px solid #111;
+  font: 16px/1.6 var(--font);
+}
+.runner-dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.runner-dialog-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.runner-dialog h2 { font: 28px/1.2 Georgia, serif; margin: 0; }
+.runner-dialog h3 { margin: 24px 0 8px; font-size: 18px; }
+.runner-dialog p { margin: 12px 0; }
+.runner-dialog a { overflow-wrap: anywhere; }
+.runner-dialog pre {
+  overflow-x: auto;
+  white-space: pre;
+  font-size: 13px;
+  padding: 16px;
+  background: #f5f5f5;
+  color: #111;
+  border: 1px solid #ddd;
+}
+.runner-dialog select {
+  width: auto;
+  min-width: 180px;
+  max-width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  color: #111;
+  background: #fff;
+}
+.runner-platforms { margin-top: 24px; }
+.runner-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  margin-top: 20px;
+}
+@media (max-width: 760px) {
+  .table-title { padding: 24px 0 18px; }
+  .table-title h1 { letter-spacing: -1px; margin-bottom: 14px; }
+  .table-title p { font-size: 14px; max-width: 300px; }
+  .game-proposition { font-size: 15px; line-height: 1.6; }
+  .game-proposition strong { font-size: 18px; }
+  .leaderboard-section .leaderboard-table { font-size: 13px; }
+  .leaderboard-section .leaderboard-table th { font-size: 12px; }
+  .leaderboard-table td, .leaderboard-table th { padding: 10px 4px; }
+  .leaderboard-table .rank-number { width: 20px; margin-right: 4px; }
+  .runner-dialog { padding: 20px; }
+  .runner-dialog h2 { font-size: 25px; }
+}
+
+.research-document {
+  max-width: 850px;
+  font-size: 17px;
+  line-height: 1.75;
+}
+.research-document p,
+.research-document li {
+  color: #222;
+  font-size: inherit;
+  line-height: inherit;
+}
+.research-document > h1 {
+  font: 600 clamp(28px, 4vw, 42px)/1.2 Georgia, serif;
+  margin: 32px 0 28px;
+  letter-spacing: -0.5px;
+}
+.research-document h2 {
+  font-size: 26px;
+  line-height: 1.3;
+  margin: 44px 0 20px;
+}
+.research-document h3 {
+  font-size: 21px;
+  line-height: 1.4;
+  margin: 32px 0 16px;
+}
+.research-document p { margin: 18px 0; }
+.research-document ol,
+.research-document ul { padding-left: 26px; }
+.research-tools {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  font-size: 15px;
+}
+.research-contents {
+  margin: 24px 0;
+  padding: 16px 0;
+  border-block: 1px solid #ddd;
+}
+.research-contents summary { font-size: 16px; cursor: pointer; }
+.research-contents ol { line-height: 1.5; font-size: 15px; }
+.research-table {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+}
+.research-table table {
+  min-width: 600px;
+  border-collapse: collapse;
+  font: 15px/1.5 var(--font);
+}
+.research-table th,
+.research-table td {
+  white-space: normal;
+  padding: 12px;
+  vertical-align: top;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+.research-table th { color: #111; font-weight: 600; }
+.research-document .katex-block {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+.research-document .katex-display { margin: 16px 0; }
+.research-document .katex { font-size: 1.07em; }
+.research-document .footnotes { font-size: 15px; }
+.research-document .footnote-ref { font-size: 0.75em; }
+.research-document pre {
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 1.65;
+  padding: 20px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+}
+.research-document code { overflow-wrap: anywhere; }
+.research-document pre code { overflow-wrap: normal; }
+.research-document blockquote {
+  margin: 24px 0;
+  padding: 0 20px;
+  border-left: 2px solid #999;
+}
+.research-document a { overflow-wrap: anywhere; }
+@media (max-width: 760px) {
+  .research-document { font-size: 16px; padding: 28px 0; }
+  .research-document > h1 { font-size: 30px; }
+  .research-document h2 { font-size: 24px; }
+  .research-document .katex { font-size: 1em; }
+  .research-document .footnotes { font-size: 14px; }
+}

@@ -8,7 +8,7 @@ import math
 from pathlib import Path
 import statistics
 
-from ingest import ROOT, MAX_REPLAYS, atomic_json, ledger_path, now, read_json
+from ingest import ROOT, MAX_REPLAYS, atomic_json, ledger_path, now, read_json, safe_profile_url
 
 EPOCH_SIZE = 64
 EXPLORATION = 0.4
@@ -115,6 +115,15 @@ def aggregate(data):
             people[key] = dict(name=person["name"], github=provenance, github_verified=True,
                                claimed_github=person["github"], submitter=provenance,
                                verified_tasks=0, verified_computations=0)
+        # Latest uniquely credited work may update the public alias/link.
+        # Duplicate submissions cannot impersonate or overwrite a participant.
+        people[key]["name"] = person["name"]
+        people[key]["claimed_github"] = person["github"]
+        url = safe_profile_url(person.get("url"))
+        if url:
+            people[key]["url"] = url
+        else:
+            people[key].pop("url", None)
         people[key]["verified_tasks"] += 1
         people[key]["verified_computations"] += int(result["counters"].get("generators", 0))
     contexts = []

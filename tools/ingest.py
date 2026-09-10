@@ -82,6 +82,22 @@ def clean_name(value):
     return " ".join(value.split())[:80] or "Anonymous"
 
 
+def safe_profile_url(value):
+    if (not isinstance(value, str) or len(value) > 2048
+            or any(c.isspace() or ord(c) < 32 or ord(c) == 127 or c == "\\" for c in value)
+            or not re.match(r"https?://", value, re.I)):
+        return ""
+    try:
+        parsed = urlsplit(value)
+        # Accessing port also rejects malformed/out-of-range ports.
+        parsed.port
+        if parsed.hostname and not parsed.username and not parsed.password:
+            return value
+    except ValueError:
+        pass
+    return ""
+
+
 def contributor(receipt):
     claim = receipt.get("contributor", {}) if isinstance(receipt, dict) else {}
     if not isinstance(claim, dict):
@@ -89,7 +105,11 @@ def contributor(receipt):
     github = claim.get("github", "")
     if not isinstance(github, str) or not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?", github):
         github = ""
-    return {"name": clean_name(claim.get("name")), "github": github, "github_verified": False}
+    person = {"name": clean_name(claim.get("name")), "github": github, "github_verified": False}
+    url = safe_profile_url(claim.get("url"))
+    if url:
+        person["url"] = url
+    return person
 
 
 def exact_triple(xyz, k=114):

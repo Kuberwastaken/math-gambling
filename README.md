@@ -16,9 +16,10 @@ The website is live at **https://kuber.studio/math-gambling/**. Source and launc
 
 ## Run the site locally
 
-Requires Python 3.11+ and Node.js 22+; the static site has no npm dependencies.
+Requires Python 3.11+ and Node.js 22+. Pinned npm dependencies render the research Markdown and equations during the build. The published pages include their math fonts and need no external rendering service.
 
 ```sh
+npm ci --ignore-scripts
 python3 tools/build_site.py
 python3 -m http.server 4173 --directory dist
 ```

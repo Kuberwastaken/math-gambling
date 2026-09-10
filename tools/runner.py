@@ -22,6 +22,7 @@ import subprocess
 import sys
 import time
 from urllib.request import Request, urlopen
+from urllib.parse import urlsplit
 
 from search_core import CONTEXTS, ENGINE, canonical_json, make_task, run_task, task_id, verify_triple
 
@@ -30,6 +31,30 @@ UA = 'OpenAI File Downloader, XaiImageApiFetch/1.0'
 STRATEGY_URL = 'https://kuber.studio/math-gambling/data/strategy.json'
 BANK_LIMIT = 256
 OUTBOX_LIMIT = 4096
+MIN_PYTHON = (3, 11)
+
+
+def profile_url(value):
+    """Validate an optional public attribution link without fetching it."""
+    if not value:
+        return None
+    if len(value) > 2048 or any(c.isspace() or ord(c) < 32 or ord(c) == 127 or c == '\\' for c in value):
+        raise argparse.ArgumentTypeError('--url must be an HTTP(S) URL without whitespace or credentials (max 2048 characters)')
+    try:
+        parsed = urlsplit(value)
+        if parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.username is not None or parsed.password is not None:
+            raise ValueError('invalid public link')
+        parsed.port
+    except ValueError:
+        raise argparse.ArgumentTypeError('--url must be an HTTP(S) URL without whitespace or credentials (max 2048 characters)') from None
+    return value
+
+
+def initialize_worker():
+    # Terminal Ctrl+C is delivered to the whole process group on macOS/Linux
+    # and to console workers on Windows. Let the parent stop allocation and
+    # drain bounded tasks instead of interrupting a worker mid-result.
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 
 def atomic_json(path, data):
@@ -227,11 +252,14 @@ def maybe_submit(db, repo, last_attempt):
 
 
 def main(argv=None):
+    if sys.version_info < MIN_PYTHON:
+        raise SystemExit('Math Gambling needs Python 3.11 or later. Install it from https://www.python.org/downloads/.')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--minutes', type=float, default=10)
     parser.add_argument('--workers', type=int, default=max(1, min(4, (os.cpu_count() or 2)//2)))
     parser.add_argument('--name')
     parser.add_argument('--github')
+    parser.add_argument('--url', type=profile_url, help='optional public HTTP(S) link for your leaderboard alias')
     parser.add_argument('--output', type=Path, default=Path('math-gambling-run'))
     parser.add_argument('--offline', action='store_true', help='never fetch the shared strategy; results remain local')
     parser.add_argument('--submit', action='store_true', help='explicitly authorize gh issue creation, at most once/minute')
@@ -261,6 +289,8 @@ def main(argv=None):
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=True)
     lock = lock_output(out/'runner.lock')
     contributor = dict(name=args.name, github=args.github)
+    if args.url:
+        contributor['url'] = args.url
     db = open_state(out, contributor)
     if args.mark_banked:
         matches = [(bid, path) for bid, path in db.execute('SELECT id,path FROM banks') if Path(path).name == args.mark_banked]
@@ -292,7 +322,7 @@ def main(argv=None):
     last_refresh_completed = 0
     last_submit = -math.inf
     started = time.monotonic()
-    pool = ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context('spawn'))
+    pool = ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context('spawn'), initializer=initialize_worker)
     active = {}
     try:
         while True:
@@ -347,4 +377,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     raise SystemExit(main())

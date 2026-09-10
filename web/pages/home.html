@@ -1,12 +1,13 @@
 <div class="table-title">
   <h1>Math Gambling</h1>
-  <p>A volunteer computing cluster searching for a sum of three cubes.</p>
+  <p>An open computing experiment in the sum-of-three-cubes problem.</p>
 </div>
 <div class="game-proposition">
   <p>
-    Your computer could help solve an unsolved maths problem. It could also
-    spend a lifetime finding nothing. We’re pooling spare processor time to
-    search for three integers whose cubes add up to 114.
+    <strong>Stake some processor time. Chase a mathematical jackpot.</strong>
+    Every batch is another shot at three integers whose cubes add up to 114.
+    The odds are absurdly long and we can’t price your hand. Most bets will
+    return nothing. One exact answer would be a discovery.
   </p>
 </div>
 <div class="game-layout" id="play">
@@ -78,6 +79,7 @@
           </button>
         </div>
 
+        <p class="bank-explanation">Banking opens a GitHub issue; hourly replay verifies your work and updates the leaderboard.</p>
         <div id="discovery" class="discovery" hidden></div>
       </section>
     </div>
@@ -107,6 +109,10 @@
               autocomplete="off"
               placeholder="@you"
             />
+          </div>
+          <div class="bank-profile-link">
+            <label for="player-url">Link on your name (optional)</label>
+            <input id="player-url" type="url" maxlength="2048" autocomplete="url" placeholder="https://your.site" />
           </div>
         </div>
         <button id="prepare-bank" type="submit" class="button primary">
@@ -154,7 +160,7 @@
     <h2>Three cubes. One missing answer.</h2>
     <div class="explanation-equation">x³ + y³ + z³ = <strong>114</strong></div>
     <p>
-      Find three whole numbers — positive or negative — that make this equation
+      Find three whole numbers, positive or negative, that make this equation
       true. The answer may involve enormous cubes that almost cancel each other
       out.
     </p>
@@ -206,7 +212,6 @@
 >
   <div class="section-heading">
     <h2 id="leaderboard-heading">Global leaderboard</h2>
-    <span class="suit" aria-hidden="true">♠</span>
   </div>
   <p><strong id="cluster-inputs">—</strong> verified inputs on the table.</p>
   <div class="table-wrap">
@@ -386,7 +391,7 @@
       <a
         class="button primary"
         href="{{BASE}}downloads/math-gambling-runner.zip"
-        download
+        download data-runner-download
         >Download the local runner ↓</a
       >
       <a class="text-link" href="{{BASE}}approach/#local">Setup ↗</a>

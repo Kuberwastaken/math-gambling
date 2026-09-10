@@ -90,6 +90,7 @@ export function createLiveVisuals(contexts) {
     svg.append(
       node("circle", { cx: 200, cy: 200, r: 192, class: "wheel-rim" }),
     );
+    svg.append(node("circle", { cx: 200, cy: 200, r: 185, class: "wheel-track" }));
     arcs = [];
     angles = new Map();
     let angle = -Math.PI / 2;
@@ -129,28 +130,31 @@ export function createLiveVisuals(contexts) {
       angle = end;
     }
     svg.append(
-      node("circle", { cx: 200, cy: 200, r: 130, class: "wheel-inner" }),
+      node("circle", { cx: 200, cy: 200, r: 118, class: "wheel-inner" }),
     );
     svg.append(
       node(
         "text",
-        { x: 200, y: 174, "text-anchor": "middle", class: "wheel-small" },
+        { x: 200, y: 146, "text-anchor": "middle", class: "wheel-small" },
         "SUM OF THREE CUBES",
       ),
     );
     svg.append(
       node(
         "text",
-        { x: 200, y: 246, "text-anchor": "middle", class: "wheel-jackpot" },
+        { x: 200, y: 200, "text-anchor": "middle", "dominant-baseline": "central", class: "wheel-jackpot" },
         "114",
       ),
     );
     wheelStatus = node(
       "text",
-      { x: 200, y: 276, "text-anchor": "middle", class: "wheel-small" },
+      { x: 200, y: 264, "text-anchor": "middle", class: "wheel-small" },
       "UNCLAIMED",
     );
     svg.append(wheelStatus);
+    for (const y of [160, 245]) svg.append(node("line", {
+      x1: 170, x2: 230, y1: y, y2: y, class: "wheel-divider",
+    }));
     ball = node("circle", {
       cx: 200,
       cy: 12,

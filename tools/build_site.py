@@ -85,7 +85,7 @@ def main():
       'ALGORITHM_REVIEW':'research/archive/research-2026-09-09/ALGORITHM_REVIEW.md',
       'GEOMETRY_REVIEW':'research/archive/research-2026-09-09/GEOMETRY_REVIEW.md',
       'DISCOVERY_LEARNING':'research/archive/research-2026-09-09/DISCOVERY_LEARNING.md',
-      'GEOMETRIC_POLICY':'docs/GEOMETRIC_POLICY.md','MATHEMATICAL_COVERAGE':'docs/MATHEMATICAL_COVERAGE.md',
+      'SHELL_PRUNING':'docs/SHELL_PRUNING.md','GEOMETRIC_POLICY':'docs/GEOMETRIC_POLICY.md','MATHEMATICAL_COVERAGE':'docs/MATHEMATICAL_COVERAGE.md',
       'DOMAIN_PROOF':'research/archive/phase3/DOMAIN_PROOF.md'}
     articles = {slug: rel for slug, rel in articles.items() if (ROOT / rel).exists()}
     rendered = render_research(articles)

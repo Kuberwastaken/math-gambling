@@ -16,14 +16,14 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-10 18:52:55 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-10 19:01:41 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 9,600 |
-| Coefficient-generator inputs | 17,878,016 |
-| Bounded curve intervals | 1,325,028 |
-| Logical quotient positions | 2,041,830,343 |
+| Unique finite tasks | 9,601 |
+| Coefficient-generator inputs | 17,880,064 |
+| Bounded curve intervals | 1,325,211 |
+| Logical quotient positions | 2,041,842,002 |
 | Exact integer square tests | 4,234 |
 | Independently verified identities for 114 | 0 |
 
@@ -35,7 +35,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com/>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 16,202,752 | 8,704 |
+| 1 | YourContributorAlias | [@EveryReasonTo](https://github.com/EveryReasonTo) | 16,204,800 | 8,705 |
 | 2 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 512 |
 | 3 | Pierre | [@pcrooks](https://github.com/pcrooks) | 482,304 | 256 |
 | 4 | [Kuber](<https://kuber.studio>) | [@Kuberwastaken](https://github.com/Kuberwastaken) | 238,592 | 128 |
@@ -44,7 +44,7 @@ Rank is based on replayed coefficient inputs. Alias websites are optional and se
 
 ### The current allocation
 
-**Epoch 150**, frozen from **9,600 verified tasks**. The next policy update needs **64 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 150**, frozen from **9,600 verified tasks**. The next policy update needs **63 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD

@@ -66,6 +66,13 @@ def main():
         if p.exists():json.loads(p.read_text(encoding='utf-8'));shutil.copy2(p,OUT/'data'/name)
     chart = ROOT / 'data/readme-progress.svg'
     if chart.exists(): shutil.copy2(chart, OUT / 'data/readme-progress.svg')
+    learning = ROOT / 'data/learning'
+    if (learning/'latest.json').exists():
+        from learning_visuals import generate as learning_visuals
+        learning_visuals(ROOT/'data')
+        (OUT/'data/learning').mkdir()
+        for name in ['latest.json','visuals.json','evolution.svg','pilot.svg']:
+            if (learning/name).exists(): shutil.copy2(learning/name, OUT/'data/learning'/name)
     coverage, _ = read_coverage(ROOT / 'data/coverage')
     shutil.copytree(ROOT / 'data/coverage', OUT / 'data/coverage',
                     ignore=shutil.ignore_patterns('.*', '*.tmp', 'retention.json'))

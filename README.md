@@ -163,6 +163,9 @@ flowchart TD
     Gate --> NoPromotion[No automatic discovery-policy promotion]
 ```
 
+
+![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
+
 Latest evaluation: tasks 19,457–20,480. Lower mean absolute log1p prediction error is better.
 
 | Quantity | Context baseline | Spatial challenger |
@@ -173,6 +176,8 @@ Latest evaluation: tasks 19,457–20,480. Lower mean absolute log1p prediction e
 | exact_tests | 0.3325 | 0.3208 |
 
 Unseen-geometry evaluation: 172 tasks. Full errors and nonzero-count support are in the report.
+
+![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 
 Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.
 

@@ -8,6 +8,7 @@ import {
 } from "./engine.mjs";
 import { createLiveVisuals } from "./live-viz.mjs";
 import { createJackpot } from "./jackpot.mjs";
+import { loadChallenger } from "./challenger-viz.mjs";
 import { renderModelEvolution } from "./model-viz.mjs";
 import { setupRunnerDownload } from "./runner-setup.mjs";
 setupRunnerDownload();
@@ -1393,7 +1394,7 @@ async function start(e) {
         coverageRefreshDue = true;
         // Optional reports never hold the save/stop barrier. Fresh shared
         // coverage is still required by dispatch before the next task starts.
-        void Promise.allSettled([loadStrategy(), loadCluster()]);
+        void Promise.allSettled([loadStrategy(), loadCluster(), loadChallenger(fetchJSON)]);
       }
       if (running) {
         const duty = processorDuty();
@@ -1459,7 +1460,7 @@ if ($("join-form")) {
       $("start-button").disabled = true;
     });
 }
-await Promise.allSettled([loadMac(), loadStrategy(), loadCluster()]);
+await Promise.allSettled([loadMac(), loadStrategy(), loadCluster(), loadChallenger(fetchJSON)]);
 setInterval(() => {
   if (!document.hidden) {
     loadMac();

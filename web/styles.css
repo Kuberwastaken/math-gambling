@@ -3368,3 +3368,25 @@ body[data-page="home"] .game-area .session-counts {
 }
 body { background-color: #fff; color: #111; }
 .run-wheel, .run-wheel svg { color-scheme: only light; }
+
+.challenger-study { margin: 36px 0; padding: 24px 0; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; }
+.challenger-study h3 { margin: 0; font: normal 25px Georgia, serif; }
+.challenger-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+.challenger-controls select { margin-left: 8px; padding: 6px; font: inherit; }
+.challenger-chart svg { display: block; width: 100%; height: auto; font-family: Arial, sans-serif; }
+.challenger-legend { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13px; }
+.challenger-legend span:last-child { color: #b5222c; }
+#challenger-window { width: 100%; margin: 12px 0; accent-color: #111; }
+.challenger-study noscript img { max-width: 100%; height: auto; }
+@media(max-width: 600px) { .challenger-study .section-heading { display: block; } .challenger-controls { display: grid; } }
+
+.challenger-pilot { margin: 28px 0 16px; overflow-x: auto; }
+.challenger-pilot img { display: block; width: 100%; min-width: 600px; height: auto; }
+
+.challenger-pilot figcaption { font: normal 21px Georgia, serif; margin-bottom: 20px; }
+#challenger-pilot-bars > div { display: grid; grid-template-columns: 150px minmax(0,1fr) 54px; align-items: center; gap: 12px; margin: 14px 0; }
+.pilot-track { height: 20px; } .pilot-track i { display: block; height: 100%; background: #111; }
+#challenger-pilot-bars > div:first-child i { background: #999; }
+#challenger-pilot-bars > div:last-child i { background: #b5222c; }
+.challenger-pilot p { font-size: 13px; }
+@media(max-width:600px) { #challenger-pilot-bars > div { grid-template-columns: 110px minmax(0,1fr) 48px; font-size: 12px; gap: 8px; } }

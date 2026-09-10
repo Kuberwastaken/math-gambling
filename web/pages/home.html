@@ -383,6 +383,28 @@
       >Read the failed experiment ↗</a
     >
   </p>
+  <section id="challenger" class="challenger-study" aria-labelledby="challenger-heading">
+    <div class="section-heading"><h3 id="challenger-heading">Can task geometry teach us more?</h3><span>Challenger · shadow only</span></div>
+    <p id="challenger-status">Loading frozen model evaluations…</p>
+    <p>Every 1,024 verified tasks freezes a new spatial model. We test its predictions on the next window of receipts. It watches the search; the cost scheduler above still makes the decisions.</p>
+    <div class="challenger-controls">
+      <label>Predicting <select id="challenger-metric" disabled><option value="cpu_ms">Server CPU cost</option><option value="quotient_points">Quotient positions</option><option value="curves">Curve intervals</option><option value="exact_tests">Exact square tests</option></select></label>
+      <output id="challenger-selected" for="challenger-window">No evaluation selected</output>
+    </div>
+    <p class="challenger-legend"><span>━ Later submitted tasks</span><span>┄ Unseen geometry</span></p>
+    <div id="challenger-chart" class="challenger-chart"></div>
+    <label for="challenger-window">Inspect a frozen evaluation</label>
+    <input id="challenger-window" type="range" min="0" max="0" value="0" step="1" disabled>
+    <p id="challenger-detail" aria-live="polite"></p>
+    <p>Above zero means lower prediction error. Historical backfills are retrospective tests; submitted work is not a random sample. Better predictions do not establish better chances of finding 114.</p>
+    <figure class="challenger-pilot">
+      <figcaption>A small performance pilot</figcaption>
+      <div id="challenger-pilot-bars"></div>
+      <p>Quotient exposure per CPU, relative to the current scheduler. Four seeds; about 8.35 CPU-seconds across all four tested arms. Exploratory, not sufficient for promotion or a multiplier on discovery odds.</p>
+    </figure>
+    <p><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md">Design, promotion gates and the exploratory performance pilot ↗</a> · <a href="{{BASE}}data/learning/visuals.json">Chart data ↗</a></p>
+    <noscript><img src="{{BASE}}data/learning/evolution.svg" alt="Challenger prediction error across frozen evaluations" width="1200" height="730"></noscript>
+  </section>
   <h3>Did my Mac’s model predict actual performance?</h3>
   <p id="mac-calibration-note" class="table-note"></p>
   <div id="mac-calibration" class="history-chart"></div>

@@ -22,6 +22,7 @@ def render(data):
            '    Report --> Gate[Controlled policy benchmark still required]',
            '    Gate --> NoPromotion[No automatic discovery-policy promotion]','```','']
     if stale: lines += ['', '**Learning report is behind the ledger; inspect the latest Action before interpreting freshness.**']
+    lines += ['', '![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)', '']
     e=r.get('latest_evaluation')
     if e:
         lines += [f"Latest evaluation: tasks {e['from']:,}–{e['through']:,}. Lower mean absolute log1p prediction error is better.",'',
@@ -30,7 +31,7 @@ def render(data):
         for t in ('cpu_ms','quotient_points','curves','exact_tests'):
             lines.append(f"| {t} | {scores['context_baseline'][t]:.4f} | {scores['spatial'][t]:.4f} |")
         lines += ['',f"Unseen-geometry evaluation: {e['results']['future_unseen_geometry']['tasks']:,} tasks. Full errors and nonzero-count support are in the report."]
-    lines += ['', 'Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.', '',
+    lines += ['', '![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)', '', 'Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.', '',
               '[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/'+r['history']+'/) · [Design and promotion protocol](docs/LEARNING.md)']
     return '\n'.join(lines)
 

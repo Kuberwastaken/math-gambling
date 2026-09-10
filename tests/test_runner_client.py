@@ -222,7 +222,7 @@ raise SystemExit(runner.main(['--name','HTTP fixture','--github','test','--worke
                 return subprocess.CompletedProcess(command, 0, 'https://github.com/example/test/issues/1', '')
             with patch.object(runner.subprocess, 'run', side_effect=fake_run), contextlib.redirect_stdout(io.StringIO()):
                 runner.maybe_submit(db, 'example/test', -float('inf'))
-            self.assertEqual(posted, [str(priority)])
+            self.assertEqual([Path(path).resolve() for path in posted], [priority.resolve()])
             db.close()
 
 

@@ -15,6 +15,7 @@ import time
 import unicodedata
 from datetime import datetime, timezone
 from urllib.parse import urlencode, urlsplit
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 MAX_RECEIPT_BYTES = 8192
@@ -133,17 +134,24 @@ def preserve_hits(data, receipt, source):
     """A valid identity is retained even when its task/receipt is rejected."""
     if not isinstance(receipt, dict):
         return []
+    try:
+        # Bound the whole rescue operation, not a prefix of its candidate list.
+        # Every candidate inside a supported input envelope gets an exact check.
+        if len(canonical(receipt).encode("ascii")) > MAX_BODY_BYTES:
+            return []
+    except (ValueError, TypeError, RecursionError):
+        return []
     candidates = []
     containers = [receipt]
     if isinstance(receipt.get("results"), list):
-        containers.extend(receipt["results"][:MAX_TASKS])
+        containers.extend(receipt["results"])
     if isinstance(receipt.get("tasks"), list):
-        containers.extend(receipt["tasks"][:MAX_BANK_TASKS])
+        containers.extend(receipt["tasks"])
     for container in containers:
         if isinstance(container, dict) and isinstance(container.get("hits"), list):
-            candidates.extend(container["hits"][:MAX_HITS])
+            candidates.extend(container["hits"])
     retained = []
-    for hit in candidates[:MAX_HITS]:
+    for hit in candidates:
         xyz = exact_triple(hit.get("xyz") if isinstance(hit, dict) else hit)
         if xyz is None:
             continue
@@ -381,7 +389,19 @@ def collect_issues(repo, token, data):
     try:
         # At most eight pending requests; every request shares the same 60-second deadline.
         for number in list(pending)[:8]:
-            issue = request(prefix + "/" + str(number), 512 * 1024)
+            try:
+                issue = request(prefix + "/" + str(number), 512 * 1024)
+            except HTTPError as exc:
+                if exc.code not in (404, 410):
+                    raise
+                unavailable = {"schema": "math-gambling-unavailable-source-v1", "issue": number,
+                               "http_status": exc.code, "observed_at": now(),
+                               "reason": "Queued GitHub source is unavailable; no mathematical exclusion is claimed."}
+                exc.close()
+                atomic_json(ledger_path(data, "unavailable", f"issue:{number}"), unavailable)
+                pending.pop(number, None)
+                available.pop(number, None)
+                continue
             if parse_issue(issue, repo) is None:
                 pending.pop(number, None)
             else:

@@ -9,6 +9,8 @@ The distinction matters: completing a task can produce **zero curves and zero
 mathematical intervals**. Its task ID is completed, but that does not establish
 that a nonempty part of the `(D,r,q)` domain was searched.
 
+The website publishes the index; compressed records live on `cluster-data`. Resolve each record's `file` against `records_base_url` for remote retrieval, or against the local index directory for an offline audit.
+
 ## Run a bounded export
 
 From the repository root, with Python 3.11 or newer:

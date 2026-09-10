@@ -343,7 +343,9 @@ def make_index(rows, records, last_run):
         'merged_interval_count': sum(entry['merged_interval_count'] for entry in records),
         'q_positions_replayed': str(sum(int(entry['q_positions_replayed']) for entry in records)),
         'q_positions_task_local_union': str(sum(int(entry['q_positions_task_local_union']) for entry in records)),
-        'global_union_computed': False, 'records': records, 'last_run': last_run,
+        'global_union_computed': False,
+        'records_base_url': 'https://raw.githubusercontent.com/Kuberwastaken/math-gambling/cluster-data/data/math-coverage/',
+        'records': records, 'last_run': last_run,
     }
 
 

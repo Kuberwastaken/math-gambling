@@ -1,4 +1,18 @@
-# Release status — 10 September 2026
+# Release status, 11 September 2026
+
+[Runner v0.4.1](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.4.1) passed [Linux, Windows and macOS release gates](https://github.com/Kuberwastaken/math-gambling/actions/runs/34527341792). A separate download check verified SHA-256 `26c84c0045e16b743ea1f2a482a5d8c07844cca83d93ad7ba66773dd6195f92f` for the 6,975,229-byte archive and completed one offline task. It submitted nothing and earned no leaderboard credit. The v0.4.0 tag remains an unpublished failed gate; the Windows filesystem-test timeout was repaired without removing byte checks.
+
+The core integration passed 20 JavaScript tests and 141 Python tests, with two opt-in tests exercised separately in the extracted-runner HTTP suite. The 243-task golden corpus retains every old result, counter and digest; 6,000 integer-interval cases exercise exact shell pruning. [Measured kernel performance and proof](SHELL_PRUNING.md) distinguish the mixed-corpus 10–13% improvement from faster empty tasks.
+
+[The first isolated verifier](https://github.com/Kuberwastaken/math-gambling/actions/runs/34527714649) successfully ingested queued work, updated the geometry/cost policy, trained shadow models and published mathematical interval records. At pinned data commit `99fc8a8075fe1da25ad4a35aac43271c20e797f8`, the ledger contained 32,127 tasks, 23,838 with no admitted curves, policy epoch 501, 31 shadow models and 30 evaluations. The separate partial interval audit covered 32 tasks and 1,946 task-local merged intervals. No verified identity was present. These are a dated observation, not live totals or distinct global mathematical coverage.
+
+`main` holds reviewed source. `cluster-data` holds evolving observations and the live README. `gh-pages` holds the built website. Deployment checks out the exact published `gh-pages` commit before uploading its files; routine builds run every 20 minutes. [Branch trust and migration details](BRANCHES.md).
+
+The live browser check confirmed the new policy description, the versioned download link and no JavaScript page errors. The geometric prior remains uncalibrated for our selected norm families, and the spatial predictor remains in shadow. No score adjustments or native-campaign changes were made by this release.
+
+---
+
+# Original launch evidence, 10 September 2026
 
 Source and verified launch data have been pushed to [Kuberwastaken/math-gambling](https://github.com/Kuberwastaken/math-gambling). The website is live at [kuber.studio/math-gambling](https://kuber.studio/math-gambling/) with HTTPS enforced.
 

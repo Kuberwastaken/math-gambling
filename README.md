@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-10 18:23:04 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-10 18:23:39 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 2,432 |
-| Coefficient-generator inputs | 4,470,784 |
-| Bounded curve intervals | 342,223 |
-| Logical quotient positions | 554,726,252 |
-| Exact integer square tests | 1,064 |
+| Unique finite tasks | 2,688 |
+| Coefficient-generator inputs | 4,945,920 |
+| Bounded curve intervals | 374,359 |
+| Logical quotient positions | 616,989,287 |
+| Exact integer square tests | 1,173 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,7 +35,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
 | ---: | --- | --- | ---: | ---: |
-| 1 | Benjamaxxing | [@EveryReasonTo](https://github.com/EveryReasonTo) | 3,277,824 | 1,792 |
+| 1 | Benjamaxxing | [@EveryReasonTo](https://github.com/EveryReasonTo) | 3,752,960 | 2,048 |
 | 2 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 512 |
 | 3 | [Kuber](<https://kuber.studio>) | [@Kuberwastaken](https://github.com/Kuberwastaken) | 238,592 | 128 |
 
@@ -43,18 +43,18 @@ Rank is based on replayed coefficient inputs. Alias websites are optional and se
 
 ### The current allocation
 
-**Epoch 38**, frozen from **2,432 verified tasks**. The next policy update needs **64 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 42**, frozen from **2,688 verified tasks**. The next policy update needs **64 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 35: 2,240 tasks; c00 1.23%"]
-    H1["Epoch 36: 2,304 tasks; c00 1.23%"]
+    H0["Epoch 39: 2,496 tasks; c00 1.23%"]
+    H1["Epoch 40: 2,560 tasks; c00 1.23%"]
     H0 --> H1
-    H2["Epoch 37: 2,368 tasks; c00 1.23%"]
+    H2["Epoch 41: 2,624 tasks; c00 1.23%"]
     H1 --> H2
-    H3["Epoch 38: 2,432 tasks; c00 1.23%"]
+    H3["Epoch 42: 2,688 tasks; c00 1.23%"]
     H2 --> H3
-    Policy["Current policy: epoch 38"]
+    Policy["Current policy: epoch 42"]
     H3 --> Policy
     Policy --> Explore["40% uniform exploration across 81 contexts"]
     Policy --> Cost["60% weighted by measured replay efficiency"]
@@ -79,11 +79,11 @@ Weights describe allocation, not the probability that a lane contains a solution
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 34 | 2,176 | c31 | 1.9908% |
-| 35 | 2,240 | c00 | 1.2346% |
-| 36 | 2,304 | c00 | 1.2346% |
-| 37 | 2,368 | c00 | 1.2346% |
 | 38 | 2,432 | c00 | 1.2346% |
+| 39 | 2,496 | c00 | 1.2346% |
+| 40 | 2,560 | c00 | 1.2346% |
+| 41 | 2,624 | c00 | 1.2346% |
+| 42 | 2,688 | c00 | 1.2346% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 

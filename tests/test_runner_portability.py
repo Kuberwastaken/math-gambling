@@ -5,6 +5,7 @@ and spawn paths execute on macOS, Windows and Linux. Optional archive smoke
 uses MG_RUNNER_ARCHIVE to verify the actual build output after extraction.
 """
 import argparse
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -65,7 +66,7 @@ class RunnerPortabilityTests(unittest.TestCase):
             status = json.loads((out / 'status.json').read_text(encoding='utf-8'))
             self.assertEqual(status['completed_this_run'], 1)
             self.assertEqual(status['state'], 'stopped')
-            with sqlite3.connect(out / 'checkpoint.sqlite3') as db:
+            with closing(sqlite3.connect(out / 'checkpoint.sqlite3')) as db:
                 rows = db.execute('SELECT id,result FROM tasks').fetchall()
                 self.assertEqual(len(rows), 3)
                 self.assertTrue(all(result for _, result in rows))

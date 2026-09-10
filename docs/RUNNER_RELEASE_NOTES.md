@@ -1,4 +1,4 @@
-# Math Gambling runner v0.2.1
+# Math Gambling runner v0.2.2
 
 A portable Python 3.11+ client for the community search for x³ + y³ + z³ = 114.
 
@@ -17,3 +17,5 @@ The release workflow tests the actual extracted archive on macOS, Windows and Li
 Completed, submitted and verified are separate states. GitHub Actions independently replays banked work and removes duplicates before leaderboard credit. A snapshot cannot prevent overlap with concurrent clients or work that has not been published yet. A seed alone cannot reproduce a changed live scheduling policy; each run logs the actual policy snapshots and ordered task assignments.
 
 This search has no guaranteed result or discovery ETA. Versioned releases and reproducible receipts make the computational experiment inspectable; they do not improve the mathematical odds by themselves.
+
+Version 0.2.1 passed Windows runtime, extraction, coverage and banking checks, but the test process retained a SQLite connection while deleting its temporary directory. Version 0.2.2 closes that inspection connection explicitly. The release still requires the complete platform gate; no failed tag is moved.

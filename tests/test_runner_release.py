@@ -20,9 +20,9 @@ class RunnerReleaseTests(unittest.TestCase):
             root = Path(directory)
             for folder in ('data', 'docs', 'release-assets'):
                 (root/folder).mkdir()
-            (root/'data/runner-release.json').write_text('{"version":"0.2.1"}')
+            (root/'data/runner-release.json').write_text('{"version":"0.2.2"}')
             (root/'docs/RUNNER_RELEASE_NOTES.md').write_text('Release fixture')
-            names = ('math-gambling-runner-v0.2.1.zip', 'SHA256SUMS.txt', 'RUNNER_SETUP.md', 'runner-release.json')
+            names = ('math-gambling-runner-v0.2.2.zip', 'SHA256SUMS.txt', 'RUNNER_SETUP.md', 'runner-release.json')
             for name in names:
                 (root/'release-assets'/name).write_bytes(name.encode())
             state = {'release': None, 'assets': []}
@@ -38,8 +38,8 @@ class RunnerReleaseTests(unittest.TestCase):
                     return state['release'].copy()
                 if method == 'POST' and url.endswith('/releases'):
                     self.assertTrue(payload['draft'])
-                    state['release'] = {'id': 1, 'tag_name': 'v0.2.1', 'draft': True,
-                                        'html_url': 'https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.2.1'}
+                    state['release'] = {'id': 1, 'tag_name': 'v0.2.2', 'draft': True,
+                                        'html_url': 'https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.2.2'}
                     return state['release'].copy()
                 if method == 'GET' and '/assets?' in url:
                     return state['assets']
@@ -55,14 +55,14 @@ class RunnerReleaseTests(unittest.TestCase):
                     return state['release'].copy()
                 self.fail(f'Unexpected request: {method} {url}')
             with patch.dict(os.environ, {'GITHUB_SHA': '1'*40}):
-                url = publisher.publish(root, 'v0.2.1', 'test-token', request)
-                self.assertTrue(url.endswith('/v0.2.1'))
+                url = publisher.publish(root, 'v0.2.2', 'test-token', request)
+                self.assertTrue(url.endswith('/v0.2.2'))
                 calls.clear()
-                self.assertEqual(publisher.publish(root, 'v0.2.1', 'test-token', request), url)
+                self.assertEqual(publisher.publish(root, 'v0.2.2', 'test-token', request), url)
                 self.assertTrue(all(method == 'GET' for method, _ in calls))
                 state['assets'][0]['digest'] = 'sha256:'+'0'*64
                 with self.assertRaisesRegex(RuntimeError, 'refusing to overwrite'):
-                    publisher.publish(root, 'v0.2.1', 'test-token', request)
+                    publisher.publish(root, 'v0.2.2', 'test-token', request)
 
     def test_unexpected_destination_cannot_receive_token(self):
         with self.assertRaisesRegex(RuntimeError, 'destination'):

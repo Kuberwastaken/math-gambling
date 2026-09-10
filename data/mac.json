@@ -1,0 +1,468 @@
+{
+  "schema_version": 1,
+  "source": "mac-research-campaign",
+  "phase": "phase3",
+  "is_live": false,
+  "exported_utc": "2026-09-10T09:51:32Z",
+  "updated_utc": "2026-09-10T09:51:25Z",
+  "state": "running",
+  "totals": {
+    "generator_inputs": "55867804066368",
+    "curve_checks": "3861904926261",
+    "quotient_points": "349940123533471",
+    "exact_tests": "715541896",
+    "excluded_mod243": "332659130888751",
+    "excluded_parity": "6912407971606",
+    "unsupported_D": "0",
+    "noninvertible_C": "253568261874",
+    "outside_norm_shell": "45709266703848",
+    "signed_congruence_exclusions": "2656885009612"
+  },
+  "jobs": {
+    "complete": "1344492",
+    "running": "11"
+  },
+  "solutions": [],
+  "audit": {
+    "observed_utc": "2026-09-10T08:18:28Z",
+    "database_integrity": "ok",
+    "model_observations_reconcile": true,
+    "allocation_accounting_reconciles": true,
+    "reserved_tiles_disjoint_and_gapless": true,
+    "source_identity_matches": true,
+    "complete_tiles": "1290963",
+    "unfinished_tiles": "12",
+    "epoch_start_job": "89685"
+  },
+  "learning": {
+    "objective": "conditional root-exposure throughput",
+    "success_probability": null,
+    "model_enabled": true,
+    "holdout": {
+      "spearman": 0.9893179765130985,
+      "top_quarter_over_baseline": 1.6108759646648207,
+      "passed": true,
+      "rows": [
+        {
+          "context": "offset:1:0:0:0:64",
+          "predicted": 929620.170292051,
+          "observed": 1792298.98748561
+        },
+        {
+          "context": "offset:1:0:0:64:256",
+          "predicted": 133713.81079006972,
+          "observed": 214091.89587549795
+        },
+        {
+          "context": "offset:1:0:0:256:4096",
+          "predicted": 31807.298250376225,
+          "observed": 21577.344558345074
+        },
+        {
+          "context": "offset:1:0:1:0:64",
+          "predicted": 642303.7640985451,
+          "observed": 957132.1319485912
+        },
+        {
+          "context": "offset:1:0:1:64:256",
+          "predicted": 83613.91686391456,
+          "observed": 110270.34655772884
+        },
+        {
+          "context": "offset:1:0:1:256:4096",
+          "predicted": 24084.319796898075,
+          "observed": 10868.27078197207
+        },
+        {
+          "context": "offset:1:0:2:0:64",
+          "predicted": 376242.02897768014,
+          "observed": 488663.16501599824
+        },
+        {
+          "context": "offset:1:0:2:64:256",
+          "predicted": 52597.500695719136,
+          "observed": 57533.00884234198
+        },
+        {
+          "context": "offset:1:0:2:256:4096",
+          "predicted": 20664.182613103,
+          "observed": 5820.9385021333355
+        },
+        {
+          "context": "offset:1:1:0:0:64",
+          "predicted": 1144820.7546660379,
+          "observed": 2277305.4913211684
+        },
+        {
+          "context": "offset:1:1:0:64:256",
+          "predicted": 153646.4818094334,
+          "observed": 248185.02911625506
+        },
+        {
+          "context": "offset:1:1:0:256:4096",
+          "predicted": 34641.05705478662,
+          "observed": 22555.07107902713
+        },
+        {
+          "context": "offset:1:1:1:0:64",
+          "predicted": 716674.7248252676,
+          "observed": 1156023.0100344203
+        },
+        {
+          "context": "offset:1:1:1:64:256",
+          "predicted": 88884.57693768575,
+          "observed": 127786.64842406289
+        },
+        {
+          "context": "offset:1:1:1:256:4096",
+          "predicted": 25310.52655543251,
+          "observed": 11338.573758706343
+        },
+        {
+          "context": "offset:1:1:2:0:64",
+          "predicted": 426713.6206383009,
+          "observed": 586708.3056842558
+        },
+        {
+          "context": "offset:1:1:2:64:256",
+          "predicted": 55350.386343486396,
+          "observed": 65257.117817868144
+        },
+        {
+          "context": "offset:1:1:2:256:4096",
+          "predicted": 21172.35582456754,
+          "observed": 5850.477017996227
+        },
+        {
+          "context": "offset:1:2:0:0:64",
+          "predicted": 1115104.8197589142,
+          "observed": 2425502.601945225
+        },
+        {
+          "context": "offset:1:2:0:64:256",
+          "predicted": 148678.27729474235,
+          "observed": 259570.1874019803
+        },
+        {
+          "context": "offset:1:2:0:256:4096",
+          "predicted": 34097.90061035688,
+          "observed": 22166.357848624433
+        },
+        {
+          "context": "offset:1:2:1:0:64",
+          "predicted": 692678.1474395186,
+          "observed": 1194306.8815778582
+        },
+        {
+          "context": "offset:1:2:1:64:256",
+          "predicted": 85699.7584683918,
+          "observed": 132517.7529529014
+        },
+        {
+          "context": "offset:1:2:1:256:4096",
+          "predicted": 23880.747604455886,
+          "observed": 11404.200831831846
+        },
+        {
+          "context": "offset:1:2:2:0:64",
+          "predicted": 423307.12109127885,
+          "observed": 621073.5328279489
+        },
+        {
+          "context": "offset:1:2:2:64:256",
+          "predicted": 55010.53916656688,
+          "observed": 68897.62266650148
+        },
+        {
+          "context": "offset:1:2:2:256:4096",
+          "predicted": 19540.627047357044,
+          "observed": 5955.3671300354345
+        },
+        {
+          "context": "offset:5:0:0:0:64",
+          "predicted": 951435.6164200036,
+          "observed": 1796116.5921511895
+        },
+        {
+          "context": "offset:5:0:0:64:256",
+          "predicted": 127578.30691638216,
+          "observed": 212334.867766497
+        },
+        {
+          "context": "offset:5:0:0:256:4096",
+          "predicted": 30606.94183416065,
+          "observed": 21533.744248080853
+        },
+        {
+          "context": "offset:5:0:1:0:64",
+          "predicted": 632685.5864604288,
+          "observed": 972135.9186185382
+        },
+        {
+          "context": "offset:5:0:1:64:256",
+          "predicted": 79213.2412282709,
+          "observed": 112906.93762935392
+        },
+        {
+          "context": "offset:5:0:1:256:4096",
+          "predicted": 23237.311716575514,
+          "observed": 11236.254154225284
+        },
+        {
+          "context": "offset:5:0:2:0:64",
+          "predicted": 371529.24374479405,
+          "observed": 482537.09262991924
+        },
+        {
+          "context": "offset:5:0:2:64:256",
+          "predicted": 51680.625501715374,
+          "observed": 57443.48616287439
+        },
+        {
+          "context": "offset:5:0:2:256:4096",
+          "predicted": 19772.176471009425,
+          "observed": 5708.1150999662195
+        },
+        {
+          "context": "offset:5:1:0:0:64",
+          "predicted": 1107952.8939860333,
+          "observed": 2248232.34464985
+        },
+        {
+          "context": "offset:5:1:0:64:256",
+          "predicted": 144775.61865412878,
+          "observed": 246415.4048367383
+        },
+        {
+          "context": "offset:5:1:0:256:4096",
+          "predicted": 33638.50058829183,
+          "observed": 22547.797817215873
+        },
+        {
+          "context": "offset:5:1:1:0:64",
+          "predicted": 702204.0672124787,
+          "observed": 1159334.877578635
+        },
+        {
+          "context": "offset:5:1:1:64:256",
+          "predicted": 86030.89171888797,
+          "observed": 125244.96198090224
+        },
+        {
+          "context": "offset:5:1:1:256:4096",
+          "predicted": 24269.658621180344,
+          "observed": 11161.910864962862
+        },
+        {
+          "context": "offset:5:1:2:0:64",
+          "predicted": 395134.09750125674,
+          "observed": 593824.8485600572
+        },
+        {
+          "context": "offset:5:1:2:64:256",
+          "predicted": 53562.83394374532,
+          "observed": 64468.086551305634
+        },
+        {
+          "context": "offset:5:1:2:256:4096",
+          "predicted": 20317.381046900227,
+          "observed": 5876.411130865418
+        },
+        {
+          "context": "offset:5:2:0:0:64",
+          "predicted": 1125182.1869520708,
+          "observed": 2295373.4596664505
+        },
+        {
+          "context": "offset:5:2:0:64:256",
+          "predicted": 149245.72833988446,
+          "observed": 261171.05563254017
+        },
+        {
+          "context": "offset:5:2:0:256:4096",
+          "predicted": 29928.701316043003,
+          "observed": 22699.55950377858
+        },
+        {
+          "context": "offset:5:2:1:0:64",
+          "predicted": 654313.7143861629,
+          "observed": 1218390.436753214
+        },
+        {
+          "context": "offset:5:2:1:64:256",
+          "predicted": 41363.258337802916,
+          "observed": 126486.50596977156
+        },
+        {
+          "context": "offset:5:2:1:256:4096",
+          "predicted": 22995.318640349124,
+          "observed": 11673.625761265812
+        },
+        {
+          "context": "offset:5:2:2:0:64",
+          "predicted": 217939.15079674928,
+          "observed": 549572.3518017146
+        },
+        {
+          "context": "offset:5:2:2:64:256",
+          "predicted": 30716.35661131194,
+          "observed": 60315.57339056525
+        },
+        {
+          "context": "offset:5:2:2:256:4096",
+          "predicted": 18374.02604211118,
+          "observed": 5822.451736543418
+        },
+        {
+          "context": "offset:25:0:0:0:64",
+          "predicted": 978658.5628787191,
+          "observed": 1698612.6616409724
+        },
+        {
+          "context": "offset:25:0:0:64:256",
+          "predicted": 134370.47167770154,
+          "observed": 201831.60657738778
+        },
+        {
+          "context": "offset:25:0:0:256:4096",
+          "predicted": 31877.973985405857,
+          "observed": 21845.793541189323
+        },
+        {
+          "context": "offset:25:0:1:0:64",
+          "predicted": 649084.9662199003,
+          "observed": 909668.098771492
+        },
+        {
+          "context": "offset:25:0:1:64:256",
+          "predicted": 81655.41144853558,
+          "observed": 105297.80855027401
+        },
+        {
+          "context": "offset:25:0:1:256:4096",
+          "predicted": 24407.083286382916,
+          "observed": 10881.405386664577
+        },
+        {
+          "context": "offset:25:0:2:0:64",
+          "predicted": 386939.11628124677,
+          "observed": 454479.8639811922
+        },
+        {
+          "context": "offset:25:0:2:64:256",
+          "predicted": 52230.245660070315,
+          "observed": 54101.55577620189
+        },
+        {
+          "context": "offset:25:0:2:256:4096",
+          "predicted": 20913.688867679204,
+          "observed": 5705.762058638736
+        },
+        {
+          "context": "offset:25:1:0:0:64",
+          "predicted": 1104601.7319175533,
+          "observed": 2246775.25558245
+        },
+        {
+          "context": "offset:25:1:0:64:256",
+          "predicted": 153046.88920728854,
+          "observed": 246733.98895777113
+        },
+        {
+          "context": "offset:25:1:0:256:4096",
+          "predicted": 35082.08096170523,
+          "observed": 22205.69874577169
+        },
+        {
+          "context": "offset:25:1:1:0:64",
+          "predicted": 719577.3570507637,
+          "observed": 1149161.7962143354
+        },
+        {
+          "context": "offset:25:1:1:64:256",
+          "predicted": 89298.29184321075,
+          "observed": 126277.5677091997
+        },
+        {
+          "context": "offset:25:1:1:256:4096",
+          "predicted": 25593.9706553186,
+          "observed": 11246.466642681433
+        },
+        {
+          "context": "offset:25:1:2:0:64",
+          "predicted": 427620.0004614518,
+          "observed": 598043.2817212191
+        },
+        {
+          "context": "offset:25:1:2:64:256",
+          "predicted": 57062.34543964387,
+          "observed": 65928.9010289214
+        },
+        {
+          "context": "offset:25:1:2:256:4096",
+          "predicted": 21481.69451379493,
+          "observed": 5889.980858417672
+        },
+        {
+          "context": "offset:25:2:0:0:64",
+          "predicted": 1136351.4487970215,
+          "observed": 2384565.4305119645
+        },
+        {
+          "context": "offset:25:2:0:64:256",
+          "predicted": 152562.1675445461,
+          "observed": 254401.4726643195
+        },
+        {
+          "context": "offset:25:2:0:256:4096",
+          "predicted": 34691.78297875037,
+          "observed": 22450.690791093322
+        },
+        {
+          "context": "offset:25:2:1:0:64",
+          "predicted": 663594.4362926567,
+          "observed": 1211341.0422077295
+        },
+        {
+          "context": "offset:25:2:1:64:256",
+          "predicted": 88402.61621835403,
+          "observed": 133327.60518022702
+        },
+        {
+          "context": "offset:25:2:1:256:4096",
+          "predicted": 24199.85829320663,
+          "observed": 11344.757541954756
+        },
+        {
+          "context": "offset:25:2:2:0:64",
+          "predicted": 388771.241011786,
+          "observed": 624961.1543959116
+        },
+        {
+          "context": "offset:25:2:2:64:256",
+          "predicted": 54003.57315105974,
+          "observed": 68009.94590835737
+        },
+        {
+          "context": "offset:25:2:2:256:4096",
+          "predicted": 19824.45508155151,
+          "observed": 6016.044434902063
+        }
+      ],
+      "scope": "Frozen release holdout: first two observations per context train; third held out."
+    }
+  },
+  "throughput": {
+    "curve_checks_per_second": 31601741.068111457,
+    "window_seconds": 323.0
+  },
+  "limitations": [
+    "Timestamped Mac observation; the browser does not run or control this campaign.",
+    "Selective finite coefficient domains, not a complete coordinate-height region.",
+    "Curve-interval checks can revisit a root in disjoint quotient bands.",
+    "Noninvertible coefficients and unsupported divisors are unresolved inputs.",
+    "Learning measures conditional root-exposure throughput, not discovery probability.",
+    "The audit covers its own earlier timestamp, not every subsequently completed job."
+  ],
+  "snapshot_id": "c53cef16fa24cb9ad560ffeff0ac61f9b9153240027e7d68d0ce75fc10c0881e"
+}

@@ -1,0 +1,284 @@
+<section class="opening">
+  <div class="intro">
+    <p class="edition">An open experiment in computational number theory</p>
+    <h1>A very long shot.<br />A real computation.</h1>
+    <p class="lede">
+      Three integers. Three cubes. One stubborn number. Lend your computer a
+      little time, and help us search for a solution to
+      <span class="nowrap">114.</span>
+    </p>
+    <p class="odds-note">
+      No money. No known odds. No guarantee we ever find it.
+    </p>
+    <a class="text-link" href="{{BASE}}approach/"
+      >Read the method before you bet your battery ↗</a
+    >
+  </div>
+  <div
+    class="equation-table"
+    aria-label="The unsolved equation x cubed plus y cubed plus z cubed equals 114"
+  >
+    <div class="table-rule">
+      <span>The problem on the table</span><span>Integers only</span>
+    </div>
+    <div class="equation-cards">
+      <span class="number-card">x<sup>3</sup></span
+      ><span class="operator">+</span
+      ><span class="number-card">y<sup>3</sup></span
+      ><span class="operator">+</span
+      ><span class="number-card">z<sup>3</sup></span>
+    </div>
+    <div class="target"><span>=</span><strong>114</strong></div>
+    <div class="table-rule bottom">
+      <span>Solution found</span><span class="unfilled">Not yet.</span>
+    </div>
+  </div>
+</section>
+<section class="play-section" id="play">
+  <div class="join">
+    <h2>Take a seat.</h2>
+    <p>
+      Your device checks real candidates. Finished work is saved on your device.
+      Bank a batch on GitHub when you’re ready. You can stop at any time.
+    </p>
+    <form id="join-form">
+      <div class="form-row">
+        <div>
+          <label for="player-name">Your name or alias</label
+          ><input
+            id="player-name"
+            name="name"
+            autocomplete="nickname"
+            maxlength="60"
+            placeholder="How should we credit you?"
+            required
+          />
+        </div>
+        <div>
+          <label for="player-github"
+            >GitHub username <span>(optional)</span></label
+          ><input
+            id="player-github"
+            name="github"
+            autocomplete="off"
+            maxlength="39"
+            pattern="[A-Za-z0-9]([A-Za-z0-9-]{0,37}[A-Za-z0-9])?"
+            placeholder="username"
+          />
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label for="run-minutes">Time budget</label
+          ><select id="run-minutes">
+            <option value="2">2 minutes · a quick hand</option>
+            <option value="5" selected>5 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="60">1 hour</option>
+          </select>
+        </div>
+        <div>
+          <label for="run-duty">Processor use</label
+          ><select id="run-duty">
+            <option value="0.25" selected>Gentle · 25% of one worker</option>
+            <option value="0.5">Balanced · 50% of one worker</option>
+            <option value="0.9">Full · 90% of one worker</option>
+          </select>
+        </div>
+      </div>
+      <label class="checkbox"
+        ><input type="checkbox" id="share-consent" required /><span
+          >I’m okay with sharing my alias, optional GitHub name, and computation
+          receipts publicly.
+          <a href="{{BASE}}approach/#privacy">What gets sent?</a></span
+        ></label
+      >
+      <button
+        class="button primary start-button"
+        id="start-button"
+        type="submit"
+      >
+        Start computing <span aria-hidden="true">↗</span>
+      </button>
+      <p id="start-note" class="form-note">
+        One browser worker. No computation until you start. Pauses when this tab
+        is hidden.
+      </p>
+    </form>
+  </div>
+  <div class="computation" aria-labelledby="session-heading">
+    <div class="section-heading">
+      <h2 id="session-heading">Your computation</h2>
+      <span id="session-state" class="plain-status">Not started</span>
+    </div>
+    <div class="session-equation" id="session-expression">
+      x³ + y³ + z³ = 114
+    </div>
+    <p id="task-detail" class="mono muted">Waiting for your first task.</p>
+    <dl class="session-counts">
+      <div>
+        <dt>Coefficient inputs</dt>
+        <dd id="local-inputs">0</dd>
+      </div>
+      <div>
+        <dt>Root intervals checked</dt>
+        <dd id="local-curves">0</dd>
+      </div>
+      <div>
+        <dt>Exact square tests</dt>
+        <dd id="local-exact">0</dd>
+      </div>
+      <div>
+        <dt>Completed tasks</dt>
+        <dd id="local-tasks">0</dd>
+      </div>
+    </dl>
+    <div class="session-chart" id="session-chart">
+      <p>A chart will appear after real work is measured.</p>
+    </div>
+    <div class="sync-line">
+      <span id="sync-state" role="status">Loading local receipts…</span
+      ><span id="elapsed">0:00</span>
+    </div>
+    <div class="session-actions">
+      <button class="button" id="stop-button" disabled>Stop</button
+      ><button class="button primary" id="bank-button" disabled>
+        Bank my work ↗</button
+      ><button class="button quiet" id="download-receipts" disabled>
+        Save receipts ↓
+      </button>
+    </div>
+    <p class="form-note" id="session-message" role="status">
+      Banked receipts are independently checked before they count as shared
+      coverage.
+    </p>
+    <div id="discovery" class="discovery" hidden></div>
+    <div class="bank-in" id="bank-panel" hidden>
+      <h3>Bank a batch.</h3>
+      <p class="form-note" id="bank-count"></p>
+      <ol>
+        <li>Copy this receipt.</li>
+        <li>
+          Open GitHub, paste it into the receipt field, and submit the issue.
+        </li>
+        <li>
+          Actions replays the work; verified unique inputs enter the
+          leaderboard.
+        </li>
+      </ol>
+      <div class="bank-actions">
+        <button class="button" id="copy-bank">1. Copy receipt</button
+        ><a
+          class="button primary"
+          id="bank-open"
+          target="_blank"
+          rel="noopener"
+          href="https://github.com/Kuberwastaken/math-gambling/issues/new"
+          >2. Open GitHub ↗</a
+        ><button class="button quiet" id="download-bank">Save bank ↓</button
+        ><button class="button quiet" id="posted-bank">
+          I posted it · next batch
+        </button>
+      </div>
+      <p class="form-note" id="copy-status" role="status">
+        Copying is not submitting. Your results stay saved here.
+      </p>
+      <label for="bank-body">Receipt JSON</label
+      ><textarea id="bank-body" readonly spellcheck="false"></textarea>
+    </div>
+    <div id="bank-history" aria-label="Your bank history"></div>
+  </div>
+</section>
+<section class="campaign-section">
+  <div class="section-heading">
+    <div>
+      <h2>A computer is already at the table.</h2>
+      <p>
+        The original Mac campaign, as last reported. These are snapshots, not an
+        animated counter.
+      </p>
+    </div>
+    <a class="text-link" href="{{BASE}}cluster/">See the whole cluster ↗</a>
+  </div>
+  <div class="campaign-reading">
+    <div>
+      <strong id="mac-curves">—</strong
+      ><span>bounded curve-interval checks, cumulative</span>
+    </div>
+    <div>
+      <strong id="mac-exact">—</strong
+      ><span>exact square tests after filtering</span>
+    </div>
+    <div>
+      <strong id="mac-state">Loading</strong
+      ><span id="mac-updated">Fetching the timestamped report</span>
+    </div>
+  </div>
+  <div id="mac-history-chart" class="history-chart">
+    <p>Loading recorded computation history…</p>
+  </div>
+  <p class="caption">
+    Counters describe work, not independent chances of discovery. The native Mac
+    campaign and browser contributions are reported separately.
+  </p>
+</section>
+<section class="story-section">
+  <div>
+    <h2>My budget is a laptop.<br />The problem doesn’t care.</h2>
+    <p>
+      “I’m Kuber, a 19-year-old college student. I started looking for 114 on my
+      Mac. Then the compute estimates got absurd. Instead of going broke trying
+      to buy a breakthrough, I’m opening the experiment.”
+    </p>
+    <p>
+      Some of the work is clever arithmetic. Some is careful engineering. The
+      part where the right integers actually show up? We don’t know how long
+      that takes. That’s the gamble.
+    </p>
+    <a class="text-link" href="{{BASE}}research/"
+      >The wins, the failures, and the receipts ↗</a
+    >
+  </div>
+  <div class="paper-teaser">
+    <span class="paper-page-number">Working draft · 01</span>
+    <h3>A distributed search for<br />x³ + y³ + z³ = 114</h3>
+    <p>math-gambling collaboration</p>
+    <div class="blank-line">
+      <span>Credit preview</span
+      ><span id="teaser-name">________________________</span>
+    </div>
+    <div class="blank-line">
+      <span>Solution</span><span>________________________</span>
+    </div>
+    <p class="paper-disclaimer">
+      The implementation is written. The result is blank. Your name here is a
+      local preview, not a discovery claim.
+    </p>
+    <a href="{{BASE}}paper/">Open the unfinished paper →</a>
+  </div>
+</section>
+<section class="local-section">
+  <div>
+    <h2>Bring a bigger computer.</h2>
+    <p>
+      Download the local runner, choose your time and worker budget, and bank
+      finished batches on GitHub. The portable runner uses exact Python
+      integers. Our faster native research code is also archived in the
+      repository.
+    </p>
+    <a
+      class="button primary"
+      href="{{BASE}}downloads/math-gambling-runner.zip"
+      download
+      >Download local runner ↓</a
+    >
+    <a class="text-link" href="{{BASE}}approach/#local"
+      >Setup instructions ↗</a
+    >
+  </div>
+  <pre aria-label="Local runner commands"><code>unzip math-gambling-runner.zip
+cd math-gambling
+python3 tools/runner.py \
+  --name "Your name" --github username \
+  --minutes 60 --workers 4</code></pre>
+</section>

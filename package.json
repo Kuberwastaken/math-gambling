@@ -1,0 +1,14 @@
+{
+  "name": "math-gambling",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "python3 tools/build_site.py",
+    "test": "node --test tests/*.mjs && python3 -m unittest discover -s tests -p 'test_*.py'",
+    "serve": "python3 -m http.server 4173 --directory dist"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

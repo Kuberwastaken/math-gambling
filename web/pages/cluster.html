@@ -1,0 +1,153 @@
+<section class="page-intro">
+  <p class="edition">Observed work, with its provenance attached</p>
+  <h1>One problem.<br />Many small bets.</h1>
+  <p class="lede">
+    Your browser is live. The shared ledger is published periodically after
+    verification. These two clocks are different, and we show both.
+  </p>
+</section>
+<section class="cluster-summary">
+  <div class="section-heading">
+    <h2>The volunteer ledger</h2>
+    <span id="cluster-updated">Loading…</span>
+  </div>
+  <dl class="ledger-totals">
+    <div>
+      <dt>Submitted tasks</dt>
+      <dd id="cluster-reported">—</dd>
+    </div>
+    <div>
+      <dt>Verified unique tasks</dt>
+      <dd id="cluster-verified">—</dd>
+    </div>
+    <div>
+      <dt>Duplicate tasks</dt>
+      <dd id="cluster-duplicates">—</dd>
+    </div>
+    <div>
+      <dt>Verified solutions</dt>
+      <dd id="cluster-hits">—</dd>
+    </div>
+  </dl>
+  <p id="cluster-note">Fetching the published ledger.</p>
+  <div class="cluster-pipeline">
+    <div><b>1. Compute</b><span>Exact work on a volunteer device</span></div>
+    <span aria-hidden="true">→</span>
+    <div><b>2. Bank</b><span>Submit a signed GitHub issue</span></div>
+    <span aria-hidden="true">→</span>
+    <div><b>3. Verify</b><span>Replay, check, deduplicate</span></div>
+    <span aria-hidden="true">→</span>
+    <div><b>4. Calibrate</b><span>Publish the next cost policy</span></div>
+  </div>
+  <p class="caption">
+    Actions runs on an hourly schedule, which GitHub may delay. Verification has
+    a bounded budget; a busy queue can take longer. Full negative replay
+    duplicates compute, so more volunteers do not automatically produce linear
+    speedup. Unverified receipts do not certify coverage.
+  </p>
+</section>
+<section class="allocation-section">
+  <div class="section-heading">
+    <div>
+      <h2>How the next tasks are chosen</h2>
+      <p id="strategy-reason">Loading the published strategy…</p>
+    </div>
+    <span class="mono" id="strategy-epoch">Epoch —</span>
+  </div>
+  <div class="allocation-layout">
+    <div>
+      <div id="allocation-chart" class="allocation-chart"></div>
+      <p class="caption">
+        81 fixed contexts: ideal class × coefficient shape × norm shell ×
+        quotient band. Cell brightness encodes allocation weight, not
+        probability of discovery. Select a cell for the actual measurement.
+      </p>
+      <p id="context-detail" role="status" class="context-detail">
+        No selection.
+      </p>
+    </div>
+    <div class="model-explainer">
+      <h3>Keep exploration in the loop.</h3>
+      <div
+        class="exploration-bar"
+        aria-label="At least 40 percent exploration, at most 60 percent cost-directed allocation"
+      >
+        <span>≥40% exploration</span><span>≤60% cost</span>
+      </div>
+      <p>
+        Every <strong>64 verified unique tasks</strong> triggers an epoch.
+        Replayed work supplies cost observations. Sparse observations keep the
+        policy conservative.
+      </p>
+      <p>
+        The old Mac model passed a held-out throughput test. Our separate
+        discovery-learning experiment did not beat its acceptance gate. Those
+        are different claims.
+      </p>
+      <a href="{{BASE}}research/discovery_learning/"
+        >Read the failed experiment →</a
+      >
+    </div>
+  </div>
+  <div id="calibration-chart" class="history-chart">
+    <p>No community calibration epochs recorded yet.</p>
+  </div>
+</section>
+<section>
+  <div class="section-heading">
+    <h2>People at the table</h2>
+    <a href="{{BASE}}#play">Join them ↗</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Contributor</th>
+          <th>GitHub submitter</th>
+          <th>Verified computations</th>
+        </tr>
+      </thead>
+      <tbody id="contributors">
+        <tr>
+          <td colspan="3">Loading contributions…</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">
+    Leaderboard credit goes to the GitHub issue author, not the handle typed
+    into the form. A replay proves the task result, not who used a processor or
+    for how long. Copying or submitting a task twice earns no extra unique
+    credit. Paper authorship is not promised.
+  </p>
+  <div id="cluster-discoveries"></div>
+</section>
+<section class="campaign-section">
+  <div class="section-heading">
+    <div>
+      <h2>The original Mac campaign</h2>
+      <p>
+        A separate native C/PARI search. Public snapshots preserve the
+        observation time.
+      </p>
+    </div>
+  </div>
+  <div class="campaign-reading">
+    <div>
+      <strong id="mac-curves">—</strong
+      ><span>bounded curve-interval checks, cumulative</span>
+    </div>
+    <div><strong id="mac-exact">—</strong><span>exact square tests</span></div>
+    <div>
+      <strong id="mac-state">Loading</strong
+      ><span id="mac-updated">Fetching report</span>
+    </div>
+  </div>
+  <div id="mac-history-chart" class="history-chart"></div>
+  <div id="mac-audit" class="audit-reading"></div><h3 class="calibration-title">Did the Mac’s cost model predict the measurements?</h3><p id="mac-calibration-note" class="caption"></p><div id="mac-calibration" class="history-chart"></div><p class="caption">Frozen release holdout: the first two observations per context trained the model; the third was held out. Both axes are logarithmic. The diagonal means predicted equals observed. These are throughput scores, not discovery probabilities.</p>
+  <p class="caption">
+    Volunteer and Mac work may overlap. Their counters are never summed as a
+    globally unique search volume. A recent status snapshot is not a direct
+    connection to the Mac.
+  </p>
+</section>

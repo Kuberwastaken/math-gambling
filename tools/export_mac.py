@@ -193,6 +193,16 @@ def export(source, output, now=None):
                 audits.append(item)
     audit = max(audits, key=lambda x: x['observed_utc']) if audits else None
     gate = status.get('learning_gate', {})
+    calibration_rows = []
+    for row in (gate.get('rows', []) if isinstance(gate.get('rows'), list) else [])[:81]:
+        if not isinstance(row, dict):
+            continue
+        key = row.get('key')
+        if not isinstance(key, str) or not re.fullmatch(r'offset:(?:1|5|25):[0-2]:[0-2]:(?:0:64|64:256|256:4096)', key):
+            continue
+        predicted, observed = number(row.get('predicted_utility')), number(row.get('observed_utility'))
+        if predicted is not None and observed is not None and predicted > 0 and observed > 0:
+            calibration_rows.append({'context': key, 'predicted': predicted, 'observed': observed})
     enabled = gate.get('enable_model') if type(gate.get('enable_model')) is bool else None
     exported = utc(now or datetime.now(timezone.utc).isoformat())
     rate = {'curve_checks_per_second': None, 'window_seconds': None}
@@ -211,7 +221,8 @@ def export(source, output, now=None):
                              'success_probability': None, 'model_enabled': enabled,
                              'holdout': {'spearman': number(gate.get('spearman')),
                                          'top_quarter_over_baseline': number(gate.get('top_quarter_over_baseline')),
-                                         'passed': enabled}},
+                                         'passed': enabled, 'rows': calibration_rows,
+                                         'scope': 'Frozen release holdout: first two observations per context train; third held out.'}},
                 'throughput': rate, 'limitations': LIMITATIONS}
     # Matching IDs expose the brief interval between the two atomic replacements.
     snapshot_id = hashlib.sha256(json.dumps(snapshot, sort_keys=True).encode()).hexdigest()

@@ -1,0 +1,230 @@
+<section class="page-intro">
+  <p class="edition">The method, without the sales pitch</p>
+  <h1>Stack the arithmetic.<br />Keep the uncertainty.</h1>
+  <p class="lede">
+    This is a structured search through a huge mathematical space. We can prove
+    that some candidates fail. We can measure which computations are cheaper. We
+    cannot tell you where the solution is.
+  </p>
+</section>
+<article class="article wide">
+  <section class="method-row">
+    <span class="step-number">01</span>
+    <div>
+      <h2>Turn three integers into a constrained search.</h2>
+      <p>Set S = x + y and V = x − y. The equation becomes:</p>
+      <div class="math-display">3SV² = 4(114 − z³) − S³</div>
+      <p>
+        Choose D = |S|. A necessary condition is z³ ≡ 114 (mod D), so z lies in
+        arithmetic progressions z = r + Dq. We search those progressions, then
+        ask whether the expression for V² is a nonnegative integer square.
+        Parity gives integer x and y. Finally, we check the original cube
+        identity exactly.
+      </p>
+      <p>
+        This transformation is the reason we don’t simply try every possible
+        triple. It does not remove the difficulty of finding a useful
+        progression.
+      </p>
+    </div>
+  </section>
+  <section class="method-row">
+    <span class="step-number">02</span>
+    <div>
+      <h2>Build roots with a cubic number field.</h2>
+      <p>Let α³ = 114. For integer coefficients a, b, c, use the norm</p>
+      <div class="math-display">N = a³ + 114b³ + 12996c³ − 342abc.</div>
+      <p>
+        Our fixed families use ℓ ∈ {1, 5, 25} and D = N/ℓ. Put B = 114c² − ab
+        and C = b² − ac. When C is invertible modulo D, r = B/C mod D provides a
+        modular cube root, which we check explicitly. The coefficient regions
+        are defined using exact integer formulas.
+      </p>
+      <p>
+        The public worker samples small blocks from the same 81-context family
+        as the Mac’s optimized search. Large D begins just beyond 10¹⁹/54; this
+        is a selective frontier search, not a complete survey of every root
+        there.
+      </p>
+      <a href="{{BASE}}research/domain_proof/">Read the domain argument →</a>
+    </div>
+  </section>
+  <section class="method-row">
+    <span class="step-number">03</span>
+    <div>
+      <h2>Let proofs reject. Let models schedule.</h2>
+      <p>
+        Divisibility, congruences, parity and quadratic-residue tests remove
+        impossible candidates before arbitrary-precision square tests. A model
+        never decides that an untested candidate cannot work.
+      </p>
+      <div class="filter-explorer">
+        <label for="filter-stage">Explore the checking sequence</label
+        ><input id="filter-stage" type="range" min="0" max="4" value="0" />
+        <div class="filter-steps" aria-hidden="true">
+          <span>Norm</span><span>Root</span><span>Residues</span
+          ><span>Square</span><span>Identity</span>
+        </div>
+        <p id="filter-explanation">
+          First, check the exact norm and whether it belongs to the task’s
+          allowed shell.
+        </p>
+      </div>
+      <p>
+        Our existing native release measured about 1.58× the earlier version on
+        a paired workload benchmark. Another proposed sieve cut exact tests by a
+        third but gave no overall speedup, so we rejected it. Optimization is an
+        experiment, not an adjective.
+      </p>
+    </div>
+  </section>
+  <section class="method-row">
+    <span class="step-number">04</span>
+    <div>
+      <h2>Share work. Learn the cost. Repeat.</h2>
+      <p>
+        Clients choose tasks from a versioned strategy. Completed results stay
+        in a durable local outbox. Bank up to 256 tasks by pasting a compact
+        receipt into a GitHub issue. The issue author supplies authenticated
+        submission attribution. Posting an issue does not certify its
+        mathematics.
+      </p>
+      <p>
+        GitHub Actions periodically replays a bounded queue using an independent
+        Python implementation. Exact positive identities are preserved. Matching
+        negative results count as verified coverage, with duplicate task IDs
+        counted once. Every 64 newly verified unique tasks is a calibration
+        epoch.
+      </p>
+      <p>
+        At least 40% of allocation remains exploration. Cost estimates use
+        verifier measurements, rather than trusting client speed claims. This
+        measures useful arithmetic per unit compute under a stated weighting
+        model. It is <strong>not a learned probability of finding 114</strong>.
+        A separate held-out discovery-learning experiment failed its acceptance
+        test.
+      </p>
+      <p>
+        There is a cost to strong verification: replaying every negative task
+        repeats the work. This first version prioritizes verifiable results and
+        may bottleneck at the verifier. It has not demonstrated linear speedup
+        from more volunteers. Future cheaper audit schemes would need weaker,
+        explicit coverage claims.
+      </p>
+      <a href="{{BASE}}cluster/"
+        >Inspect the current allocation and evidence →</a
+      >
+    </div>
+  </section>
+  <section id="limits">
+    <h2>What this cannot promise</h2>
+    <ul class="honest-list">
+      <li>
+        A solution exists for 114: not proved by this project or the literature
+        we reviewed.
+      </li>
+      <li>
+        A finite budget is enough: no proven containing bound, no reliable
+        discovery ETA.
+      </li>
+      <li>
+        The globally best algorithm: our benchmarks compare specific
+        implementations and workloads.
+      </li>
+      <li>
+        All values are covered: finite selected coefficient blocks and quotient
+        bands leave other regions untouched.
+      </li>
+      <li>
+        No repeated effort: client-side random allocation and retries can
+        overlap. Verified task receipts are deduplicated; Mac and volunteer
+        coverage are not added into a single “unique” total.
+      </li>
+      <li>
+        Perfect software: exact arithmetic, independent verification and
+        extensive tests provide evidence, not a formal proof of the complete
+        stack.
+      </li>
+    </ul>
+    <p>
+      Booker–Sutherland’s density heuristics help explain why the problem is
+      hard. They do not give calibrated odds for our selected norm families. We
+      therefore display no win percentage, countdown to discovery, or misleading
+      “percent complete.”
+    </p>
+  </section>
+  <section id="local">
+    <h2>Run it locally</h2>
+    <p>
+      Install Python 3.11 or later. Download and unzip the
+      <a href="{{BASE}}downloads/math-gambling-runner.zip">portable runner</a>,
+      then run:
+    </p>
+    <pre><code>cd math-gambling
+python3 tools/runner.py --name "Your name" \
+  --github username --minutes 60 --workers 4</code></pre>
+    <p>
+      Your processor and time limits are explicit. Use <code>--help</code> for
+      offline mode, receipt output and optional automatic submission with the
+      GitHub CLI. Stop with Ctrl+C; completed work is saved. Names are
+      self-reported; the leaderboard credits the authenticated GitHub account
+      that submits the issue.
+    </p>
+    <p>
+      The
+      <a
+        href="https://github.com/Kuberwastaken/math-gambling/tree/main/research/archive/phase3"
+        >native C/PARI research implementation</a
+      >
+      is separate from this portable client. It offers substantially different
+      performance and has its own ledger and build instructions. We don’t
+      pretend the Python download is a native-speed port.
+    </p>
+  </section>
+  <section id="privacy">
+    <h2>Your device & data</h2>
+    <p>
+      Nothing computes until you press Start. The browser uses one Web Worker,
+      defaults to a gentle duty cycle, stops at your chosen time limit, and
+      pauses when hidden. You can stop immediately; only finished tasks are
+      credited. Processor work uses electricity and can warm your device.
+    </p>
+    <p>
+      When you choose to bank your work, submissions contain your chosen alias,
+      optional GitHub handle, task parameters, exact counters, digests and any
+      candidate identities. Attribution and accepted mathematical results can
+      appear publicly in this repository and site. Your browser stores your
+      profile and pending receipts locally. No email, wallet, advertising
+      tracker or browser GitHub token is needed.
+    </p>
+    <p>
+      GitHub may process ordinary network metadata. The leaderboard uses the
+      actual issue author, not the optional handle entered in this form. A
+      posted issue means “awaiting verification.” Offline work stays “saved
+      locally,” never “verified.” Use an alias if you don’t want a real name
+      published.
+    </p>
+    <p>
+      <button class="button" id="clear-profile">Forget my saved profile</button>
+      <span id="clear-profile-status" role="status"></span>
+    </p>
+  </section>
+  <section>
+    <h2>Standing on other people’s mathematics</h2>
+    <p>
+      Start with
+      <a href="https://arxiv.org/abs/2007.01209"
+        >Booker & Sutherland, On a question of Mordell</a
+      >,
+      <a href="https://arxiv.org/abs/2211.12149"
+        >Grantham & Walsh, Representing integers as a sum of three cubes</a
+      >, and
+      <a href="https://arxiv.org/abs/1604.07746"
+        >Huisman’s computational results</a
+      >. The <a href="{{BASE}}research/">notebook</a> covers lattice methods,
+      geometry, elliptic curves, heuristic search, failed optimizations and our
+      validation evidence. This is an independent project, not an endorsement by
+      those authors.
+    </p>
+  </section>
+</article>

@@ -43,6 +43,18 @@ class ExportTests(unittest.TestCase):
         self.assertFalse(result['is_live'])
         self.assertEqual(result['snapshot_id'], history['snapshot_id'])
 
+    def test_calibration_rows_are_bounded_and_allowlisted(self):
+        valid = {'key':'offset:1:0:0:0:64','predicted_utility':12.5,'observed_utility':13.1,'token':'SECRET'}
+        self.status['learning_gate']['rows'] = [valid, {'key':'/Users/private/person','predicted_utility':2,'observed_utility':3}, {'key':'offset:1:0:0:0:64','predicted_utility':float('nan'),'observed_utility':3}]
+        self.write_status()
+        result, _ = self.run_export()
+        rows = result['learning']['holdout']['rows']
+        self.assertEqual(rows, [{'context':'offset:1:0:0:0:64','predicted':12.5,'observed':13.1}])
+        self.assertNotIn('SECRET', json.dumps(rows))
+        self.status['learning_gate']['rows'] = [valid] * 100
+        self.write_status()
+        self.assertEqual(len(self.run_export()[0]['learning']['holdout']['rows']), 81)
+
     def test_source_tree_unchanged_and_database_untouched(self):
         forbidden = self.campaign / 'campaign.sqlite3'
         forbidden.write_bytes(b'not a database; must never be opened by exporter')

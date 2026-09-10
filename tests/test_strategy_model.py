@@ -28,7 +28,9 @@ class StrategyModelTests(unittest.TestCase):
             self.write(p,records);second=m.publish(p)
             self.assertEqual(second['completed_evaluations'],1);self.assertEqual(before,model.read_bytes())
             snapshot={str(f):f.read_bytes() for f in (p/'learning').rglob('*.json')}
-            m.publish(p);self.assertEqual(snapshot,{str(f):f.read_bytes() for f in (p/'learning').rglob('*.json')})
+            with patch.object(m,'evaluate',side_effect=AssertionError('frozen evaluations must not be recomputed')):
+                m.publish(p)
+            self.assertEqual(snapshot,{str(f):f.read_bytes() for f in (p/'learning').rglob('*.json')})
             self.assertEqual((p/'strategy.json').read_text(),'UNCHANGED')
     def test_changed_frozen_timing_rejected(self):
         with tempfile.TemporaryDirectory() as tmp,patch.object(m,'BOUNDARY',4):

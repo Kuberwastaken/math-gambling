@@ -89,7 +89,7 @@ def evaluate(model, rows):
 
 def publish(data):
     data=Path(data); rows=observations(data); through=len(rows)//BOUNDARY*BOUNDARY
-    source_hash=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    source_hash=hashlib.sha256(Path(__file__).read_bytes()+(ROOT/'tools/search_core.py').read_bytes()).hexdigest()
     history=data/'learning'/SCHEMA/source_hash[:16]; history.mkdir(parents=True,exist_ok=True)
     models=[]
     # Each model is fitted once. Future evaluation uses the next complete window.
@@ -110,11 +110,19 @@ def publish(data):
     evaluations=[]
     for record in models[:-1]:
         n=record['through']; path=history/f'eval-{n:09d}.json'
-        evaluation={'model_hash':record['model_hash'],'from':n+1,'through':n+BOUNDARY,
-                    'evaluation_ledger_hash':digest([r['hash'] for r in rows[n:n+BOUNDARY]]),
-                    'results':evaluate(record['model'],rows[n:n+BOUNDARY])}
-        if path.exists() and json.loads(path.read_text())!=evaluation: raise ValueError('frozen evaluation changed')
-        if not path.exists():atomic_json(path,evaluation)
+        input_hash=digest([r['hash'] for r in rows[n:n+BOUNDARY]])
+        if path.exists():
+            evaluation=json.loads(path.read_text())
+            if (evaluation.get('model_hash')!=record['model_hash']
+                    or evaluation.get('evaluation_ledger_hash')!=input_hash
+                    or evaluation.get('evaluation_hash')!=digest({k:v for k,v in evaluation.items() if k!='evaluation_hash'})):
+                raise ValueError('frozen evaluation changed')
+        else:
+            evaluation={'model_hash':record['model_hash'],'from':n+1,'through':n+BOUNDARY,
+                        'evaluation_ledger_hash':input_hash,
+                        'results':evaluate(record['model'],rows[n:n+BOUNDARY])}
+            evaluation['evaluation_hash']=digest(evaluation)
+            atomic_json(path,evaluation)
         evaluations.append(evaluation)
     report={'schema':SCHEMA,'mode':'shadow','observed_tasks':len(rows),'through':through,
             'source_hash':source_hash,'history':str(history.relative_to(data)),

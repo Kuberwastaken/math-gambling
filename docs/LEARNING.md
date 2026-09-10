@@ -43,7 +43,7 @@ python3 tools/learning_readme.py
 python3 -m unittest discover -s tests -p test_strategy_model.py
 ```
 
-Only verified receipt data is required. Repeated runs with unchanged code and ledger produce identical JSON. `data/learning/latest.json` links the active source-addressed history. Timing labels themselves are machine-dependent observations, not mathematically deterministic quantities.
+Only verified receipt data is required. Repeated runs with unchanged code and ledger preserve identical JSON. Frozen evaluations are checked by input/model/content hashes, not recomputed through platform-dependent logarithm libraries. Newly computed last-bit metric values can differ across platforms; those differences are not scientific effects. The first deployment caught this Mac/Linux distinction; its older source-addressed history is retained as superseded evidence. `data/learning/latest.json` links the active source-addressed history. Timing labels themselves are machine-dependent observations, not mathematically deterministic quantities.
 
 ## Initial controlled pilot, 11 September
 

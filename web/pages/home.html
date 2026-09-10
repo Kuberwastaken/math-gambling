@@ -4,8 +4,12 @@
 </div>
 <div class="game-proposition">
   <p>
+    Can three integers, positive or negative, have cubes that add up to 114?
+    Cubing means multiplying a number by itself twice: 3³ = 3 × 3 × 3 = 27.
+    No solution to 114 is known. We’re pooling computers to look for one.
+  </p>
+  <p>
     <strong>Stake some processor time. Chase a mathematical jackpot.</strong>
-    Every batch is another shot at three integers whose cubes add up to 114.
     The odds are absurdly long and we can’t price your hand. Most bets will
     return nothing. One exact answer would be a discovery.
   </p>
@@ -32,6 +36,16 @@
         </button>
       </div>
     </form>
+    <section id="jackpot-panel" class="jackpot-result" aria-labelledby="jackpot-heading" hidden tabindex="-1">
+      <h2 id="jackpot-heading">Jackpot.</h2>
+      <p id="jackpot-status" role="status" aria-live="assertive"></p>
+      <p id="jackpot-equation" class="jackpot-identity"></p>
+      <div class="session-actions">
+        <button id="jackpot-save" class="button primary" type="button">Save discovery evidence ↓</button>
+        <a id="jackpot-bank" class="button" target="_blank" rel="noopener">Bank the discovery on GitHub ↗</a>
+        <button id="jackpot-quiet" class="button quiet" type="button" hidden>Stop confetti</button>
+      </div>
+    </section>
     <div class="game-board">
       <div class="wheel-stage">
         <div id="run-wheel" class="run-wheel"></div>
@@ -161,9 +175,10 @@
     <h2>Three cubes. One missing answer.</h2>
     <div class="explanation-equation">x³ + y³ + z³ = <strong>114</strong></div>
     <p>
-      Find three whole numbers, positive or negative, that make this equation
-      true. The answer may involve enormous cubes that almost cancel each other
-      out.
+      The sum-of-three-cubes problem asks which whole-number totals can be made
+      by adding three integer cubes. For 114, nobody has found the three integers.
+      They may be positive or negative, with enormous cubes that almost cancel
+      each other out.
     </p>
     <p>
       Your computer searches selected regions of those numbers. Exact arithmetic
@@ -391,7 +406,7 @@
     <div class="runner-links">
       <a
         class="button primary"
-        href="https://github.com/Kuberwastaken/math-gambling/releases/download/v0.2.0/math-gambling-runner-v0.2.0.zip"
+        href="https://github.com/Kuberwastaken/math-gambling/releases/download/v0.2.1/math-gambling-runner-v0.2.1.zip"
         download data-runner-download
         >Download the local runner ↓</a
       >

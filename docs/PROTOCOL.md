@@ -321,3 +321,20 @@ core-days or a discovery probability. Analytic expected counts and conservation
 checks can expose mistakes but cannot certify that every candidate was visited.
 The finite negative claim depends on the exact task enumeration and replay;
 the positive claim is the exact integer identity.
+
+## Jackpot and identity-only submissions
+
+A browser hit is checked again on the main page with exact integer cubes. The
+identity is saved separately before task metadata is examined. The winning
+display offers another evidence download and an identity-only GitHub bank,
+survives a reload, and stops the search after the active result is handled.
+Confetti and sparkles are display effects only; a failed animation cannot affect
+receipt saving. Reduced-motion settings suppress the particles.
+
+An identity-only bank has schema `math-gambling-identity-v1`, a `contributor`
+object and a `hits` array containing objects with exactly one `xyz` field. Each
+`xyz` has three decimal integer strings. The receiver recomputes every identity
+independently. Such a bank can establish positive evidence even if the original
+task envelope is damaged, but earns no task coverage or input-count credit.
+The authenticated issue source is retained for attribution. The full task bank
+remains the way to receive verified work credit. No near miss triggers a jackpot.

@@ -7,6 +7,7 @@ import {
   validateTask,
 } from "./engine.mjs";
 import { createLiveVisuals } from "./live-viz.mjs";
+import { createJackpot } from "./jackpot.mjs";
 import { renderModelEvolution } from "./model-viz.mjs";
 import { setupRunnerDownload } from "./runner-setup.mjs";
 setupRunnerDownload();
@@ -48,6 +49,15 @@ const fetchJSON = async (file) => {
   return response.json();
 };
 const sharedCoverage = createCoverageClient(BASE);
+let jackpot;
+try {
+  jackpot = createJackpot({ onSave: (evidence) => download("math-gambling-identity-evidence.json", JSON.stringify(evidence, null, 2)) });
+} catch { /* The display cannot interrupt evidence preservation. */ }
+function showJackpot(xyz, receipt, source = "local", animate = true) {
+  try {
+    if (jackpot?.show({ xyz, receipt, source, animate })) showRun("jackpot", xyz);
+  } catch { /* Saving and banking run independently of the celebration. */ }
+}
 let liveVisuals;
 try {
   liveVisuals = createLiveVisuals(CONTEXTS);
@@ -590,14 +600,14 @@ async function loadCluster() {
         { label: "Verified unique tasks at recorded policy epochs" },
       );
     if ($("cluster-discoveries")) $("cluster-discoveries").replaceChildren();
-    if ($("cluster-discoveries"))
-      for (const d of clusterData.discoveries || []) {
+    for (const d of clusterData.discoveries || []) {
         const xyz = d.xyz || d.hit?.xyz;
         if (verifyTriple(xyz)) {
+          showJackpot(xyz, d, "cluster");
           const p = document.createElement("p");
           p.className = "discovery";
           p.textContent = `Verified identity: ${xyz.map((x) => `(${x})³`).join(" + ")} = 114. See the repository evidence for attribution.`;
-          $("cluster-discoveries").append(p);
+          $("cluster-discoveries")?.append(p);
         }
       }
     if ($("join-form")) await reconcileBanks();
@@ -1166,7 +1176,9 @@ async function start(e) {
         const evidence = {
           schema: "math-gambling-independent-browser-identity-v1",
           xyz: exactHits.map((h) => h.xyz),
+          hits: exactHits.map((h) => ({ xyz: h.xyz })),
           contributor: owner,
+          search_session: provenance,
           observed: new Date().toISOString(),
         };
         try {
@@ -1184,6 +1196,7 @@ async function start(e) {
           "math-gambling-identity-evidence.json",
           JSON.stringify(evidence, null, 2),
         );
+        showJackpot(exactHits[0].xyz, evidence);
       }
 
       if (generation !== sessionGeneration) {
@@ -1250,6 +1263,7 @@ async function start(e) {
       showRun("result", { result: r, elapsedMs: data.elapsedMs });
       if (r.hits?.length) {
         const hit = r.hits[0];
+        showJackpot(hit.xyz, record);
         $("discovery").hidden = false;
         $("discovery").textContent =
           `Exact identity found: ${hit.xyz.map((x) => `(${x})³`).join(" + ")} = 114. Saved locally. Download this evidence and bank it for independent verification.`;
@@ -1312,6 +1326,14 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 if ($("join-form")) {
+  try {
+    const saved = localStorage.getItem("mg-discovery-v1");
+    if (saved && saved.length < 100000) {
+      const evidence = JSON.parse(saved);
+      const xyz = evidence.hits?.find((hit) => verifyTriple(hit?.xyz))?.xyz || evidence.xyz?.find((xyz) => verifyTriple(xyz));
+      if (xyz) showJackpot(xyz, evidence, "local", false);
+    }
+  } catch { /* A corrupt optional preview must not block saved task recovery. */ }
   if (typeof profile.name === "string") $("player-name").value = profile.name;
   if (typeof profile.github === "string")
     $("player-github").value = profile.github;

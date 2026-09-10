@@ -208,6 +208,19 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
     if previous and previous["body_sha256"] != body_hash:
         raise ValueError("immutable bank revision changed payload")
     try:
+        if isinstance(receipt, dict) and receipt.get("schema") == "math-gambling-identity-v1":
+            if len(raw.encode()) > MAX_BANK_BYTES or set(receipt) != {"schema", "contributor", "hits"}:
+                raise ValueError("invalid identity-only submission fields or size")
+            hits = receipt["hits"]
+            if not isinstance(hits, list) or not 1 <= len(hits) <= MAX_HITS or any(
+                not isinstance(hit, dict) or set(hit) != {"xyz"} or exact_triple(hit["xyz"]) is None
+                for hit in hits
+            ):
+                raise ValueError("identity-only submission failed exact cube verification")
+            # Positive evidence needs no negative task coverage or claimed runtime.
+            record.update(status="accepted", complete=True, discoveries=discoveries, processed_at=now())
+            atomic_json(record_path, record)
+            return record
         bank = isinstance(receipt, dict) and receipt.get("schema") == "math-gambling-bank-v1"
         expected_schema = "math-gambling-bank-v1" if bank else "math-gambling-receipt-v1"
         key, cap, byte_cap = ("tasks", MAX_BANK_TASKS, MAX_BANK_BYTES) if bank else ("results", MAX_TASKS, MAX_RECEIPT_BYTES)

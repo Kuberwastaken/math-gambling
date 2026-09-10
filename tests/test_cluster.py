@@ -64,6 +64,23 @@ class ClusterTests(unittest.TestCase):
         self.assertEqual(int(person["verified_computations"]), self.results[0]["counters"]["generators"])
         self.assertEqual(report["banks"][0]["bank_digest"], hashlib.sha256(ig.canonical(receipt).encode()).hexdigest())
 
+    def test_identity_only_bank_preserves_discovery_without_claiming_coverage(self):
+        xyz = ["-159380", "134476", "117367"]
+        receipt = {"schema": "math-gambling-identity-v1", "contributor": {"name": "Fixture", "github": "fixture"}, "hits": [{"xyz": xyz}]}
+        self.assertEqual(self.submit(receipt)["status"], "rejected", "k=39 is not a 114 discovery")
+        real_verifier = ig.exact_triple
+        # Explicitly substitute k=39 only in this isolated positive-path fixture.
+        with mock.patch.object(ig, "exact_triple", side_effect=lambda v: real_verifier(v, k=39)):
+            accepted = self.submit(receipt, number=2)
+            self.assertEqual(accepted["status"], "accepted")
+            self.assertEqual(len(accepted["discoveries"]), 1)
+            self.assertEqual(self.submit(receipt, number=2), accepted)
+            report = ag.aggregate(self.data)
+        self.assertEqual(report["totals"]["verified_hits"], 1)
+        self.assertEqual(report["totals"]["verified_unique_tasks"], 0)
+        self.assertEqual(report["contributors"], [])
+        self.assertEqual(self.replay_count, 0)
+
     def test_profile_link_updates_only_from_credited_work(self):
         receipt = bank(self.results[:1], name="First alias")
         receipt["contributor"]["url"] = "https://example.org/me?q=1&b=2"

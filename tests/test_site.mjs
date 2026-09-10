@@ -61,6 +61,8 @@ async function harness({
   coverageFails = false,
   coverageProbe = null,
   randomFactory = null,
+  fixtureTarget = 114,
+  brokenCelebration = false,
 } = {}) {
   const elements = new Map();
   const get = (id) => {
@@ -82,7 +84,7 @@ async function harness({
       listeners.set(type, list);
     },
   };
-  const local = new Map();
+  const local = new Map(), celebrations = [];
   if (cachedProfile !== null)
     local.set("mg-profile", JSON.stringify(cachedProfile));
   const stores = new Map(),
@@ -153,7 +155,12 @@ async function harness({
     }
   }
   const context = vm.createContext({
-    __engine: engine,
+    __engine: { ...engine, verifyTriple: (xyz) => engine.verifyTriple(xyz, fixtureTarget) },
+    __jackpot: () => ({ show(value) {
+      if (brokenCelebration) throw Error("fixture broken animation");
+      celebrations.push(value);
+      return true;
+    } }),
     __sessionTools: {...sessionTools, seededRandom: randomFactory || sessionTools.seededRandom, createCoverageClient: () => ({
       revision: 128,
       async refresh() { if (coverageFails) throw Error("fixture coverage offline"); },
@@ -199,6 +206,8 @@ async function harness({
     },
   });
   const source = appSource
+    .replace(/import \{ createJackpot \} from "\.\/jackpot\.mjs";/,
+      "const createJackpot=__jackpot;")
     .replace(/import \{ createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM \} from "\.\/search-session\.mjs";/,
       "const { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } = __sessionTools;")
     .replace(/import \{ setupRunnerDownload \} from "\.\/runner-setup\.mjs";/,
@@ -232,6 +241,8 @@ async function harness({
     get,
     workers,
     stores,
+    local,
+    celebrations,
     holdWrites(value = true) {
       holdWrites = value;
     },
@@ -531,3 +542,40 @@ console.log(
   assert.equal(h.stores.get("tasks").rows.size, 2);
 }
 console.log("Async coverage lifecycle checks passed: hidden selection retry and stale receipt/error isolation.");
+
+// Known k=39 is substituted only inside this isolated host. No 114 solution is
+// manufactured or submitted. Test the actual app's emergency and priority paths.
+for (const brokenCelebration of [false, true]) {
+  const h = await harness({ fixtureTarget: 39, brokenCelebration }), worker = await ready(h);
+  const result = await engine.runTask(worker.posts[0].task);
+  const xyz = ["-159380", "134476", "117367"];
+  result.hits = [{xyz}];
+  result.counters.hits = 1;
+  const {digest, ...core} = result;
+  result.digest = Buffer.from(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(engine.canonicalJSON(core)))).toString("hex");
+  worker.emit({type: "result", result, elapsedMs: 5});
+  await waitFor(() => h.stores.get("banks").rows.size === 1, "positive evidence never reached the priority bank");
+  assert.equal(worker.terminated, true);
+  assert.deepEqual(JSON.parse(h.local.get("mg-discovery-v1")).hits, [{xyz}]);
+  const bank = JSON.parse(h.get("bank-body").value);
+  assert.deepEqual(bank.tasks[0].hits, [{xyz}]);
+  assert.equal(bank.tasks.length, 1);
+  assert.equal(h.app.state().running, false);
+}
+{
+  const h = await harness({fixtureTarget: 39}), worker = await ready(h);
+  const xyz = ["-159380", "134476", "117367"];
+  worker.emit({type: "result", result: {hits: [{xyz}], task: "broken envelope"}});
+  await waitFor(() => worker.terminated, "malformed envelope did not stop after preserving its identity");
+  assert.deepEqual(JSON.parse(h.local.get("mg-discovery-v1")).hits, [{xyz}]);
+  assert.equal(h.stores.get("tasks").rows.size, 0, "bad envelope must not grant negative coverage");
+  assert.equal(h.celebrations.length, 1);
+}
+{
+  const h = await harness(), worker = await ready(h);
+  worker.emit({type: "result", result: {hits: [{xyz: ["1", "2", "3"]}]}});
+  await waitFor(() => worker.terminated, "invalid result did not stop");
+  assert.equal(h.local.has("mg-discovery-v1"), false);
+  assert.equal(h.celebrations.length, 0, "unverified candidates must never celebrate");
+}
+console.log("Positive lifecycle checks passed with isolated k=39: emergency preservation, priority banking, stop, animation-failure isolation and false-hit rejection.");

@@ -505,6 +505,30 @@ dd {
   margin: 16px 0;
   overflow-wrap: anywhere;
 }
+.jackpot-result {
+  margin: 16px 0 24px;
+  padding: clamp(18px, 3vw, 32px);
+  border: 3px double #13753c;
+  background: #f5fff7;
+  color: #111;
+}
+.jackpot-result h2 { font-size: clamp(38px, 6vw, 68px); margin: 0 0 12px; }
+.jackpot-result p { max-width: 70ch; }
+.jackpot-identity { font: clamp(16px, 2.6vw, 27px)/1.65 var(--mono); overflow-wrap: anywhere; }
+.jackpot-confetti { position: fixed; inset: 0; z-index: 1000; pointer-events: none; overflow: hidden; }
+.jackpot-confetti i {
+  position: absolute; top: -36px; left: var(--x); display: block;
+  animation: jackpot-fall var(--duration) var(--delay) linear both;
+}
+.jackpot-chip { width: 9px; height: 16px; background: var(--chip-color); border: 1px solid #8885; }
+.jackpot-sparkle { font-style: normal; font-size: 26px; color: #b58822; }
+.jackpot-wheel .wheel-inner { stroke: #13753c; stroke-width: 3; }
+@keyframes jackpot-fall {
+  from { transform: translate(0, 0) rotate(0); opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translate(var(--drift), calc(100vh + 72px)) rotate(var(--turn)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .jackpot-confetti { display: none; } }
 .campaign-reading {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -2584,6 +2608,8 @@ body[data-page="home"] .game-area {
   min-width: 0;
 }
 .game-board .run-wheel {
+  grid-column: 1;
+  grid-row: auto;
   width: 100%;
   max-width: 430px;
   min-height: 0;
@@ -3079,6 +3105,7 @@ body[data-page="home"] .game-area .session-counts {
 }
 .wheel-stage {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
 }
 .game-area .session-counts div {

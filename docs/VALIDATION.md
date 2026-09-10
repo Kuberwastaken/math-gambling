@@ -56,3 +56,20 @@ The release candidate passes 243 JavaScript/Python differential tasks, all 11 No
 Browser lifecycle tests now cover a tab hidden during a coverage lookup, late persistence after worker replacement, and isolation of old errors from new sessions. Task digests remain unchanged by seed or display attribution. A real browser session completed 70 tasks across its 64-task refresh boundary, showed a 256-bit seed and coverage revision128, rendered a live graph, then stopped cleanly. The local receipts were not posted.
 
 Mobile and desktop checks cover the one-click start, normal leaderboard, compact counters, optional website link banking, versioned setup dialog, and mathematical article rendering. The site checker validates 392 internal links/assets, the complete downloaded file list, all81 packaged coverage-shard hashes and release metadata. GitHub release publication is gated separately on Windows, macOS and Linux process/archive tests; passing the local suite alone is not recorded as a Windows test.
+
+## Jackpot preservation and Windows release correction
+
+The v0.2.0 release gate passed Ubuntu and macOS, then correctly rejected the
+Windows checkout because Git converted hashed coverage bytes to CRLF. The
+v0.2.1 candidate preserves these files byte-for-byte and explicitly writes UTF-8
+LF protocol data. A real temporary Git checkout with `core.autocrlf=true` checks
+all 81 shard hashes alongside a control file that does convert to CRLF.
+
+Celebration tests use the known k=39 triple (−159380, 134476, 117367) in isolated
+fixtures. The production 114 gate rejects it. With the fixture target explicitly
+substituted, the actual browser application preserves the identity, stops the
+worker and prepares the priority bank. Tests also cover broken task metadata,
+an animation that throws, false hits, evidence download, duplicate/permuted
+identities, hidden-tab cleanup and reduced motion. An identity-only receiver
+test verifies positive persistence while awarding zero negative coverage. No
+fixture was posted to GitHub or counted as a 114 discovery.

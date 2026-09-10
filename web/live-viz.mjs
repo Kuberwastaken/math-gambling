@@ -1,5 +1,6 @@
 // Only real dispatched tasks and durably saved results drive these displays.
-// No simulated work, random activity, or animation timer.
+// Celebrations reflect an independently checked identity, never a near miss.
+import { verifyTriple } from "./engine.mjs";
 const NS = "http://www.w3.org/2000/svg";
 const number = new Intl.NumberFormat("en-US", {
   notation: "compact",
@@ -27,7 +28,7 @@ export function createLiveVisuals(contexts) {
   const label = (id, t) => {
     if ($(id)) $(id).textContent = t;
   };
-  let running = false,
+  let found = false, running = false,
     runState = "idle",
     active = null,
     started = 0,
@@ -52,6 +53,10 @@ export function createLiveVisuals(contexts) {
     wheelStatus;
   const cells = new Map();
   function mark() {
+    if (found) {
+      wheelStatus.textContent = "EXACT IDENTITY";
+      return;
+    }
     if (!active) {
       arcs.forEach((a, i) =>
         a.setAttribute("class", `wheel-sector ${i % 2 ? "black" : "red"}`),
@@ -325,6 +330,12 @@ export function createLiveVisuals(contexts) {
   }
   wheel();
   return {
+    jackpot(xyz) {
+      if (!verifyTriple(xyz)) return;
+      found = true;
+      root.className = "run-wheel jackpot-wheel";
+      mark();
+    },
     reset() {
       totals = {};
       lanes = new Map();

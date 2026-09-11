@@ -2,7 +2,7 @@
 """Run bounded exact tasks locally and bank replayable claims through GitHub.
 
 No dependencies. Default mode writes durable local files and sends no results.
---submit explicitly authorizes gh issue creation (at most once per minute).
+--submit explicitly authorizes gh issue creation (normally one bank every ten seconds).
 """
 from __future__ import annotations
 
@@ -32,6 +32,7 @@ from client_audit import RunAudit, VERSION, RNG_ALGORITHM, seed_value
 ROOT = Path(__file__).resolve().parents[1]
 UA = 'OpenAI File Downloader, XaiImageApiFetch/1.0'
 STRATEGY_URL = 'https://kuber.studio/math-gambling/data/strategy.json'
+SUBMIT_INTERVAL = 10
 BANK_LIMIT = 256
 OUTBOX_LIMIT = 4096
 MIN_PYTHON = (3, 11)
@@ -323,14 +324,48 @@ def write_bank(out, db, contributor, force=False, bank_every=BANK_LIMIT, priorit
     return path
 
 
+def submission_delay(db, failure=False, headers=None):
+    """Persist pacing and backoff so restarting cannot reset a rate-limit wait."""
+    previous = db.execute("SELECT value FROM meta WHERE key='submit_failures'").fetchone()
+    failures = min(8, int(previous[0]) + 1) if failure and previous else int(failure)
+    delay = max(SUBMIT_INTERVAL, min(3600, 60 * 2**(failures-1))) if failure else SUBMIT_INTERVAL
+    headers = headers or {}
+    for name in ('retry-after', 'x-ratelimit-reset'):
+        try:
+            value = float(headers[name])
+            if name == 'x-ratelimit-reset':
+                if headers.get('x-ratelimit-remaining') != '0': continue
+                value -= time.time()
+            if math.isfinite(value): delay = max(delay, value)
+        except (KeyError, ValueError): pass
+    with db:
+        db.execute("INSERT OR REPLACE INTO meta VALUES('submit_failures',?)", (str(failures),))
+        db.execute("INSERT OR REPLACE INTO meta VALUES('submit_after',?)", (str(time.time()+delay),))
+    return delay
+
+
+def issue_response(proc):
+    raw = proc.stdout.replace('\r\n', '\n')
+    match = re.fullmatch(r'HTTP/[0-9.]+ ([0-9]{3})[^\n]*\n(.*?)\n\n(.*)', raw, re.S)
+    if not match: raise RuntimeError('ambiguous GitHub response; bank retained for inspection')
+    status = int(match[1])
+    headers = dict(line.split(':',1) for line in match[2].splitlines() if ':' in line)
+    headers = {key.strip().lower(): value.strip() for key,value in headers.items()}
+    return status, headers, json.loads(match[3])
+
+
 def maybe_submit(db, repo, last_attempt):
-    if time.monotonic()-last_attempt < 60:
+    pacing = db.execute("SELECT value FROM meta WHERE key='submit_after'").fetchone()
+    if time.monotonic()-last_attempt < SUBMIT_INTERVAL or (pacing and time.time() < float(pacing[0])):
         return last_attempt
     pending = db.execute('SELECT id,path FROM banks WHERE submitted IS NULL ORDER BY CASE WHEN id IN (SELECT id FROM bank_priority) THEN 0 ELSE 1 END,rowid LIMIT 1').fetchone()
     if not pending:
         return last_attempt
     bid, path = pending
     attempt = time.monotonic()
+    with db:
+        db.execute("INSERT OR REPLACE INTO meta VALUES('submit_after',?)", (str(time.time()+SUBMIT_INTERVAL),))
+    headers = {}
     try:
         title = f'[bank] Bank-in {bid[:16]}'
         path, bank_body = resolve_bank(db, bid, path)
@@ -350,6 +385,7 @@ def maybe_submit(db, repo, last_attempt):
             if same_body:
                 existing.append(issue['url'])
         if existing:
+            submission_delay(db)
             db.execute('UPDATE banks SET submitted=? WHERE id=?', (existing[0], bid)); db.commit()
             print(f'Existing submission retained: {existing[0]}', flush=True)
             return attempt
@@ -358,20 +394,28 @@ def maybe_submit(db, repo, last_attempt):
         with db:
             db.execute('UPDATE banks SET submitted=? WHERE id=?',
                        ('uncertain; submission intent recorded; inspect GitHub before retrying', bid))
-        proc = subprocess.run(['gh', 'issue', 'create', '--repo', repo,
-            '--title', title, '--body-file', str(path)], text=True,
+        proc = subprocess.run(['gh', 'api', '--include', '--method', 'POST',
+            '-H', 'User-Agent: ' + UA, f'repos/{repo}/issues', '--input', '-'],
+            input=json.dumps({'title': title, 'body': canonical_json(bank_body)}), text=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
-        if proc.returncode:
-            raise RuntimeError(proc.stderr.strip()[:200])
-        url = proc.stdout.strip()
-        if not re.fullmatch(r'https://github\.com/[^/]+/[^/]+/issues/[0-9]+', url):
+        status, headers, response = issue_response(proc)
+        if status in (403, 429):
+            # GitHub explicitly rejected this request. It is safe to retry after
+            # its wait; timeouts/unknown responses keep the durable uncertain marker.
+            with db: db.execute('UPDATE banks SET submitted=NULL WHERE id=?', (bid,))
+        if proc.returncode or status != 201:
+            raise RuntimeError(f'GitHub rejected submission (HTTP {status}); bank retained')
+        url = response.get('html_url', '')
+        if not re.fullmatch(r'https://github\.com/' + re.escape(repo) + r'/issues/[0-9]+', url):
             raise RuntimeError('ambiguous gh response; check GitHub before retrying this bank')
         db.execute('UPDATE banks SET submitted=? WHERE id=?', (url, bid)); db.commit()
+        submission_delay(db)
         print(f'Submitted: {url} (queued, not yet verified)', flush=True)
     except (OSError, ValueError, subprocess.TimeoutExpired, RuntimeError, sqlite3.Error) as exc:
         db.rollback()
         # Any dispatch intent was already committed before the request.
-        print(f'Bank retained locally; submission did not confirm: {exc}', file=sys.stderr)
+        delay = submission_delay(db, failure=True, headers=headers)
+        print(f'Bank retained locally; submission did not confirm: {exc}. Next attempt in at least {math.ceil(delay)}s.', file=sys.stderr)
     return attempt
 
 
@@ -434,7 +478,7 @@ def main(argv=None):
     parser.add_argument('--output', type=Path, default=Path('math-gambling-run'))
     parser.add_argument('--offline', action='store_true', help='use the bundled strategy/coverage snapshot; it may miss work banked since release')
     parser.add_argument('--login', action='store_true', help='use the GitHub CLI browser login and read your authenticated username')
-    parser.add_argument('--submit', action='store_true', help='explicitly authorize gh issue creation, at most once/minute')
+    parser.add_argument('--submit', action='store_true', help='explicitly authorize gh issue creation, normally one bank/10 seconds; rate-limit backoff applies')
     parser.add_argument('--bank-every', type=int, default=BANK_LIMIT, help='prepare a bank every N completed tasks, 1..256 (default256)')
     parser.add_argument('--seed', type=seed_value, help='reproducible client PRNG seed: exactly64 hex digits; securely generated when omitted')
     parser.add_argument('--bank', action='store_true', help='write a final bank (also done by default)')
@@ -520,7 +564,7 @@ def run_campaign(args, out, db, contributor):
             completed_this_run=0, discoveries=identities, queue=bank_queue(db)))
         return 0
     print(f'Math Gambling {VERSION} | {ENGINE}: {args.workers} workers, at most {args.minutes:g} minutes.', flush=True)
-    print('Results are local until banked; GitHub replays before credit. Ctrl-C stops scheduling and drains current tasks.', flush=True)
+    print('Results are local until banked; GitHub audits before contribution credit; exact replays are shown separately. Ctrl-C stops scheduling and drains current tasks.', flush=True)
     queue = bank_queue(db)
     print(f'Bank every {args.bank_every} completed tasks. Queue: {queue["pending"]} pending, {queue["uncertain"]} uncertain; submitted issues await verification.', flush=True)
     seed = args.seed or secrets.token_hex(32)
@@ -592,7 +636,7 @@ def run_campaign(args, out, db, contributor):
             if not active:
                 while write_bank(out, db, contributor, force=True, bank_every=args.bank_every): pass
                 # Automatic mode uses the remaining user-selected time to drain
-                # queued banks at the same one-per-minute rate, without compute.
+                # queued banks at the normal submission rate, without compute.
                 if args.submit and not stop and time.monotonic() < deadline and bank_queue(db)['pending']:
                     last_submit = maybe_submit(db, args.repo, last_submit)
                     if bank_queue(db)['pending']:

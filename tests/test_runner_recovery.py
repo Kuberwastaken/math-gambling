@@ -273,7 +273,7 @@ class RunnerRecoveryTests(unittest.TestCase):
                 def mock_external(command, **_kwargs):
                     if command[2] == 'list':
                         return subprocess.CompletedProcess(command, 0, '[]', '')
-                    self.assertEqual(command[2], 'create')
+                    self.assertEqual(command[1], 'api')
                     # A separate connection proves the intent was committed
                     # before dispatch, not just pending in memory.
                     with closing(sqlite3.connect(out/'checkpoint.sqlite3')) as observer:

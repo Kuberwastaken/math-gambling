@@ -218,11 +218,11 @@ raise SystemExit(runner.main(['--name','HTTP fixture','--github','test','--worke
             def fake_run(command, **kwargs):
                 if command[2] == 'list':
                     return subprocess.CompletedProcess(command, 0, '[]', '')
-                posted.append(command[command.index('--body-file')+1])
-                return subprocess.CompletedProcess(command, 0, 'https://github.com/example/test/issues/1', '')
+                posted.append(json.loads(kwargs['input'])['body'])
+                return subprocess.CompletedProcess(command, 0, 'HTTP/2.0 201 Created\nContent-Type: application/json\n\n{"html_url":"https://github.com/example/test/issues/1"}', '')
             with patch.object(runner.subprocess, 'run', side_effect=fake_run), contextlib.redirect_stdout(io.StringIO()):
                 runner.maybe_submit(db, 'example/test', -float('inf'))
-            self.assertEqual([Path(path).resolve() for path in posted], [priority.resolve()])
+            self.assertEqual([json.loads(body) for body in posted], [bank])
             db.close()
 
 

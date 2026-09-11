@@ -198,6 +198,7 @@ class PublishSnapshotTests(unittest.TestCase):
         before = {name: (self.repo / name).read_bytes() for name in FILES}
         def empty_export(repo, ref, stage):
             (stage / 'data').mkdir()
+            return []
         with mock.patch.object(branch_state, 'export_data', side_effect=empty_export), \
                 mock.patch.object(branch_state, 'validate_snapshot'):
             branch_state.overlay(self.repo, 'HEAD')
@@ -210,6 +211,7 @@ class PublishSnapshotTests(unittest.TestCase):
         before = {name: (self.repo / name).read_bytes() for name in FILES}
         def partial_export(repo, ref, stage):
             atomic_json(stage / FILES[0], self.pair[FILES[0]])
+            return [FILES[0]]
         with mock.patch.object(branch_state, 'export_data', side_effect=partial_export), \
                 mock.patch.object(branch_state, 'validate_snapshot'), \
                 self.assertRaisesRegex(branch_state.BranchError, 'incomplete Mac snapshot pair'):

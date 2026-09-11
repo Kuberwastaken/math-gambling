@@ -26,6 +26,10 @@ during development and is **not** an untouched promotion test. New production
 arrivals provide the prospective evaluation. No discovery or allocation lift is
 inferred. [Development results](../research/experiments/2026-09-12/shared-model.json).
 
+With a verified ledger containing those historical records, reproduce using
+`python3 tools/evaluate_shared_model.py --data data --through 28543 --train 16384 --output /tmp/shared-development.json`.
+The output path must be new. This never submits work or promotes a model.
+
 New trusted ledger rows record the audit-selection source and its conditional
 inclusion probability, separately from contributor attribution. This is not a
 dispatch propensity and is not enough to debias all historical arrivals. No

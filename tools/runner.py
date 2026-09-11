@@ -53,7 +53,17 @@ def profile_url(value):
     return value
 
 
-def initialize_worker():
+_native_kernel = None
+
+
+def initialize_worker(kernel="python"):
+    global _native_kernel
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    if kernel == "rust":
+        import atexit
+        from native_kernel import NativeKernel
+        _native_kernel = NativeKernel()
+        atexit.register(_native_kernel.close)
     # Terminal Ctrl+C is delivered to the whole process group on macOS/Linux
     # and to console workers on Windows. Let the parent stop allocation and
     # drain bounded tasks instead of interrupting a worker mid-result.
@@ -224,7 +234,8 @@ def preserve_identity(output, hit, task=None):
 
 
 def execute_task(task, output):
-    return run_task(task, on_hit=lambda hit: preserve_identity(output, hit, task))
+    compute = _native_kernel.run if _native_kernel is not None else run_task
+    return compute(task, on_hit=lambda hit: preserve_identity(output, hit, task))
 
 
 def recover_discoveries(out, db, contributor, *, scan_results=False):
@@ -413,6 +424,7 @@ def main(argv=None):
     if sys.version_info < MIN_PYTHON:
         raise SystemExit('Math Gambling needs Python 3.11 or later. Install it from https://www.python.org/downloads/.')
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--kernel', choices=['python', 'rust'], default='python', help='exact search kernel; build Rust once with python tools/build_native.py')
     parser.add_argument('--version', action='version', version='Math Gambling runner ' + VERSION)
     parser.add_argument('--minutes', type=float, default=10)
     parser.add_argument('--workers', type=int, default=max(1, min(4, (os.cpu_count() or 2)//2)))
@@ -512,7 +524,8 @@ def run_campaign(args, out, db, contributor):
     queue = bank_queue(db)
     print(f'Bank every {args.bank_every} completed tasks. Queue: {queue["pending"]} pending, {queue["uncertain"]} uncertain; submitted issues await verification.', flush=True)
     seed = args.seed or secrets.token_hex(32)
-    audit = RunAudit(out, seed, dict(minutes=args.minutes, workers=args.workers, max_tasks=args.max_tasks, bank_every=args.bank_every))
+    audit = RunAudit(out, seed, dict(minutes=args.minutes, workers=args.workers, max_tasks=args.max_tasks, bank_every=args.bank_every, kernel=args.kernel))
+    print(f'Kernel: {args.kernel}', flush=True)
     print(f'Seed: {seed} ({RNG_ALGORITHM}; Python {sys.version.split()[0]})', flush=True)
     print(f'Scheduling log: {audit.path}', flush=True)
     coverage = CoverageIndex(ROOT/'data/coverage', out/'cache/coverage', offline=args.offline)
@@ -543,7 +556,7 @@ def run_campaign(args, out, db, contributor):
     last_refresh_completed = 0
     last_submit = -math.inf
     started = time.monotonic()
-    pool = ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context('spawn'), initializer=initialize_worker)
+    pool = ProcessPoolExecutor(max_workers=args.workers, mp_context=multiprocessing.get_context('spawn'), initializer=initialize_worker, initargs=(args.kernel,))
     active = {}
     capacity_paused = False
     try:

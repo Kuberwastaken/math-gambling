@@ -3,6 +3,8 @@ import {runTask, verifyTriple, ENGINE} from './engine.mjs';
 // A worker accepts one task at a time. The page decides when to queue the next.
 // Stop is a task-boundary instruction; terminating a worker discards only its
 // unfinished task, which must never be submitted as completed coverage.
+import {loadWasmKernel} from './wasm-kernel.mjs';
+const accelerated = await loadWasmKernel();
 let busy = false;
 self.onmessage = async ({data}) => {
   if (data?.type === 'stop') {
@@ -14,7 +16,7 @@ self.onmessage = async ({data}) => {
   busy = true;
   const started = performance.now();
   try {
-    const result = await runTask(data.task, {onHit(hit) {
+    const result = await (accelerated?.runTask || runTask)(data.task, {onHit(hit) {
       if (verifyTriple(hit?.xyz))
         self.postMessage({type: 'identity', hit, task: data.task});
     }});
@@ -23,4 +25,4 @@ self.onmessage = async ({data}) => {
     self.postMessage({type: 'error', message: String(error?.message || error)});
   } finally { busy = false; }
 };
-self.postMessage({type: 'ready', engine: ENGINE});
+self.postMessage({type: 'ready', engine: ENGINE, kernel: accelerated ? 'rust-wasm' : 'javascript-bigint'});

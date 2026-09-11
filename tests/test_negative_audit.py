@@ -66,6 +66,20 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(len(self.calls),3)
         self.assertEqual(len(record.get('unreplayed_tasks',[])),0)
         self.assertTrue(record['audit_sample_failed'])
+    def test_copy_of_retained_digest_cannot_steal_later_verified_credit(self):
+        receipt=bank(self.results[:1])
+        with patch('negative_audit.selected',return_value=False):first=self.submit(receipt)
+        self.assertEqual(first['accepted_tasks'],[])
+        # A new account gets full replay, but not ownership of the older claim.
+        policy=AuditPolicy(self.data,20)
+        copied=ig.process_receipt(receipt,source(2,'copier'),self.data,ig.Budget(),replay=self.replay,audit_policy=policy)
+        self.assertEqual(copied['accepted_tasks'],[])
+        self.assertEqual(len(copied['duplicate_tasks']),1)
+        report=ag.aggregate(self.data)
+        self.assertEqual(report['contributors'][0]['github'],'trusted')
+        self.assertEqual(report['totals']['unreplayed_claims'],0)
+        self.assertEqual(len(report['contributors']),1)
+
     def test_sampling_decision_rate_and_bounds(self):
         plan={'one_in':20,'salt':'00'*32}
         count=sum(selected(plan,'body',str(i)) for i in range(10000))

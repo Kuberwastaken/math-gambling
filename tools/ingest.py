@@ -424,9 +424,13 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                 if (not saved and bank and not claimed.get("hits")
                         and not record.get("audit_sample_failed")
                         and not selected(record.get("negative_audit"), body_hash, identifier)):
-                    record["unreplayed_tasks"].append({"task": task, "digest": claimed["digest"]})
+                    retained = {"task": task, "digest": claimed["digest"], "received_at": now()}
+                    record["unreplayed_tasks"].append(retained)
+                    if audit_policy is not None:
+                        audit_policy.remember(retained, source, contributor(receipt))
                     record["next_index"] = index + 1
-                    atomic_json(record_path, record)
+                    if (index+1)%16 == 0 or index+1 == len(results):
+                        atomic_json(record_path, record)
                     continue
                 if saved:
                     expected, cpu_ms = saved["result"], saved["server_replay_cpu_ms"]
@@ -457,12 +461,26 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                 else:
                     if budget.next_sequence is None:
                         budget.next_sequence = sum(1 for _ in (Path(data) / "receipts" / "tasks").glob("*/*.json")) + 1
+                    credit_source, credit_person = (audit_policy.attribution(identifier, expected['digest'], source, contributor(receipt))
+                                                    if audit_policy is not None else (source, contributor(receipt)))
                     atomic_json(path, {"schema": "math-gambling-verified-task-v1", "sequence": budget.next_sequence,
                                        "result": expected, "verified_at": now(), "server_replay_cpu_ms": cpu_ms,
                                        "replay_kernel_sha256": REPLAY_KERNEL_SHA256,
-                                       "contributor": contributor(receipt), "source": source})
+                                       "contributor": credit_person, "source": credit_source})
                     budget.next_sequence += 1
-                    record["accepted_tasks"].append(identifier)
+                    record["accepted_tasks" if credit_source['id'] == source_id else "duplicate_tasks"].append(identifier)
+                # A later audit can establish an earlier retained claim. Credit
+                # its original author, not someone copying its public digest.
+                origin = saved['source'] if saved else credit_source
+                if origin['id'] != source_id:
+                    origin_path = ledger_path(data, 'issues', origin['id'])
+                    origin_record = read_json(origin_path)
+                    if origin_record and any(x['task'] == task and x['digest'] == expected['digest'] for x in origin_record.get('unreplayed_tasks', [])):
+                        origin_record['unreplayed_tasks'] = [x for x in origin_record['unreplayed_tasks'] if x['task'] != task or x['digest'] != expected['digest']]
+                        if identifier not in origin_record['accepted_tasks']:
+                            origin_record['accepted_tasks'].append(identifier)
+                        origin_record.setdefault('later_verified_tasks', []).append(identifier)
+                        atomic_json(origin_path, origin_record)
             except RetryLater:
                 record.update(status="pending", complete=False, discoveries=sorted(set(discoveries)),
                               deferred_reason="verification_budget", processed_at=now())
@@ -648,7 +666,7 @@ def main():
     parser.add_argument("--sample-negatives", type=int, default=1, metavar="N", help="replay 1/N new negative tasks after 256 verified tasks/account; unreplayed claims receive no verified credit or coverage")
     args = parser.parse_args()
     from negative_audit import AuditPolicy
-    audit_policy = AuditPolicy(args.data, args.sample_negatives) if args.sample_negatives != 1 else None
+    audit_policy = AuditPolicy(args.data, args.sample_negatives) if args.issues else None
     if args.input and args.data.resolve() == (ROOT / "data").resolve():
         raise ValueError("fixture ingestion requires a separate --data directory")
     if args.replay_stream:

@@ -6,7 +6,7 @@ $$x^3+y^3+z^3=114,\qquad x,y,z\in\mathbb{Z}.$$
 
 The coordinates may be positive or negative, and enormous cubes can nearly cancel. An answer is one exactly verified integer triple. There is no known small search bound that guarantees our campaign will contain one.
 
-Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. Measured cost and a declared geometric prior adjust allocation after each 64 verified tasks, while preserving 40% uniform task proposals. It has not learned where a solution is likely to be.
+Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. Measured cost and a declared geometric prior adjust allocation after each 64 verified tasks. New epochs reserve 40% of predicted CPU for exploration, and exact tile proofs avoid dispatching provably empty work. It has not learned where a solution is likely to be.
 
 This is an open computational research project by Kuber Mehta. The gamble is spare processor time for a possible mathematical discovery. We publish the algorithms, finite search definitions, unsuccessful experiments, verification records and evolving model so the work can be inspected and reproduced.
 
@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-11 20:54:49 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-11 21:04:37 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 279,204 |
-| Coefficient-generator inputs | 526,074,880 |
-| Bounded curve intervals | 38,255,348 |
-| Logical quotient positions | 27,950,293,649 |
-| Exact integer square tests | 57,626 |
+| Unique finite tasks | 279,600 |
+| Coefficient-generator inputs | 526,824,448 |
+| Bounded curve intervals | 38,304,297 |
+| Logical quotient positions | 27,984,151,162 |
+| Exact integer square tests | 57,693 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,7 +35,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 801,039,360 | 478,417,920 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 816,427,008 | 479,167,488 |
 | 2 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 75,799,552 | 34,284,544 |
 | 3 | [Anish Bhattacharya](<https://essentialis.cloud>) | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 2,867,200 | 2,867,200 |
 | 4 | anubhav-pandey1 | [@anubhav-pandey1](https://github.com/anubhav-pandey1) | 1,934,336 | 997,376 |
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 954,368 |
 | 10 | [Kuber](<https://kuber.studio>) | [@Kuberwastaken](https://github.com/Kuberwastaken) | 704,512 | 704,512 |
 
-**208,107 / 279,204 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**208,410 / 279,600 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 4362**, frozen from **279,168 verified tasks**. The next policy update needs **28 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 4368**, frozen from **279,552 verified tasks**. The next policy update needs **16 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 4359: 278,976 tasks; c63 3.93%"]
-    H1["Epoch 4360: 279,040 tasks; c63 3.94%"]
+    H0["Epoch 4365: 279,360 tasks; c54 4.48%"]
+    H1["Epoch 4366: 279,424 tasks; c54 4.49%"]
     H0 --> H1
-    H2["Epoch 4361: 279,104 tasks; c63 3.92%"]
+    H2["Epoch 4367: 279,488 tasks; c54 4.49%"]
     H1 --> H2
-    H3["Epoch 4362: 279,168 tasks; c63 3.92%"]
+    H3["Epoch 4368: 279,552 tasks; c54 4.45%"]
     H2 --> H3
-    Policy["Current policy: epoch 4362"]
+    Policy["Current policy: epoch 4368"]
     H3 --> Policy
-    Policy --> Explore["40% uniform exploration across 81 contexts"]
+    Policy --> Explore["40% predicted CPU exploration across 81 contexts"]
     Policy --> Cost["60% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c63: 3.92%"]
-    Mix --> C1["c18: 3.75%"]
-    Mix --> C2["c09: 3.72%"]
-    Mix --> Rest["Other 78 contexts: 88.61% combined"]
+    Mix --> C0["c54: 4.45%"]
+    Mix --> C1["c27: 4.28%"]
+    Mix --> C2["c45: 4.24%"]
+    Mix --> Rest["Other 78 contexts: 87.02% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -85,17 +85,17 @@ flowchart TD
     Gate --> Policy
 ```
 
-Weights describe task-selection shares, not CPU-time shares or discovery probabilities. 40% uniform task proposals; 60% geometry-weighted curve yield / cost. Zero-curve tasks count toward 
+Weights describe task-selection shares, not CPU-time shares or discovery probabilities. 40% of predicted CPU is reserved equally across contexts; 60% follows geometric exposure/cost. All c
 
 ### Model history and evidence
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 4358 | 278,912 | c63 | 3.9287% |
-| 4359 | 278,976 | c63 | 3.9294% |
-| 4360 | 279,040 | c63 | 3.9356% |
-| 4361 | 279,104 | c63 | 3.9207% |
-| 4362 | 279,168 | c63 | 3.9197% |
+| 4364 | 279,296 | c54 | 4.5245% |
+| 4365 | 279,360 | c54 | 4.4763% |
+| 4366 | 279,424 | c54 | 4.4919% |
+| 4367 | 279,488 | c54 | 4.4900% |
+| 4368 | 279,552 | c54 | 4.4546% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -119,7 +119,7 @@ These finite generators and ratio bands do not cover every integer triple, every
 
 ## What the model learns
 
-Every 64 verified tasks freezes a policy. The production method combines a declared geometric band/shell prior with measured curve yield and aggregate CPU, including empty tasks. It keeps 40% uniform task proposals; those are selection shares, not CPU budgets or discovery probabilities.
+Every 64 verified tasks freezes a policy. The production method combines a declared geometric band/shell prior with measured curve yield and aggregate CPU. Its exploration reserve is expressed in predicted CPU; actual device costs and discovery probabilities remain uncertain. A separate [shared-feature model](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md) learns residual workload patterns against a proof-aware baseline, with unseen geometry withheld. The [positive unit-phase experiment](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/UNIT_PHASE_EXPERIMENT.md) tests a distinct generator family separately from production.
 
 ```mermaid
 flowchart TD
@@ -166,16 +166,17 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **278,528 verified tasks**; **272 models** and **271 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **279,552 verified tasks**; **1 models** and **0 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
-The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.
+The challenger learns residual log-cost and arithmetic exposure from shared coefficient, band and exact shell-bound features. Its comparator already knows provably empty tiles and context costs. Entire geometry cells remain withheld; no discoveries are predicted.
 
 ```mermaid
 flowchart TD
     Receipts[Independently replayed receipts] --> Ledger[Canonical ledger]
     Ledger --> Production[Geometry and measured cost: 40 percent exploration]
     Ledger --> Freeze[Freeze each 1024 task boundary]
-    Freeze --> Spatial[Train spatial challenger excluding held-out geometry]
+    Freeze --> Proof[Exact shell geometry and proof-aware baseline]
+    Proof --> Spatial[Learn shared-feature residuals excluding held-out geometry]
     Spatial --> Future[Score next 1024 accepted tasks]
     Future --> Report[Publish errors and immutable model hashes]
     Report --> Gate[Controlled policy benchmark still required]
@@ -185,21 +186,11 @@ flowchart TD
 
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 
-Latest evaluation: tasks 277,505–278,528. Lower mean absolute log1p prediction error is better.
-
-| Quantity | Context baseline | Spatial challenger |
-| --- | ---: | ---: |
-| cpu_ms | 1.2581 | 1.0875 |
-| quotient_points | 7.9343 | 7.5798 |
-| curves | 4.0709 | 3.7277 |
-| exact_tests | 0.1587 | 0.1401 |
-
-Unseen-geometry evaluation: 186 tasks. Full errors and nonzero-count support are in the report.
 
 ![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 
 Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.
 
-[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/learning/mg114-spatial-shadow-v1/1df1bb496828a2dc/) · [Design and promotion protocol](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md)
+[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/learning/mg114-spatial-shadow-v2/79b17fb84ec4793d/) · [Design and promotion protocol](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md)
 
 <!-- LEARNING:END -->

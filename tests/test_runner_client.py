@@ -41,6 +41,18 @@ def snapshot(folder, completed=()):
 
 
 class RunnerClientTests(unittest.TestCase):
+    def test_preflight_holds_context_and_bounded_fallback_never_credits_a_skip(self):
+        with tempfile.TemporaryDirectory() as directory:
+            db=runner.open_state(Path(directory),{'name':'proof fixture','github':'proof-fixture'})
+            weights=runner.PolicyWeights([1/81]*81,{'proposal_preflight':'mg114-shell-tile-v1'})
+            proposed=[]
+            with patch('search_features.certified_empty',side_effect=lambda t:proposed.append(t) or True):
+                task=runner.choose_task(random.Random(114),weights,db,seed='ab'*32)
+            self.assertEqual(len(proposed),31)
+            self.assertEqual({t['context'] for t in proposed},{task['context']})
+            self.assertEqual(db.execute('SELECT count(*) FROM tasks').fetchone()[0],1)
+            self.assertEqual(db.execute('SELECT count(*) FROM tasks WHERE result IS NOT NULL').fetchone()[0],0)
+            db.close()
     @unittest.skipUnless(os.environ.get('MG_HTTP_FIXTURE'), 'local HTTP integration is enabled explicitly')
     def test_real_http_coverage_skips_reserved_task_before_spawn(self):
         with tempfile.TemporaryDirectory(prefix='mg114 http fixture ') as directory:

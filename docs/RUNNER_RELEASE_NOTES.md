@@ -1,3 +1,13 @@
+# Math Gambling runner v0.6.0
+
+Supports the CPU-budgeted policy and exact proposal preflight. All fixed task definitions, exact checks, stored results, receipt digests and contribution credits remain compatible. Stop the old runner before resuming its output directory with this release.
+
+The new policy expresses its exploration reserve in predicted reference CPU, rather than task counts. Device costs vary; the geometric objective remains a proxy, not discovery probability. Before reserving a task, exact outward integer bounds can prove its whole norm tile empty. Such proposals receive no credit and are never recorded as completed mathematical coverage. Context is held fixed during bounded resampling, and uncertain tiles remain eligible.
+
+The Rust arithmetic kernel, ten-second bank pacing, authentication and durable recovery are unchanged. The archive includes the new proof module; Windows, macOS and Linux packaging checks exercise the extracted runner.
+
+## Previous release
+
 # Math Gambling runner v0.5.2
 
 Bank uploads normally run ten seconds apart instead of one minute apart. Twelve queued banks require 110 seconds of scheduled spacing, plus request time; GitHub limits or network failures can extend this. Rate-limit waits honor response headers and survive a restart. Repeated failures back off. An ambiguous creation remains saved for inspection instead of being blindly retried. The runner continues using the remaining chosen time budget to drain; Ctrl+C retains its queue.

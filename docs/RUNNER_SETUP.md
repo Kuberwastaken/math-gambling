@@ -1,6 +1,6 @@
 # Run Math Gambling locally
 
-Release **v0.5.2** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.5.2 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
+Release **v0.6.0** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.6.0 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
 
 Use a normal Python **3.11 or newer** installation with SQLite support. Download it from [python.org](https://www.python.org/downloads/) if needed. This is the portable volunteer client; the separate native C/PARI research campaign has different build requirements and performance.
 
@@ -11,13 +11,13 @@ Eligible negative banks now use random audits. Only actually replayed tasks earn
 
 ## 1. Download and extract
 
-[Download runner v0.5.2](https://github.com/Kuberwastaken/math-gambling/releases/download/v0.5.2/math-gambling-runner-v0.5.2.zip). The [GitHub release](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.5.2) includes SHA-256 checksums and the setup guide. The archive contains a `math-gambling` folder with `tools`, `data` and these instructions. Keep that folder together.
+[Download runner v0.6.0](https://github.com/Kuberwastaken/math-gambling/releases/download/v0.6.0/math-gambling-runner-v0.6.0.zip). The [GitHub release](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.6.0) includes SHA-256 checksums and the setup guide. The archive contains a `math-gambling` folder with `tools`, `data` and these instructions. Keep that folder together.
 
 On macOS or Linux, open Terminal. If you saved the ZIP in Downloads:
 
 ```sh
 cd ~/Downloads
-unzip math-gambling-runner-v0.5.2.zip
+unzip math-gambling-runner-v0.6.0.zip
 cd math-gambling
 ```
 
@@ -25,7 +25,7 @@ On Windows, open PowerShell:
 
 ```powershell
 cd "$HOME\Downloads"
-Expand-Archive .\math-gambling-runner-v0.5.2.zip -DestinationPath .\math-gambling-runner
+Expand-Archive .\math-gambling-runner-v0.6.0.zip -DestinationPath .\math-gambling-runner
 cd .\math-gambling-runner\math-gambling
 ```
 
@@ -157,4 +157,4 @@ A published snapshot is not a live task reservation. Concurrent clients can choo
 
 ## Upgrading an existing run
 
-Version 0.5.2 reads both coverage v1 and v2. Older runners pause on the new published coverage and should be upgraded. Stop the old runner, extract the new release, and point `--output` at your existing stopped output folder. Saved tasks and banks remain valid; startup also checks for saved exact discoveries. Operational failures now exit nonzero after preserving results. Keep uncertain bank files for reconciliation rather than posting them repeatedly.
+Version 0.6.0 reads both coverage v1 and v2. Older runners pause on the new published coverage and should be upgraded. Stop the old runner, extract the new release, and point `--output` at your existing stopped output folder. Saved tasks and banks remain valid; startup also checks for saved exact discoveries. Operational failures now exit nonzero after preserving results. Keep uncertain bank files for reconciliation rather than posting them repeatedly.

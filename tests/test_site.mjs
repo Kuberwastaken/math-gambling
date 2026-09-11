@@ -7,6 +7,7 @@ import fs from "node:fs/promises";
 import vm from "node:vm";
 import * as engine from "../web/engine.mjs";
 import * as sessionTools from "../web/search-session.mjs";
+import {certifiedEmpty} from '../web/proposal-proof.mjs';
 
 const appURL = new URL("../web/app.mjs", import.meta.url);
 const appSource = await fs.readFile(appURL, "utf8");
@@ -172,6 +173,7 @@ async function harness({
     }
   }
   const context = vm.createContext({
+    __certifiedEmpty: certifiedEmpty,
     __engine: { ...engine, verifyTriple: (xyz) => engine.verifyTriple(xyz, fixtureTarget) },
     __jackpot: () => ({ show(value) {
       if (brokenCelebration) throw Error("fixture broken animation");
@@ -233,6 +235,7 @@ async function harness({
     },
   });
   const source = appSource
+    .replace(/import \{certifiedEmpty\} from '\.\/proposal-proof\.mjs';/, 'const certifiedEmpty=__certifiedEmpty;')
     .replace(/import \{ loadChallenger \} from "\.\/challenger-viz\.mjs";/, "const loadChallenger=async()=>{};")
     .replace(/import \{ createJackpot \} from "\.\/jackpot\.mjs";/,
       "const createJackpot=__jackpot;")
@@ -742,6 +745,19 @@ for (const type of ["identity", "result"]) {
   await waitFor(() => worker.terminated, "history regression did not drain");
 }
 console.log("Audit regressions passed: early identity rescue, independent storage failure, immutable worker provenance, bounded report refresh and linear history checks.");
+{
+  let body='{"epoch":1}',etag='"one"',enabled=false;
+  const h=await harness({fetchProbe:async()=>{
+    if(!enabled)throw Error('fixture offline');
+    return new Response(body,{headers:{etag}});
+  }});
+  enabled=true;
+  const first=await h.app.fetchJSON('data/cache-fixture.json');
+  body='not JSON: unchanged ETag must reuse parsed value';
+  assert.equal(await h.app.fetchJSON('data/cache-fixture.json'),first);
+  etag='"two"';body='{"epoch":2}';
+  assert.equal((await h.app.fetchJSON('data/cache-fixture.json')).epoch,2);
+}
 
 {
   let refreshes = 0;

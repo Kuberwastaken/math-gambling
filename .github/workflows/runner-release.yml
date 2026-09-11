@@ -43,7 +43,9 @@ jobs:
       - name: Check exact shell pruning against frozen baseline
         run: |
           python -m unittest discover -s tests -p test_shell_pruning.py -v
+          python -m unittest discover -s tests -p test_search_features.py -v
           node --test tests/test_shell_pruning.mjs
+          node --test tests/test_proposal_proof.mjs
       - name: Check mathematical positive fixtures and independent search kernel
         run: python -m unittest discover -s tests -p test_search.py -v
       - name: Package native runner for this OS and architecture

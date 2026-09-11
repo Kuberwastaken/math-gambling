@@ -1,10 +1,90 @@
 {
-  "completed_evaluations": 0,
+  "completed_evaluations": 1,
   "feature_model": "shared mathematical features with exact shell bounds; unseen geometry remains withheld",
   "first_training_boundary": 279552,
   "history": "learning/mg114-spatial-shadow-v2/79b17fb84ec4793d",
-  "latest_evaluation": null,
-  "latest_model_hash": "29290bf89da3f1f9efd69d3ff3e3be53f4e6f7de27c02cd39a5d0539b1a22d40",
+  "latest_evaluation": {
+    "evaluation_hash": "e5d8652b686a5ced448d6e985ffb1ac7daeb586d2f459b93a401d4716ecb67a9",
+    "evaluation_ledger_hash": "1814a383443b793f4198d1fa1f53bc5bcc41b7742c1f551e0606f125594dd3e7",
+    "from": 279553,
+    "model_hash": "29290bf89da3f1f9efd69d3ff3e3be53f4e6f7de27c02cd39a5d0539b1a22d40",
+    "results": {
+      "future_all": {
+        "mean_absolute_log1p_error": {
+          "context_baseline": {
+            "cpu_ms": 1.2432331493884832,
+            "curves": 4.083630362774503,
+            "exact_tests": 0.17012036788806023,
+            "quotient_points": 7.950645496968374
+          },
+          "proof_baseline": {
+            "cpu_ms": 0.2727953549681245,
+            "curves": 0.0915109807694446,
+            "exact_tests": 0.06367619161674284,
+            "quotient_points": 0.14317710503216063
+          },
+          "spatial": {
+            "cpu_ms": 0.26032205110861306,
+            "curves": 0.08611012738662652,
+            "exact_tests": 0.06313322764773145,
+            "quotient_points": 0.12345973262138171
+          }
+        },
+        "nonzero_exact_tasks": 67,
+        "tasks": 1024
+      },
+      "future_nonempty": {
+        "mean_absolute_log1p_error": {
+          "context_baseline": {
+            "cpu_ms": 1.0675691027831256,
+            "curves": 1.284425545492988,
+            "exact_tests": 0.2665814548557447,
+            "quotient_points": 1.2522476864689247
+          },
+          "proof_baseline": {
+            "cpu_ms": 0.56641727768279,
+            "curves": 0.38722001780128623,
+            "exact_tests": 0.2694397529567962,
+            "quotient_points": 0.6058403122022004
+          },
+          "spatial": {
+            "cpu_ms": 0.49783471630877,
+            "curves": 0.3643668200161386,
+            "exact_tests": 0.26714225252593804,
+            "quotient_points": 0.5224081248111359
+          }
+        },
+        "nonzero_exact_tasks": 67,
+        "tasks": 242
+      },
+      "future_unseen_geometry": {
+        "mean_absolute_log1p_error": {
+          "context_baseline": {
+            "cpu_ms": 1.10872713966235,
+            "curves": 3.8263739558814804,
+            "exact_tests": 0.14296207525290822,
+            "quotient_points": 7.527824638828846
+          },
+          "proof_baseline": {
+            "cpu_ms": 0.2941029412334998,
+            "curves": 0.13045687158313057,
+            "exact_tests": 0.06424024484414904,
+            "quotient_points": 0.18393053626897354
+          },
+          "spatial": {
+            "cpu_ms": 0.2859932414368989,
+            "curves": 0.12844729833288665,
+            "exact_tests": 0.06548134564500756,
+            "quotient_points": 0.1602313409231873
+          }
+        },
+        "nonzero_exact_tasks": 13,
+        "tasks": 180
+      }
+    },
+    "through": 280576
+  },
+  "latest_model_hash": "973c8d5075a978bcb4732f5e930410752d40e40a3777a6891081857731383850",
   "limitations": [
     "Arrival order is not dispatch time.",
     "Held-out errors describe submitted tasks, not an unbiased sampling population.",
@@ -13,14 +93,14 @@
     "No production exclusions, seed changes, leaderboard changes or automatic promotion."
   ],
   "mode": "shadow",
-  "model_count": 1,
-  "next_boundary": 280576,
-  "observed_tasks": 280427,
+  "model_count": 2,
+  "next_boundary": 281600,
+  "observed_tasks": 280838,
   "promotion": {
     "allowed": false,
     "reason": "Prediction validation is not controlled search-policy validation. No discovery advantage established."
   },
   "schema": "mg114-spatial-shadow-v2",
   "source_hash": "79b17fb84ec4793d65fb95b908efe91f67f5aca3f8fc49e3363c9867a8c0964c",
-  "through": 279552
+  "through": 280576
 }

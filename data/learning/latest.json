@@ -1,90 +1,90 @@
 {
-  "completed_evaluations": 3,
+  "completed_evaluations": 4,
   "feature_model": "shared mathematical features with exact shell bounds; unseen geometry remains withheld",
   "first_training_boundary": 279552,
   "history": "learning/mg114-spatial-shadow-v2/79b17fb84ec4793d",
   "latest_evaluation": {
-    "evaluation_hash": "c0d2f8b9075e05c9592514f33e8e4c04c5f8c4fd86e738a8cc9e043ec97d73ef",
-    "evaluation_ledger_hash": "b077eb4795563bcecf1d6ae648019608e46e40188a1ea83e0261d64cf39eb8a1",
-    "from": 281601,
-    "model_hash": "0e9ad8212feaa9cb972d7d28d75e561109f5614c0b104f27bbc0b685867b9d03",
+    "evaluation_hash": "2e8285e33553fef062c2f647fb4d6e413359d4eba70373f909c7e46b71ab38fd",
+    "evaluation_ledger_hash": "a82114603c6e7ebf328fd4384cd0fc1d5fc993152f4cf26bd2114b7a26eadb8d",
+    "from": 282625,
+    "model_hash": "51eb31ef47cf22486921e23f6c1e72a57311f3a5ddad145dc3fb9a80a271ef60",
     "results": {
       "future_all": {
         "mean_absolute_log1p_error": {
           "context_baseline": {
-            "cpu_ms": 1.4233038918423047,
-            "curves": 3.9974412095822522,
-            "exact_tests": 0.2492353159900882,
-            "quotient_points": 8.184428802621547
+            "cpu_ms": 1.4081900852434388,
+            "curves": 3.8859171094925475,
+            "exact_tests": 0.281035768014571,
+            "quotient_points": 8.002324641201437
           },
           "proof_baseline": {
-            "cpu_ms": 0.21435436220672316,
-            "curves": 0.10510787536332933,
-            "exact_tests": 0.08005709393854413,
-            "quotient_points": 0.17937124770312127
+            "cpu_ms": 0.2754950845213814,
+            "curves": 0.13016047911800857,
+            "exact_tests": 0.09855229207000847,
+            "quotient_points": 0.21860515789616777
           },
           "spatial": {
-            "cpu_ms": 0.2071526961482198,
-            "curves": 0.09879548927894032,
-            "exact_tests": 0.0790564642477253,
-            "quotient_points": 0.14550266909590426
+            "cpu_ms": 0.26289898120859206,
+            "curves": 0.12161933999787268,
+            "exact_tests": 0.0951613808215754,
+            "quotient_points": 0.1790079203283229
           }
         },
-        "nonzero_exact_tasks": 90,
+        "nonzero_exact_tasks": 115,
         "tasks": 1024
       },
       "future_nonempty": {
         "mean_absolute_log1p_error": {
           "context_baseline": {
-            "cpu_ms": 0.846921978085998,
-            "curves": 1.3040645675924945,
-            "exact_tests": 0.30422995771132066,
-            "quotient_points": 1.2727825774711932
+            "cpu_ms": 0.9241912759843187,
+            "curves": 1.241308317464927,
+            "exact_tests": 0.3559344935997421,
+            "quotient_points": 1.2190037398537084
           },
           "proof_baseline": {
-            "cpu_ms": 0.4088184090286603,
-            "curves": 0.4046258059099595,
-            "exact_tests": 0.3081897150115383,
-            "quotient_points": 0.6905118708571285
+            "cpu_ms": 0.5267363869059452,
+            "curves": 0.4533480633225877,
+            "exact_tests": 0.3432569628560839,
+            "quotient_points": 0.7614002778424347
           },
           "spatial": {
-            "cpu_ms": 0.35541655063702526,
-            "curves": 0.38032549256253717,
-            "exact_tests": 0.3043376668784613,
-            "quotient_points": 0.5601305757676915
+            "cpu_ms": 0.4691500245629257,
+            "curves": 0.4235993338701416,
+            "exact_tests": 0.331446442045215,
+            "quotient_points": 0.6234833687625941
           }
         },
-        "nonzero_exact_tasks": 90,
-        "tasks": 266
+        "nonzero_exact_tasks": 115,
+        "tasks": 294
       },
       "future_unseen_geometry": {
         "mean_absolute_log1p_error": {
           "context_baseline": {
-            "cpu_ms": 1.262802733719397,
-            "curves": 3.6601518909776196,
-            "exact_tests": 0.22527193256167347,
-            "quotient_points": 7.545978760105497
+            "cpu_ms": 1.2042637777258849,
+            "curves": 3.4300187513896585,
+            "exact_tests": 0.2479221910207776,
+            "quotient_points": 7.0350961585924985
           },
           "proof_baseline": {
-            "cpu_ms": 0.23466823029523515,
-            "curves": 0.13522438791838584,
-            "exact_tests": 0.08931304165132407,
-            "quotient_points": 0.23110062201535725
+            "cpu_ms": 0.3174263351365275,
+            "curves": 0.22183728009584297,
+            "exact_tests": 0.12207110186601491,
+            "quotient_points": 0.33237361371716345
           },
           "spatial": {
-            "cpu_ms": 0.22401375440411295,
-            "curves": 0.13624599778963944,
-            "exact_tests": 0.0896431650072383,
-            "quotient_points": 0.19683947063349447
+            "cpu_ms": 0.2975643311674329,
+            "curves": 0.21755371552620525,
+            "exact_tests": 0.11912569181693287,
+            "quotient_points": 0.28991509904816
           }
         },
-        "nonzero_exact_tasks": 15,
-        "tasks": 166
+        "nonzero_exact_tasks": 24,
+        "tasks": 164
       }
     },
-    "through": 282624
+    "through": 283648
   },
-  "latest_model_hash": "51eb31ef47cf22486921e23f6c1e72a57311f3a5ddad145dc3fb9a80a271ef60",
+  "latest_model_hash": "d6e7981dce39b16b7fa3d9379e35125aadee1f23040cf70debdfcf2e7e4f2694",
   "limitations": [
     "Arrival order is not dispatch time.",
     "Held-out errors describe submitted tasks, not an unbiased sampling population.",
@@ -93,14 +93,14 @@
     "No production exclusions, seed changes, leaderboard changes or automatic promotion."
   ],
   "mode": "shadow",
-  "model_count": 4,
-  "next_boundary": 283648,
-  "observed_tasks": 283430,
+  "model_count": 5,
+  "next_boundary": 284672,
+  "observed_tasks": 283711,
   "promotion": {
     "allowed": false,
     "reason": "Prediction validation is not controlled search-policy validation. No discovery advantage established."
   },
   "schema": "mg114-spatial-shadow-v2",
   "source_hash": "79b17fb84ec4793d65fb95b908efe91f67f5aca3f8fc49e3363c9867a8c0964c",
-  "through": 282624
+  "through": 283648
 }

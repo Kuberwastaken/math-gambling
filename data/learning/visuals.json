@@ -1,6 +1,6 @@
 {
   "baseline": "proof-aware context baseline",
-  "completed_evaluations": 2,
+  "completed_evaluations": 3,
   "metrics": {
     "cpu_ms": "Server CPU cost",
     "curves": "Curve intervals",
@@ -8,9 +8,9 @@
     "quotient_points": "Quotient positions"
   },
   "mode": "shadow",
-  "model_count": 3,
-  "next_boundary": 282624,
-  "observed_tasks": 282386,
+  "model_count": 4,
+  "next_boundary": 283648,
+  "observed_tasks": 282746,
   "pilot": [
     {
       "label": "Uniform",
@@ -74,8 +74,32 @@
       "model_hash": "973c8d5075a978bcb4732f5e930410752d40e40a3777a6891081857731383850",
       "through": 281600,
       "unseen_tasks": 172
+    },
+    {
+      "from": 281601,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": 3.3597011902925886,
+          "future_unseen_geometry": 4.5402293602836
+        },
+        "curves": {
+          "future_all": 6.005626184116852,
+          "future_unseen_geometry": -0.7554923242619463
+        },
+        "exact_tests": {
+          "future_all": 1.2498950956013413,
+          "future_unseen_geometry": -0.36962502878697573
+        },
+        "quotient_points": {
+          "future_all": 18.881832534985293,
+          "future_unseen_geometry": 14.825209505314978
+        }
+      },
+      "model_hash": "0e9ad8212feaa9cb972d7d28d75e561109f5614c0b104f27bbc0b685867b9d03",
+      "through": 282624,
+      "unseen_tasks": 166
     }
   ],
   "source_hash": "79b17fb84ec4793d65fb95b908efe91f67f5aca3f8fc49e3363c9867a8c0964c",
-  "through": 281600
+  "through": 282624
 }

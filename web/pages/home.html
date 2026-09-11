@@ -389,11 +389,13 @@
     <p id="challenger-status">Loading frozen model evaluations…</p>
     <p>Every 1,024 verified tasks freezes a new spatial model. We test its predictions on the next window of receipts. It watches the search; the published scheduler above still makes the decisions.</p>
     <div class="challenger-controls">
+      <label>Model <select id="challenger-version" disabled><option>Current model</option></select></label>
       <label>Predicting <select id="challenger-metric" disabled><option value="cpu_ms">Server CPU cost</option><option value="quotient_points">Quotient positions</option><option value="curves">Curve intervals</option><option value="exact_tests">Exact square tests</option></select></label>
       <output id="challenger-selected" for="challenger-window">No evaluation selected</output>
     </div>
     <p class="challenger-legend"><span>━ Later submitted tasks</span><span>┄ Unseen geometry</span></p>
     <div id="challenger-chart" class="challenger-chart"></div>
+    <p id="challenger-window-progress" aria-live="polite"></p>
     <label for="challenger-window">Inspect a frozen evaluation</label>
     <input id="challenger-window" type="range" min="0" max="0" value="0" step="1" disabled>
     <p id="challenger-detail" aria-live="polite"></p>

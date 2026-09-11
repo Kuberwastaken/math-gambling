@@ -1533,6 +1533,7 @@ setInterval(() => {
     loadMac();
     loadCluster();
     loadStrategy();
+    void loadChallenger(fetchJSON);
   }
 }, 60000);
 

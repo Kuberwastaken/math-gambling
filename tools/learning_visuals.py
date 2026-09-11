@@ -15,19 +15,41 @@ def reduction(scores,metric):
     if not math.isfinite(result):raise ValueError('nonfinite prediction metric')
     return result
 
-def generate(data=ROOT/'data'):
-    data=Path(data);latest=json.loads((data/'learning/latest.json').read_text())
-    folder=(data/latest['history']).resolve()
-    if not folder.is_relative_to((data/'learning').resolve()):raise ValueError('invalid history path')
+def read_series(folder):
     series=[]
     for p in sorted(folder.glob('eval-*.json')):
         e=json.loads(p.read_text());point={'through':e['through'],'from':e['from'],'model_hash':e['model_hash'],'metrics':{},'unseen_tasks':e['results']['future_unseen_geometry']['tasks']}
         for key in METRICS:
             point['metrics'][key]={group:reduction(e['results'][group]['mean_absolute_log1p_error'],key) for group in ('future_all','future_unseen_geometry')}
         series.append(point)
+    return series
+
+def generate(data=ROOT/'data'):
+    data=Path(data);latest=json.loads((data/'learning/latest.json').read_text())
+    folder=(data/latest['history']).resolve()
+    if not folder.is_relative_to((data/'learning').resolve()):raise ValueError('invalid history path')
+    series=read_series(folder)
     report={k:latest[k] for k in ['mode','through','observed_tasks','model_count','completed_evaluations','next_boundary','source_hash']}
     baseline='proof-aware context baseline' if latest.get('schema')=='mg114-spatial-shadow-v2' else 'context baseline'
     report.update(schema='mg114-learning-visuals-v1',series=series[-512:],metrics=METRICS,baseline=baseline)
+    report.update(model_version=latest['schema'],first_training_boundary=latest.get('first_training_boundary'),archives=[])
+    # Publish each previous source version separately. Never splice incomparable
+    # baselines into the current curve or make the initial page fetch all history.
+    for old in sorted((data/'learning').glob('mg114-spatial-shadow-v*/*')):
+        if not old.is_dir() or old.resolve()==folder:continue
+        if old.parent.name not in ('mg114-spatial-shadow-v1','mg114-spatial-shadow-v2'):continue
+        if len(old.name)!=16 or any(c not in '0123456789abcdef' for c in old.name):continue
+        points=read_series(old)
+        if not points:continue
+        models=sorted(old.glob('model-*.json'))
+        name=f'archive-{old.parent.name}-{old.name}.json'
+        old_baseline='proof-aware context baseline' if old.parent.name.endswith('v2') else 'context baseline'
+        archived=dict(schema=report['schema'],mode='shadow',model_version=old.parent.name,source_hash=old.name,
+                      model_count=len(models),completed_evaluations=len(points),through=int(models[-1].stem.split('-')[1]) if models else points[-1]['through'],
+                      series=points[-512:],baseline=old_baseline,archived=True)
+        atomic_json(data/'learning'/name,archived)
+        report['archives'].append(dict(source_hash=old.name,model_version=old.parent.name,
+                                       evaluations=len(points),url=f'data/learning/{name}'))
     atomic_json(data/'learning/visuals.json',report)
     svg=['<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="730" viewBox="0 0 1200 730" role="img" aria-labelledby="title desc">',
          '<title id="title">Spatial challenger: prediction error across frozen evaluations</title>',
@@ -42,16 +64,23 @@ def generate(data=ROOT/'data'):
         left=65+(index%2)*590;top=165+(index//2)*245;w=505;h=145
         values=[p['metrics'][metric][g] for p in series for g in ('future_all','future_unseen_geometry') if p['metrics'][metric][g] is not None]
         lo=min([0]+values);hi=max([1]+values);pad=(hi-lo)*.15;lo-=pad;hi+=pad
-        x=lambda j:left+j*w/max(1,len(series)-1)
+        x=lambda j:left+w/2 if len(series)==1 else left+j*w/max(1,len(series)-1)
         y=lambda v:top+h-(v-lo)/(hi-lo)*h
         svg.append(f'<text x="{left}" y="{top-20}" font-size="19">{escape(label)}</text>')
         for v in [lo,0,hi]:
             svg.append(f'<path d="M{left} {y(v):.2f}h{w}" stroke="#ddd"/><text x="{left-9}" y="{y(v)+5:.2f}" text-anchor="end" font-size="12">{v:.1f}%</text>')
         for group,color,dash in [('future_all','#111',''),('future_unseen_geometry','#b5222c','6 4')]:
-            points=' '.join(f'{x(j):.2f},{y(p["metrics"][metric][group]):.2f}' for j,p in enumerate(series) if p['metrics'][metric][group] is not None)
-            svg.append(f'<polyline points="{points}" fill="none" stroke="{color}" stroke-width="2.5" stroke-dasharray="{dash}"/>')
+            pen=False;segments=[]
+            for j,p in enumerate(series):
+                value=p['metrics'][metric][group]
+                if value is None:pen=False;continue
+                segments.append(f'{"L" if pen else "M"}{x(j):.2f},{y(value):.2f}');pen=True
+                svg.append(f'<circle cx="{x(j):.2f}" cy="{y(value):.2f}" r="3" fill="{color}"/>')
+            svg.append(f'<path d="{" ".join(segments)}" fill="none" stroke="{color}" stroke-width="2.5" stroke-dasharray="{dash}"/>')
         if series:
-            for j in (0,len(series)-1):svg.append(f'<text x="{x(j):.2f}" y="{top+h+23}" text-anchor="middle" font-size="12">{series[j]["through"]:,}</text>')
+            for j in sorted({0,len(series)-1}):svg.append(f'<text x="{x(j):.2f}" y="{top+h+23}" text-anchor="middle" font-size="12">{series[j]["through"]:,}</text>')
+        else:
+            svg.append(f'<text x="{left+w/2}" y="{top+h/2}" text-anchor="middle" font-size="15">Awaiting the first complete evaluation window</text>')
         svg.append(f'<text x="{left+w/2}" y="{top+h+43}" text-anchor="middle" font-size="12">Verified tasks at evaluation end</text>')
     svg+=[f'<text x="38" y="679" font-size="15">Y: reduction in mean absolute log1p error versus {baseline}. Above zero = lower error.</text>',
           '<text x="38" y="706" font-size="15">Historical backfills are retrospective. Better predictions do not establish better discovery odds.</text></g></svg>']

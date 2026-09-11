@@ -78,6 +78,9 @@ def main():
         (OUT/'data/learning').mkdir()
         for name in ['latest.json','visuals.json','evolution.svg','pilot.svg']:
             if (learning/name).exists(): shutil.copy2(learning/name, OUT/'data/learning'/name)
+        for archive in json.loads((learning/'visuals.json').read_text()).get('archives',[]):
+            name=Path(archive['url']).name
+            shutil.copy2(learning/name, OUT/'data/learning'/name)
     if (ROOT/'data/math-coverage/index.json').exists():
         (OUT/'data/math-coverage').mkdir()
         shutil.copy2(ROOT/'data/math-coverage/index.json', OUT/'data/math-coverage/index.json')

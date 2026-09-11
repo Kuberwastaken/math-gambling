@@ -63,7 +63,12 @@ def main():
     (OUT/'data').mkdir()
     for name in ['site-config.json','mac.json','mac-history.json','cluster.json','strategy.json','runner-release.json']:
         p=ROOT/'data'/name
-        if p.exists():json.loads(p.read_text(encoding='utf-8'));shutil.copy2(p,OUT/'data'/name)
+        if p.exists():
+            if name == 'cluster.json':
+                from public_reports import publish
+                publish(p, OUT/'data'/name)
+            else:
+                json.loads(p.read_text(encoding='utf-8'));shutil.copy2(p,OUT/'data'/name)
     chart = ROOT / 'data/readme-progress.svg'
     if chart.exists(): shutil.copy2(chart, OUT / 'data/readme-progress.svg')
     learning = ROOT / 'data/learning'

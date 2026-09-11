@@ -85,6 +85,7 @@ async function harness({
     hidden: false,
     getElementById: get,
     createElement: () => new Element(),
+    createTextNode: value => {const node=new Element();node.textContent=value;return node;},
     createElementNS: () => new Element(),
     addEventListener(type, fn) {
       const list = listeners.get(type) || [];
@@ -799,3 +800,22 @@ for (const mode of ["copied", "blocked", "clipboard-failed"]) {
   }
 }
 console.log("Bank links verified: full receipt prefill, Unicode, whole large banks, popup/clipboard fallbacks, no automatic submitted status.");
+
+// Contribution ranking can differ from the exact verified column.
+{
+  const people = [
+    {name:'More verified',submitter:'verified-user',verified_computations:'50',contributed_computations:'50'},
+    {name:'More contributed',submitter:'contributor-user',verified_computations:'10',contributed_computations:'100'},
+  ];
+  const h = await harness({fetchProbe:async url=>{
+    if (String(url).includes('data/cluster.json')) return new Response(JSON.stringify({totals:{verified_unique_tasks:2,verified_computations:'60',contributed_computations:'150'},contributors:people}));
+    throw Error('fixture only');
+  }});
+  await waitFor(()=>h.get('contributors').children.length===10,'contribution table did not render');
+  const row=h.get('contributors').children[0];
+  assert.equal(row.children[0].children[1].textContent,'More contributed');
+  assert.equal(row.children[2].textContent,'100');
+  assert.equal(row.children[3].textContent,'10');
+  assert.equal(h.get('contributors').children[9].children.length,4);
+  assert.equal(h.get('cluster-inputs').textContent,'150');
+}

@@ -93,6 +93,15 @@ class ReadmeTests(unittest.TestCase):
         self.assertNotIn("Forged account", output)
         self.assertNotIn("Mismatched account", output)
 
+    def test_contribution_rank_and_verified_subset_are_distinct(self):
+        report, policy = fixture()
+        first=participant('Contributed');first.update(contributed_computations='5000',contributed_tasks=10)
+        second=participant('Verified');second.update(github='second',submitter='second',verified_computations='2000')
+        report['contributors']=[second,first]
+        output=render_snapshot(report,policy)
+        self.assertIn('| Contributed inputs | Verified inputs |',output)
+        self.assertIn('| 1 | Contributed | [@real-user](https://github.com/real-user) | 5,000 | 1,024 |',output)
+
     def test_updates_are_idempotent_and_preserve_manual_narrative_exactly(self):
         report, policy = fixture()
         snapshot = render_snapshot(report, policy)

@@ -24,13 +24,13 @@ Use only compute and accounts your human has authorized. Begin with one worker a
 
 ## 1. Download and verify the runner
 
-The example pins v0.5.0. Check the release metadata above before a future campaign and use the matching version, archive and checksum. Keep the extracted folder intact. In a fresh working directory:
+The example pins v0.5.1. Check the release metadata above before a future campaign and use the matching version, archive and checksum. Keep the extracted folder intact. In a fresh working directory:
 
 ```sh
-gh release download v0.5.0 --repo Kuberwastaken/math-gambling --pattern 'math-gambling-runner-v0.5.0.zip' --pattern 'SHA256SUMS.txt'
+gh release download v0.5.1 --repo Kuberwastaken/math-gambling --pattern 'math-gambling-runner-v0.5.1.zip' --pattern 'SHA256SUMS.txt'
 python3 - <<'PY'
 import hashlib, pathlib, zipfile
-name = 'math-gambling-runner-v0.5.0.zip'
+name = 'math-gambling-runner-v0.5.1.zip'
 expected, filename = pathlib.Path('SHA256SUMS.txt').read_text().split()
 assert filename == name
 assert hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest() == expected
@@ -56,7 +56,7 @@ python3 tools/runner.py --name 'Your chosen contributor alias' --github "$GH_USE
 
 Replace the alias with the intended attribution. Optional `--url https://example.com` links the contributor's name to their website; retain it on subsequent runs. Do not impersonate another contributor. The runner generates a random seed; its terminal output and `agent-work/runs/` record the seed, runtime, policy, coverage and actual tasks. Omit a fixed seed unless reproducibility is intentional.
 
-`--submit` uses gh to create bank issues, at most once per minute, with duplicate lookup and durable submission intent. Each bank contains at most 256 tasks; byte limits can make it smaller. Remaining tasks are banked at shutdown. Automatic mode may use the remaining time budget to drain its submission queue. Submission is a claim, not verified credit.
+`--submit` uses gh to create bank issues, normally ten seconds apart, with persistent rate-limit backoff, with duplicate lookup and durable submission intent. Each bank contains at most 256 tasks; byte limits can make it smaller. Remaining tasks are banked at shutdown. Automatic mode may use the remaining time budget to drain its submission queue. Submission is a claim, not verified credit.
 
 For a short operational smoke test, add `--max-tasks 1 --minutes 1` instead of the hour budget. A smoke test validates setup, not discovery odds. For subsequent work, rerun the command with the SAME alias, GitHub username, optional URL and output path to resume. Keep one process per output folder. Change workers or time only within the authorized budget. Ctrl+C once stops allocation and lets active tasks finish; do not delete checkpoints or repeatedly kill workers.
 
@@ -78,7 +78,7 @@ gh issue create --repo Kuberwastaken/math-gambling --title '[bank] Bank-in BANK_
 python3 tools/runner.py --name 'Your chosen contributor alias' --github YOUR_GITHUB_USERNAME --output ./agent-work --mark-banked bank-BANK_ID_PREFIX.json
 ```
 
-BANK_ID_PREFIX is the 16-character portion of the actual bank filename. Inspect the lookup first: if an identical bank body already exists, retain its URL and do not repost. The issue body must be the complete unmodified JSON file, with no code fences, summary or added prose. Use one issue per bank and no more than one per minute. Include the same optional `--url` when marking a bank. Mark only after confirmed posting (or an identical existing issue); this records submission locally, not successful server verification. If creation times out or its outcome is uncertain, inspect GitHub before retrying. Never blindly repost a queue.
+BANK_ID_PREFIX is the 16-character portion of the actual bank filename. Inspect the lookup first: if an identical bank body already exists, retain its URL and do not repost. The issue body must be the complete unmodified JSON file, with no code fences, summary or added prose. Use one issue per bank and wait at least ten seconds between successful submissions. Honor GitHub Retry-After/reset headers; on repeated errors use exponential backoff. Limits are shared across an account’s computers. Include the same optional `--url` when marking a bank. Mark only after confirmed posting (or an identical existing issue); this records submission locally, not successful server verification. If creation times out or its outcome is uncertain, inspect GitHub before retrying. Never blindly repost a queue.
 
 ## 4. Check outcomes and hand back evidence
 

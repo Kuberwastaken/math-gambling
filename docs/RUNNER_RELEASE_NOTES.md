@@ -1,3 +1,13 @@
+# Math Gambling runner v0.5.1
+
+Bank uploads normally run ten seconds apart instead of one minute apart. Twelve queued banks require 110 seconds of scheduled spacing, plus request time; GitHub limits or network failures can extend this. Rate-limit waits honor response headers and survive a restart. Repeated failures back off. An ambiguous creation remains saved for inspection instead of being blindly retried. The runner continues using the remaining chosen time budget to drain; Ctrl+C retains its queue.
+
+The leaderboard now ranks **contributed inputs**: exact replays plus provisional unique work from complete banks with at least one matched random audit. Verified inputs are shown separately. Duplicate tasks receive no extra credit, later verification replaces provisional credit, and a failed account audit revokes provisional credit. Unchecked tasks remain outside certified coverage and model training. Existing stored claims qualify under the same rules; no individual score is manually adjusted.
+
+The Rust/WebAssembly mathematical kernel and receipt protocol are unchanged. Stop the old runner and point the new one at the same output folder with the same attribution. Linux, Windows and macOS release gates check checkpoint recovery, queue pacing, rate-limit handling and the native kernel before publication.
+
+## Previous release
+
 # Math Gambling runner v0.5.0
 
 The search kernel can now run in Rust with bounded 64/128-bit arithmetic and an arbitrary-precision final check. Choose a platform ZIP and pass `--kernel rust`; the universal ZIP retains the dependency-free Python fallback and Rust sources. Python 3.11+ continues to handle authentication, seeds, checkpoints and banking. The browser uses the same kernel through WebAssembly.

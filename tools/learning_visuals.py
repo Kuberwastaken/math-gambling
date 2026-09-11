@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[1]
 METRICS={'cpu_ms':'Server CPU cost','quotient_points':'Quotient positions','curves':'Curve intervals','exact_tests':'Exact square tests'}
 
 def reduction(scores,metric):
-    base=scores['context_baseline'][metric];value=scores['spatial'][metric]
+    base=scores.get('proof_baseline',scores['context_baseline'])[metric];value=scores['spatial'][metric]
     if base is None or value is None or base<=0:return None
     result=100*(base-value)/base
     if not math.isfinite(result):raise ValueError('nonfinite prediction metric')
@@ -26,11 +26,12 @@ def generate(data=ROOT/'data'):
             point['metrics'][key]={group:reduction(e['results'][group]['mean_absolute_log1p_error'],key) for group in ('future_all','future_unseen_geometry')}
         series.append(point)
     report={k:latest[k] for k in ['mode','through','observed_tasks','model_count','completed_evaluations','next_boundary','source_hash']}
-    report.update(schema='mg114-learning-visuals-v1',series=series,metrics=METRICS)
+    baseline='proof-aware context baseline' if latest.get('schema')=='mg114-spatial-shadow-v2' else 'context baseline'
+    report.update(schema='mg114-learning-visuals-v1',series=series[-512:],metrics=METRICS,baseline=baseline)
     atomic_json(data/'learning/visuals.json',report)
     svg=['<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="730" viewBox="0 0 1200 730" role="img" aria-labelledby="title desc">',
          '<title id="title">Spatial challenger: prediction error across frozen evaluations</title>',
-         '<desc id="desc">Percentage error reduction relative to the context baseline. Positive is better. Black is later submitted tasks; red dashed is unseen geometry. This measures predictions, not discovery odds.</desc>',
+         f'<desc id="desc">Percentage error reduction relative to the {baseline}. Positive is better. Black is later submitted tasks; red dashed is unseen geometry. This measures predictions, not discovery odds.</desc>',
          '<rect width="1200" height="730" fill="white"/>',
          '<g font-family="Arial,Helvetica,sans-serif" fill="#111">',
          '<text x="38" y="45" font-size="27">Is the challenger learning?</text>',
@@ -52,7 +53,7 @@ def generate(data=ROOT/'data'):
         if series:
             for j in (0,len(series)-1):svg.append(f'<text x="{x(j):.2f}" y="{top+h+23}" text-anchor="middle" font-size="12">{series[j]["through"]:,}</text>')
         svg.append(f'<text x="{left+w/2}" y="{top+h+43}" text-anchor="middle" font-size="12">Verified tasks at evaluation end</text>')
-    svg+=['<text x="38" y="679" font-size="15">Y: reduction in mean absolute log1p error versus context baseline. Above zero = lower prediction error.</text>',
+    svg+=[f'<text x="38" y="679" font-size="15">Y: reduction in mean absolute log1p error versus {baseline}. Above zero = lower error.</text>',
           '<text x="38" y="706" font-size="15">Historical backfills are retrospective. Better predictions do not establish better discovery odds.</text></g></svg>']
     (data/'learning/evolution.svg').write_text('\n'.join(svg),encoding='utf-8',newline='\n')
     pilot_path=data/'learning/pilots/2026-09-11/results.json'

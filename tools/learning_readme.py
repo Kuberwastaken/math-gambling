@@ -12,11 +12,12 @@ def render(data):
     stale=current>r['observed_tasks']
     lines=['## Experimental task learning','',
            f"Frozen through **{r['through']:,} verified tasks**; **{r['model_count']} models** and **{r['completed_evaluations']} completed forward-window evaluations**. Mode: **shadow**, with no production influence.",'',
-           'The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.','',
+           ('The challenger learns residual log-cost and arithmetic exposure from shared coefficient, band and exact shell-bound features. Its comparator already knows provably empty tiles and context costs. Entire geometry cells remain withheld; no discoveries are predicted.' if r.get('schema')=='mg114-spatial-shadow-v2' else 'The historical challenger uses context and coarse geometry, with shrinkage. These are cost and arithmetic predictions, not winning probabilities.'),'',
            '```mermaid','flowchart TD','    Receipts[Independently replayed receipts] --> Ledger[Canonical ledger]',
            '    Ledger --> Production[Geometry and measured cost: 40 percent exploration]',
            '    Ledger --> Freeze[Freeze each 1024 task boundary]',
-           '    Freeze --> Spatial[Train spatial challenger excluding held-out geometry]',
+           '    Freeze --> Proof[Exact shell geometry and proof-aware baseline]',
+           '    Proof --> Spatial[Learn shared-feature residuals excluding held-out geometry]',
            '    Spatial --> Future[Score next 1024 accepted tasks]',
            '    Future --> Report[Publish errors and immutable model hashes]',
            '    Report --> Gate[Controlled policy benchmark still required]',
@@ -25,11 +26,12 @@ def render(data):
     lines += ['', '![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)', '']
     e=r.get('latest_evaluation')
     if e:
-        lines += [f"Latest evaluation: tasks {e['from']:,}–{e['through']:,}. Lower mean absolute log1p prediction error is better.",'',
-                  '| Quantity | Context baseline | Spatial challenger |','| --- | ---: | ---: |']
         scores=e['results']['future_all']['mean_absolute_log1p_error']
+        reference='proof_baseline' if 'proof_baseline' in scores else 'context_baseline'
+        lines += [f"Latest evaluation: tasks {e['from']:,}–{e['through']:,}. Lower mean absolute log1p prediction error is better.",'',
+                  '| Quantity | '+reference.replace('_',' ')+' | Shared challenger |','| --- | ---: | ---: |']
         for t in ('cpu_ms','quotient_points','curves','exact_tests'):
-            lines.append(f"| {t} | {scores['context_baseline'][t]:.4f} | {scores['spatial'][t]:.4f} |")
+            lines.append(f"| {t} | {scores[reference][t]:.4f} | {scores['spatial'][t]:.4f} |")
         lines += ['',f"Unseen-geometry evaluation: {e['results']['future_unseen_geometry']['tasks']:,} tasks. Full errors and nonzero-count support are in the report."]
     lines += ['', '![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)', '', 'Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.', '',
               '[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/'+r['history']+'/) · [Design and promotion protocol](docs/LEARNING.md)']

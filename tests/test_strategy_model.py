@@ -58,4 +58,24 @@ class StrategyModelTests(unittest.TestCase):
     def test_empty_ledger_stays_shadow(self):
         with tempfile.TemporaryDirectory() as tmp:
             report=m.publish(Path(tmp));self.assertEqual(report['model_count'],0);self.assertFalse(report['promotion']['allowed'])
+    def test_new_version_starts_prospectively_and_authenticates_old_prefix(self):
+        with tempfile.TemporaryDirectory() as tmp,patch.object(m,'BOUNDARY',4):
+            p=Path(tmp);records=self.records(12);self.write(p,records)
+            report=m.publish(p)
+            self.assertEqual(report['model_count'],1);self.assertEqual(report['first_training_boundary'],12)
+            self.assertEqual(report['completed_evaluations'],0)
+            records[0]['server_replay_cpu_ms']+=1;self.write(p,records)
+            with self.assertRaises(ValueError):m.publish(p)
+    def test_shared_model_has_real_features_and_respects_exact_empty_proof(self):
+        from search_features import certified_empty
+        records=self.records(12)
+        rows=[{'task':r['result']['task'],'features':m.features(r['result']['task']),
+               'y':{'cpu_ms':r['server_replay_cpu_ms'],**{t:r['result']['counters'][t] for t in m.TARGETS[1:]}}} for r in records]
+        # Explicit train labels for this fixture; production derives them from the immutable split.
+        for r in rows:r['features']=(*r['features'][:3],False)
+        model=m.fit(rows);self.assertEqual(len(model['shared']['coefficients']['cpu_ms']),20)
+        for c in m.CONTEXT_BY_ID:
+            task=make_task(c,0);pred=m.predict(model,task)
+            self.assertTrue(all(m.math.isfinite(v) and v>=0 for v in pred.values()))
+            if certified_empty(task):self.assertTrue(all(pred[t]==0 for t in m.TARGETS[1:]))
 if __name__=='__main__':unittest.main()

@@ -10,7 +10,7 @@ from ingest import atomic_json
 from search_core import CONTEXT_BY_ID, canonical_json, task_id, validate_task
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = 'mg114-spatial-shadow-v1'
+SCHEMA = 'mg114-spatial-shadow-v2'
 BOUNDARY = 1024
 PRIOR = 32
 TARGETS = ('cpu_ms', 'quotient_points', 'curves', 'exact_tests')
@@ -57,6 +57,7 @@ def observations(data, through=None):
     return rows
 
 def fit(rows):
+    from shared_model import fit_shared,fit_reference
     train=[r for r in rows if not r['features'][3]]
     if not train: raise ValueError('no spatial training observations')
     def stats(items):
@@ -64,9 +65,15 @@ def fit(rows):
     groups=defaultdict(list)
     for row in train:
         for key in row['features'][:2]:groups[key].append(row)
-    return {'global':stats(train),'groups':{k:stats(v) for k,v in sorted(groups.items())},'prior':PRIOR}
+    reference=fit_reference(rows)
+    return {'global':stats(train),'groups':{k:stats(v) for k,v in sorted(groups.items())},'prior':PRIOR,
+            'shared':fit_shared(rows,reference),'proof_reference':reference}
 
 def predict(model, task, fine=True):
+    if fine and model.get('shared'):
+        from shared_model import predict_shared
+        result=predict_shared(model['shared'],task);result['cpu_ms']=max(result['cpu_ms'],.01)
+        return result
     keys=features(task)[:2 if fine else 1]
     g=model['global']; mean={t:g['sum'][t]/g['n'] for t in TARGETS}
     for key in keys:
@@ -79,30 +86,46 @@ def predict(model, task, fine=True):
 def evaluate(model, rows):
     """Prediction error on future arrivals; never a counterfactual policy estimate."""
     out={}
-    for name,subset in [('future_all',rows),('future_unseen_geometry',[r for r in rows if r['features'][3]])]:
+    from shared_model import predict_reference
+    from search_features import certified_empty
+    for name,subset in [('future_all',rows),('future_unseen_geometry',[r for r in rows if r['features'][3]]),
+                        ('future_nonempty',[r for r in rows if 'task' in r and not certified_empty(r['task'])])]:
         measures={}
         for fine,label in [(False,'context_baseline'),(True,'spatial')]:
             preds=[predict(model,r['task'],fine) for r in subset]
             measures[label]={t:(math.fsum(abs(math.log1p(p[t])-math.log1p(r['y'][t])) for p,r in zip(preds,subset))/len(subset) if subset else None) for t in TARGETS}
+        if model.get('proof_reference'):
+            preds=[predict_reference(model['proof_reference'],r['task']) or predict(model,r['task'],False) for r in subset]
+            measures['proof_baseline']={t:(math.fsum(abs(math.log1p(p[t])-math.log1p(r['y'][t])) for p,r in zip(preds,subset))/len(subset) if subset else None) for t in TARGETS}
         out[name]={'tasks':len(subset),'nonzero_exact_tasks':sum(r['y']['exact_tests']>0 for r in subset),'mean_absolute_log1p_error':measures}
     return out
 
 def publish(data):
     data=Path(data); rows=observations(data); through=len(rows)//BOUNDARY*BOUNDARY
-    source_hash=hashlib.sha256(Path(__file__).read_bytes()+(ROOT/'tools/search_core.py').read_bytes()).hexdigest()
+    source_hash=hashlib.sha256(b''.join((ROOT/'tools'/name).read_bytes() for name in
+        ('strategy_model.py','search_core.py','shared_model.py','search_features.py'))).hexdigest()
     history=data/'learning'/SCHEMA/source_hash[:16]; history.mkdir(parents=True,exist_ok=True)
     models=[]
     # Each model is fitted once. Future evaluation uses the next complete window.
-    for n in range(BOUNDARY,through+1,BOUNDARY):
+    # A new model version begins prospectively at the current boundary. No
+    # retroactive retraining of hundreds of prefixes on every source change.
+    existing=sorted(history.glob('model-*.json'))
+    first=int(existing[0].stem.split('-')[1]) if existing else max(BOUNDARY,through)
+    # Authenticate all prefixes in one linear pass, including old input changes.
+    chain=bytes(32);prefixes={}
+    for i,row in enumerate(rows[:through],1):
+        chain=hashlib.sha256(chain+bytes.fromhex(row['hash'])).digest()
+        if i%BOUNDARY==0:prefixes[i]=chain.hex()
+    for n in range(first,through+1,BOUNDARY):
         path=history/f'model-{n:09d}.json'
-        prefix_hash=digest([r['hash'] for r in rows[:n]])
+        prefix_hash=prefixes[n]
         if path.exists():
             record=json.loads(path.read_text())
             if record['ledger_hash']!=prefix_hash or record['source_hash']!=source_hash: raise ValueError('frozen model input changed')
         else:
             record={'schema':SCHEMA,'source_hash':source_hash,'through':n,'ledger_hash':prefix_hash,
                     'mode':'shadow','objective':'predict arithmetic exposure and server cost, not discoveries',
-                    'model':fit(rows[:n])}
+                    'ledger_hash_algorithm':'sha256-chain-v1','model':fit(rows[:n])}
             record['model_hash']=digest(record)
             atomic_json(path,record)
         if record['model_hash']!=digest({k:v for k,v in record.items() if k!='model_hash'}):raise ValueError('frozen model corrupted')
@@ -128,6 +151,8 @@ def publish(data):
             'source_hash':source_hash,'history':str(history.relative_to(data)),
             'model_count':len(models),'completed_evaluations':len(evaluations),
             'latest_model_hash':models[-1]['model_hash'] if models else None,
+            'first_training_boundary':first if models else None,
+            'feature_model':'shared mathematical features with exact shell bounds; unseen geometry remains withheld',
             'latest_evaluation':evaluations[-1] if evaluations else None,
             'promotion':{'allowed':False,'reason':'Prediction validation is not controlled search-policy validation. No discovery advantage established.'},
             'next_boundary':through+BOUNDARY,

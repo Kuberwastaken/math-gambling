@@ -150,17 +150,21 @@ class SearchTests(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 bank = runner.write_bank(out, db, person, force=True)
             calls = []
+            requests = []
+            clock = runner.time.time()
             def fake_run(command, **kwargs):
                 calls.append(command)
                 if command[2] == 'list':
                     return subprocess.CompletedProcess(command, 0, '[]', '')
+                requests.append(json.loads(kwargs['input']))
                 return subprocess.CompletedProcess(command, 0,
-                    'https://github.com/Kuberwastaken/math-gambling/issues/123\n', '')
+                    'HTTP/2.0 201 Created\nContent-Type: application/json\n\n{"html_url":"https://github.com/Kuberwastaken/math-gambling/issues/123"}', '')
             with patch.object(runner.subprocess, 'run', side_effect=fake_run), contextlib.redirect_stdout(io.StringIO()):
                 attempt = runner.maybe_submit(db, 'Kuberwastaken/math-gambling', -math.inf)
                 runner.maybe_submit(db, 'Kuberwastaken/math-gambling', -math.inf)
             self.assertEqual(len(calls), 2)
-            title = calls[1][calls[1].index('--title')+1]
+            title = requests[0]['title']
+            self.assertEqual(json.loads(requests[0]['body']), json.loads(bank.read_text()))
             self.assertTrue(title.startswith('[bank]'))
             parsed = ingest.parse_issue(dict(number=123, title=title,
                 body=bank.read_text(), user={'login': 'test-user'}, updated_at='2026-09-10T00:00:00Z'), 'Kuberwastaken/math-gambling')
@@ -175,8 +179,8 @@ class SearchTests(unittest.TestCase):
                     return subprocess.CompletedProcess(command, 0,
                         json.dumps([dict(title=title, body='{}', url='https://github.com/Kuberwastaken/math-gambling/issues/999')]), '')
                 return subprocess.CompletedProcess(command, 0,
-                    'https://github.com/Kuberwastaken/math-gambling/issues/124\n', '')
-            with patch.object(runner.subprocess, 'run', side_effect=impostor_run), contextlib.redirect_stdout(io.StringIO()):
+                    'HTTP/2.0 201 Created\nContent-Type: application/json\n\n{"html_url":"https://github.com/Kuberwastaken/math-gambling/issues/124"}', '')
+            with patch.object(runner.time, 'time', return_value=clock+60), patch.object(runner.subprocess, 'run', side_effect=impostor_run), contextlib.redirect_stdout(io.StringIO()):
                 runner.maybe_submit(db, 'Kuberwastaken/math-gambling', -math.inf)
             self.assertEqual(len(calls), 2)
             # Confirmed matching content avoids the create call after a resume.
@@ -185,7 +189,7 @@ class SearchTests(unittest.TestCase):
                 calls.append(command)
                 return subprocess.CompletedProcess(command, 0,
                     json.dumps([dict(title=title, body=bank.read_text(), url='https://github.com/Kuberwastaken/math-gambling/issues/124')]), '')
-            with patch.object(runner.subprocess, 'run', side_effect=existing_run), contextlib.redirect_stdout(io.StringIO()):
+            with patch.object(runner.time, 'time', return_value=clock+120), patch.object(runner.subprocess, 'run', side_effect=existing_run), contextlib.redirect_stdout(io.StringIO()):
                 runner.maybe_submit(db, 'Kuberwastaken/math-gambling', -math.inf)
             self.assertEqual(len(calls), 1)
             # Timeout after dispatch is uncertain, retained and never blindly
@@ -196,7 +200,7 @@ class SearchTests(unittest.TestCase):
                 if command[2] == 'list':
                     return subprocess.CompletedProcess(command, 0, '[]', '')
                 raise subprocess.TimeoutExpired(command, 30)
-            with patch.object(runner.subprocess, 'run', side_effect=timeout_run), contextlib.redirect_stderr(io.StringIO()):
+            with patch.object(runner.time, 'time', return_value=clock+180), patch.object(runner.subprocess, 'run', side_effect=timeout_run), contextlib.redirect_stderr(io.StringIO()):
                 runner.maybe_submit(db, 'Kuberwastaken/math-gambling', -math.inf)
                 runner.maybe_submit(db, 'Kuberwastaken/math-gambling', -math.inf)
             self.assertEqual(len(calls), 2)

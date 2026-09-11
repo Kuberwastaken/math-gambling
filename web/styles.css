@@ -1878,10 +1878,11 @@ summary {
   font: 17px var(--mono);
 }
 .leaderboard-section .table-wrap {
-  overflow: visible;
+  overflow-x: auto;
 }
 .leaderboard-table {
-  table-layout: fixed;
+  table-layout: auto;
+  min-width: 640px;
   width: 100%;
   border-collapse: collapse;
   font-family: var(--mono);
@@ -1906,13 +1907,16 @@ summary {
   overflow-wrap: anywhere;
 }
 .leaderboard-table th:first-child {
-  width: 36%;
+  width: 28%;
 }
 .leaderboard-table th:nth-child(2) {
-  width: 32%;
+  width: 26%;
+}
+.leaderboard-table th:nth-child(3) {
+  width: 23%;
 }
 .leaderboard-table th:last-child {
-  width: 32%;
+  width: 23%;
 }
 .leaderboard-table a,
 .leaderboard-table a:visited {
@@ -3161,8 +3165,10 @@ body[data-page="home"] .game-area .session-counts {
   padding: 12px;
   border-bottom: 1px solid #ddd;
 }
-.leaderboard-table th:last-child,
-.leaderboard-table td:last-child {
+.leaderboard-table th:nth-child(n+3),
+.leaderboard-table td:nth-child(n+3) {
+  white-space: nowrap;
+  overflow-wrap: normal;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }

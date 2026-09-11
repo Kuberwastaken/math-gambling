@@ -138,24 +138,25 @@
       <div id="bank-receipt" hidden>
         <p id="bank-count" class="table-note"></p>
         <div class="bank-actions">
-          <button class="button" id="copy-bank">1. Copy receipt</button
-          ><a
+          <a
             class="button primary"
             id="bank-open"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             href="https://github.com/Kuberwastaken/math-gambling/issues/new"
-            >2. Open GitHub ↗</a
+            >Submit on GitHub ↗</a
+          ><a class="button quiet" id="bank-manual" target="_blank" rel="noopener noreferrer" hidden>Open GitHub ↗</a
           ><button class="button quiet" id="download-bank">Save bank ↓</button
           ><button class="button quiet" id="posted-bank">
             I posted it · next batch
           </button>
         </div>
         <p id="copy-status" role="status" class="table-note">
-          Paste the receipt into the issue and submit. Verification starts after submission.
+          Review the prefilled receipt on GitHub and click Create.
         </p>
-        <details>
+        <details id="bank-json-details">
           <summary>Inspect receipt JSON</summary>
+          <button class="button quiet" id="copy-bank" type="button">Copy receipt</button>
           <label class="sr-only" for="bank-body">Receipt JSON</label
           ><textarea id="bank-body" readonly spellcheck="false"></textarea>
         </details>

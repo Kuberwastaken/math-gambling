@@ -69,6 +69,8 @@ async function harness({
   downloadFails = false,
   identityStorageFails = false,
   cachedIdentities = [],
+  clipboardWrite = async () => {},
+  openWindow = () => null,
 } = {}) {
   const elements = new Map();
   const get = (id) => {
@@ -205,8 +207,8 @@ async function harness({
     AbortController,
     Intl,
     Date,
-    navigator: { clipboard: { writeText: async () => {} } },
-    window: { print() {}, addEventListener() {} },
+    navigator: { clipboard: { writeText: clipboardWrite } },
+    window: { print() {}, addEventListener() {}, open: openWindow },
     matchMedia: () => ({ matches: true }),
     fetch: async (...args) => {
       if (fetchProbe) return fetchProbe(...args);
@@ -251,8 +253,8 @@ async function harness({
     )
     .replaceAll("import.meta.url", JSON.stringify(appURL.href));
   await vm.runInContext(
-    `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,openBank,submitBankProfile,prepareBank,safeProfileURL,counter,
-    state:()=>({running,starting,busy,worker,tasks,counts,pendingIdentitySaves}),
+    `(async()=>{${source}\n globalThis.__app={start,stop,dispatch,processorDuty,updateProcessor,openBank,submitBankProfile,prepareBank,bankIssueLink,safeProfileURL,counter,
+    state:()=>({running,starting,busy,worker,tasks,counts,pendingIdentitySaves,activeBank}),
     fetchJSON, setRefreshCounter:n=>{completedSinceRefresh=n;},
     setHistory:(t,b)=>{tasks=t;banks=b;},
     ageRun:()=>{startAt=Date.now()-86400000;}};})()`,
@@ -755,3 +757,45 @@ console.log("Audit regressions passed: early identity rescue, independent storag
   assert.equal(worker.terminated, true);
   assert.equal(h.stores.get("tasks").rows.size, 1);
 }
+
+// Prefill uses the issue-form field ID and round-trips the complete bank. Oversized
+// banks remain intact, with clipboard/popup failures leaving a manual path.
+for (const mode of ["copied", "blocked", "clipboard-failed"]) {
+  let copied = null, opened = 0, destination = null, prevented = false;
+  const popup = {closed: false, opener: {}, close() {this.closed = true;},
+    location: {replace(url) {destination = url;}}};
+  const h = await harness({
+    clipboardWrite: async value => {if (mode === "clipboard-failed") throw Error("denied"); copied = value;},
+    openWindow: () => {opened++; return mode === "blocked" ? null : popup;},
+  });
+  const worker = await ready(h); h.app.stop(); await deliver(worker);
+  await waitFor(() => worker.terminated, "bank fixture did not drain");
+  await h.app.prepareBank();
+  const bank = h.app.state().activeBank;
+  const link = new URL(h.get("bank-open").href);
+  assert.equal(link.searchParams.get("template"), "compute.yml");
+  assert.deepEqual(JSON.parse(link.searchParams.get("receipt")), JSON.parse(JSON.stringify(bank.payload)));
+  const click = h.get("bank-open").listeners.get("click")[0];
+  await click({preventDefault() {prevented = true;}});
+  assert.equal(prevented, false); assert.equal(opened, 0); assert.equal(copied, null);
+  bank.payload.contributor.name = "Unicode 🔴 & # + ?";
+  assert.equal(JSON.parse(new URL(h.app.bankIssueLink(bank).href).searchParams.get("receipt")).contributor.name,
+    bank.payload.contributor.name);
+  bank.payload.tasks = Array.from({length:256}, () => bank.payload.tasks[0]);
+  const large = h.app.bankIssueLink(bank);
+  assert.equal(large.prefilled, false);
+  assert.equal(new URL(large.href).searchParams.has("receipt"), false);
+  await click({preventDefault() {prevented = true;}});
+  assert.equal(prevented, true); assert.equal(opened, 1);
+  assert.equal(bank.posted, undefined, "Opening GitHub must not mark work submitted");
+  if (mode === "copied") {
+    assert.equal(copied, JSON.stringify(bank.payload));
+    assert.equal(destination, large.manual); assert.equal(popup.opener, null);
+  } else {
+    assert.equal(h.get("bank-manual").hidden, false);
+    if (mode === "clipboard-failed") {
+      assert.equal(popup.closed, true); assert.equal(h.get("bank-json-details").open, true);
+    } else assert.equal(copied, JSON.stringify(bank.payload));
+  }
+}
+console.log("Bank links verified: full receipt prefill, Unicode, whole large banks, popup/clipboard fallbacks, no automatic submitted status.");

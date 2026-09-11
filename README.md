@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-11 17:43:20 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-11 17:52:01 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 269,610 |
-| Coefficient-generator inputs | 508,006,400 |
-| Bounded curve intervals | 36,991,675 |
-| Logical quotient positions | 27,131,518,214 |
-| Exact integer square tests | 56,017 |
+| Unique finite tasks | 269,760 |
+| Coefficient-generator inputs | 508,294,144 |
+| Bounded curve intervals | 37,014,144 |
+| Logical quotient positions | 27,147,468,323 |
+| Exact integer square tests | 56,048 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,8 +35,8 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 539,592,704 | 465,299,456 |
-| 2 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 73,401,344 | 34,171,904 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 543,931,392 | 465,494,016 |
+| 2 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 75,316,224 | 34,265,088 |
 | 3 | culnaen | [@culnaen](https://github.com/culnaen) | 1,909,760 | 1,443,840 |
 | 4 | V01D0 | [@V01D0](https://github.com/V01D0) | 1,454,080 | 538,624 |
 | 5 | Vasudev | [@VasudevCodeReaper](https://github.com/VasudevCodeReaper) | 963,584 | 963,584 |
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | [Dr. Ashish Bamania](<https://www.intoai.pub/>) | [@ashishbamania](https://github.com/ashishbamania) | 491,520 | 491,520 |
 | 10 | [Ijtihed](<https://ijtihed.com>) | [@Ijtihed](https://github.com/Ijtihed) | 487,424 | 487,424 |
 
-**200,864 / 269,610 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**200,970 / 269,760 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 4212**, frozen from **269,568 verified tasks**. The next policy update needs **22 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 4215**, frozen from **269,760 verified tasks**. The next policy update needs **64 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 4209: 269,376 tasks; c45 3.92%"]
-    H1["Epoch 4210: 269,440 tasks; c63 3.92%"]
+    H0["Epoch 4212: 269,568 tasks; c63 3.93%"]
+    H1["Epoch 4213: 269,632 tasks; c63 3.93%"]
     H0 --> H1
-    H2["Epoch 4211: 269,504 tasks; c63 3.93%"]
+    H2["Epoch 4214: 269,696 tasks; c63 3.94%"]
     H1 --> H2
-    H3["Epoch 4212: 269,568 tasks; c63 3.93%"]
+    H3["Epoch 4215: 269,760 tasks; c63 3.92%"]
     H2 --> H3
-    Policy["Current policy: epoch 4212"]
+    Policy["Current policy: epoch 4215"]
     H3 --> Policy
     Policy --> Explore["40% uniform exploration across 81 contexts"]
     Policy --> Cost["60% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c63: 3.93%"]
-    Mix --> C1["c45: 3.89%"]
+    Mix --> C0["c63: 3.92%"]
+    Mix --> C1["c45: 3.86%"]
     Mix --> C2["c09: 3.80%"]
-    Mix --> Rest["Other 78 contexts: 88.39% combined"]
+    Mix --> Rest["Other 78 contexts: 88.42% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -91,11 +91,11 @@ Weights describe task-selection shares, not CPU-time shares or discovery probabi
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 4208 | 269,312 | c63 | 3.9198% |
-| 4209 | 269,376 | c45 | 3.9156% |
-| 4210 | 269,440 | c63 | 3.9160% |
 | 4211 | 269,504 | c63 | 3.9253% |
 | 4212 | 269,568 | c63 | 3.9254% |
+| 4213 | 269,632 | c63 | 3.9298% |
+| 4214 | 269,696 | c63 | 3.9356% |
+| 4215 | 269,760 | c63 | 3.9230% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -143,7 +143,7 @@ The initial discovery-learning experiment failed its promotion test. The new geo
 
 ## What verified work means
 
-Browser workers use the Rust WebAssembly kernel with a BigInt fallback. The local runner can use the same fixed-width Rust kernel, with arbitrary-precision arithmetic for the final check and an independent Python reference. [Matched benchmarks](https://github.com/Kuberwastaken/math-gambling/blob/main/research/benchmarks/native-wasm-2026-09-11.json) measured **20.2× native vs Python** and **5.2× WASM vs JavaScript** on this Mac; these are kernel comparisons, not discovery odds or guaranteed whole-campaign speedups. [Build, bounds and tests](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/NATIVE_KERNEL.md). Each result has a fixed task descriptor and deterministic digest. GitHub ingestion fully replays new-account tasks, then samples eligible new negative banks at 1-in-20 after submission. Only independently replayed tasks with matching digests credit the actual issue creator; other claims stay unverified. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
+Browser workers use the Rust WebAssembly kernel with a BigInt fallback. The local runner can use the same fixed-width Rust kernel, with arbitrary-precision arithmetic for the final check and an independent Python reference. [Matched benchmarks](https://github.com/Kuberwastaken/math-gambling/blob/main/research/benchmarks/native-wasm-2026-09-11.json) measured **20.2× native vs Python** and **5.2× WASM vs JavaScript** on this Mac; these are kernel comparisons, not discovery odds or guaranteed whole-campaign speedups. [Build, bounds and tests](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/NATIVE_KERNEL.md). Each result has a fixed task descriptor and deterministic digest. GitHub ingestion fully replays new-account tasks, then samples eligible new negative banks at 1-in-20 after submission. The leaderboard ranks contributed inputs: independently replayed tasks plus provisional unique claims from complete banks that passed at least one random check. Verified inputs are shown separately. Failed account audits revoke provisional credit; unchecked claims never certify coverage or train the model. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
 
 The [shared completed-task index](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/data/coverage/index.json) contains exact task IDs in SHA-256 checked, immutable hash-routed chunks. Runners v0.3.1 and newer read coverage v2; older runners need an upgrade. Clients skip IDs in their checked snapshot and local completed records. There is no probabilistic membership filter that could discard unvisited work. Simultaneous clients can still select the same unfinished task, and stale or offline snapshots cannot know about later completions; the server deduplicates accepted work.
 

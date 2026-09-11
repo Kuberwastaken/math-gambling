@@ -48,6 +48,7 @@ export function setupRunnerDownload(doc = document) {
     <pre><code data-runner-setup></code></pre>
     <button type="button" data-runner-copy="setup">Copy setup commands</button>
     <p>If you already unzipped it, open a terminal in the extracted <code>math-gambling</code> folder containing <code>tools</code> and <code>data</code>. If Downloads is elsewhere on your computer, use that location.</p>
+    <p>For faster computation, choose your platform’s ZIP from <a href="https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.5.0" target="_blank" rel="noopener noreferrer">the Rust runner release assets</a>, extract it, and add <code>--kernel rust</code> to the run command below. Python still handles login and checkpoints. The standard ZIP uses the Python fallback; <a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/NATIVE_KERNEL.md" target="_blank" rel="noopener noreferrer">source build instructions</a> cover other architectures.</p>
     <h3>2. Set your budget and let it ride</h3>
     <p data-runner-identity>Replace <code>Your name</code> before running. The first line must report Python 3.11 or newer.</p>
     <p data-runner-automatic>First install the <a href="https://cli.github.com/" target="_blank" rel="noopener noreferrer">GitHub CLI</a>. <code>--login</code> opens GitHub’s browser sign-in and reads your username. <code>--submit</code> authorizes the runner to create bank issues for completed work.</p>
@@ -58,10 +59,10 @@ export function setupRunnerDownload(doc = document) {
     <h3>3. Bank your work on GitHub</h3>
     <div data-runner-auto-bank>
       <p>The runner prepares a bank every 256 completed tasks and posts at most one issue per minute. Change <code>--bank-every</code> from 1 to 256 to choose the batch size. The terminal shows pending banks and submitted issue links.</p>
-      <p>GitHub Actions independently replays the tasks and updates the leaderboard after verification. When computation stops, automatic mode uses the remaining time budget to submit queued banks. Anything left stays on disk and resumes with your next <code>--submit</code> run.</p>
+      <p>GitHub Actions checks every submitted identity and samples eligible negative banks. Only replay-verified tasks earn verified credit; other claims are retained without coverage or model-training claims. When computation stops, automatic mode uses the remaining time budget to submit queued banks. Anything left stays on disk and resumes with your next <code>--submit</code> run.</p>
     </div>
     <div data-runner-manual-bank hidden>
-    <p>Open a <code>bank-*.json</code> file from <code>math-gambling-run/banks</code> in a text editor. Copy the entire file into a <a href="https://github.com/Kuberwastaken/math-gambling/issues/new?title=%5Bbank%5D%20Local%20computation%20bank" target="_blank" rel="noopener noreferrer">new bank issue</a> and submit. Use one issue per file. GitHub Actions replays the tasks, deduplicates them and updates the leaderboard after verification.</p>
+    <p>Open a <code>bank-*.json</code> file from <code>math-gambling-run/banks</code> in a text editor. Copy the entire file into a <a href="https://github.com/Kuberwastaken/math-gambling/issues/new?title=%5Bbank%5D%20Local%20computation%20bank" target="_blank" rel="noopener noreferrer">new bank issue</a> and submit. Use one issue per file. GitHub Actions samples eligible negative banks; only replay-verified tasks earn verified leaderboard credit.</p>
     <p>After posting, record the actual bank filename locally so the runner can make room for more work:</p>
     <pre><code data-runner-check></code></pre>
     <button type="button" data-runner-copy="check">Copy bank command</button>

@@ -1,3 +1,13 @@
+# Rust/WASM release, 11 September 2026
+
+[Runner v0.5.0](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.5.0) passed [all three platform gates](https://github.com/Kuberwastaken/math-gambling/actions/runs/34618079823): Linux x86_64, Windows x86_64 and macOS arm64. Each platform archive was extracted and executed with the Rust backend before upload. All four ZIPs, including the portable fallback/source archive, have release SHA-256 checksums.
+
+The local integration passed 158 Python tests (two opt-in HTTP/archive tests are exercised by the release gates), 22 JavaScript tests and the Rust unit tests. The [matched benchmark](../research/benchmarks/native-wasm-2026-09-11.json) measured 20.2× native/Python and 5.2× WASM/JavaScript kernel speedups. A real Chromium worker matched a 269-curve fixture both with WASM and with a deliberately blocked WASM download. Fixtures submitted nothing.
+
+[Negative audits](NEGATIVE_AUDITS.md) reduce the expected replay task count for eligible new banks. Unreplayed claims receive no verified credit, exact coverage or learning weight. A subsequent verified copy credits the original matching retained claim. Sampling tests cover challenge persistence, quarantine, copied-claim attribution and exclusion from verified aggregates. These changes do not establish exhaustive mathematical coverage or a discovery predictor.
+
+---
+
 # Release status, 11 September 2026
 
 [Runner v0.4.1](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.4.1) passed [Linux, Windows and macOS release gates](https://github.com/Kuberwastaken/math-gambling/actions/runs/34527341792). A separate download check verified SHA-256 `26c84c0045e16b743ea1f2a482a5d8c07844cca83d93ad7ba66773dd6195f92f` for the 6,975,229-byte archive and completed one offline task. It submitted nothing and earned no leaderboard credit. The v0.4.0 tag remains an unpublished failed gate; the Windows filesystem-test timeout was repaired without removing byte checks.

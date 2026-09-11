@@ -40,6 +40,8 @@ jobs:
           python3 -m unittest discover -s tests -p test_replay_pool.py
           python3 -m unittest discover -s tests -p test_coverage.py
           python3 -m unittest discover -s tests -p test_geometric_policy.py
+          python3 -m unittest discover -s tests -p test_search_features.py
+          python3 -m unittest discover -s tests -p test_public_reports.py
           python3 -m unittest discover -s tests -p test_branch_state.py
       - name: Independently replay selected tasks; retain other claims as unverified
         id: replay
@@ -55,7 +57,7 @@ jobs:
       - name: Generate verified reports with trusted main code
         run: |
           python3 tools/aggregate.py
-          python3 tools/coverage_index.py --prune
+          python3 tools/coverage_index.py --prune-only
           python3 tools/readme_charts.py
           python3 tools/learning_visuals.py
       - name: Export a bounded mathematical coverage increment

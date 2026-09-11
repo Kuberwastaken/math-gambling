@@ -48,7 +48,7 @@ def render(data):
         '<text class="tick" x="580" y="362">c00</text><text class="tick" x="943" y="362">c80</text>',
         '<text class="tick" x="225" y="385">Calibration epoch</text>',
         '<text class="tick" x="580" y="385">Dashed line: uniform allocation</text>',
-        '<text x="38" y="428" font-size="14">40% uniform task exploration. Exploitation follows the current declared objective; no discovery advantage established.</text>', '</svg>']
+        '<text x="38" y="428" font-size="14">Exploration follows the published policy unit. Geometric exposure is a proxy; no discovery advantage established.</text>', '</svg>']
     (data / 'readme-progress.svg').write_text('\n'.join(out)+'\n',encoding='utf-8')
 
 if __name__ == '__main__':

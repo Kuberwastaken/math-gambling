@@ -73,3 +73,24 @@ def calibrate(tasks,epoch):
                 'Root exchangeability within selected norm families is unvalidated.',
                 'Selection fractions are not CPU-time fractions; server cost differs from browser cost.'],
             'contexts':contexts}
+
+
+def cpu_budget_policy(policy):
+    """Convert explicit CPU shares to proposal probabilities. All contexts remain.
+
+    Predicted shares are exact under these cost estimates, not guarantees for a
+    different device. A separate benchmark must authorize production migration.
+    """
+    contexts=policy['contexts'];rates=[]
+    for c in contexts:
+        cost=c['predicted_cpu_ms_per_task']
+        if not math.isfinite(cost) or cost<=0:raise ValueError('invalid CPU prediction')
+        rates.append(c['exploration_weight']*EXPLORATION+(1-EXPLORATION)*c['exploit_weight'])
+    proposals=[share/c['predicted_cpu_ms_per_task'] for share,c in zip(rates,contexts)]
+    total=math.fsum(proposals)
+    return {**policy,'policy_version':'mg114-cpu-budget-v1','exploration_unit':'predicted_cpu',
+        'objective':'geometry-weighted exposure proxy per reference CPU; 40% predicted CPU exploration reserve',
+        'proposal_preflight':'mg114-shell-tile-v1',
+        'reason':'40% of predicted CPU is reserved equally across contexts; 60% follows geometric exposure/cost. All contexts retain support. Device costs may differ.',
+        'contexts':[{**c,'weight':p/total,'target_cpu_share':share} for c,p,share in zip(contexts,proposals,rates)],
+        'assumptions':policy['assumptions']+['CPU quotas use measured reference costs; actual device shares must be monitored.']}

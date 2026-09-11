@@ -468,6 +468,10 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                     atomic_json(path, {"schema": "math-gambling-verified-task-v1", "sequence": budget.next_sequence,
                                        "result": expected, "verified_at": now(), "server_replay_cpu_ms": cpu_ms,
                                        "replay_kernel_sha256": REPLAY_KERNEL_SHA256,
+                                       "audit_selection": {"schema":"mg114-audit-inclusion-v1",
+                                           "auditing_source_id":source_id,
+                                           "conditional_probability":1/(record.get('negative_audit') or {}).get('one_in',1),
+                                           "condition":"given this bank and eligibility; not dispatch propensity or overall duplicate-adjusted inclusion"},
                                        "contributor": credit_person, "source": credit_source})
                     budget.next_sequence += 1
                     record["accepted_tasks" if credit_source['id'] == source_id else "duplicate_tasks"].append(identifier)

@@ -97,11 +97,17 @@ def aggregate(data):
     start_epoch = config.get('geometry_start_epoch')
     if type(start_epoch) is not int or start_epoch < 1:
         raise ValueError('invalid policy migration boundary')
+    if 'cpu_budget_start_epoch' not in config:
+        config['cpu_budget_start_epoch']=max(start_epoch,previous['epoch']+1)
+        atomic_json(config_path,config)
+    cpu_start=config['cpu_budget_start_epoch']
+    if type(cpu_start) is not int or cpu_start<start_epoch:raise ValueError('invalid CPU policy boundary')
     def calibrate(tasks, number):
         if number < start_epoch:
             return legacy_calibrate(tasks, number)
-        from geometric_policy import calibrate as geometric_calibrate
-        return geometric_calibrate(tasks, number)
+        from geometric_policy import calibrate as geometric_calibrate, cpu_budget_policy
+        policy=geometric_calibrate(tasks, number)
+        return cpu_budget_policy(policy) if number>=cpu_start else policy
     recorded = read_json(data / "cluster.json", {}).get("calibration_history", [])
     if not isinstance(recorded, list):
         raise ValueError("invalid calibration history")

@@ -52,11 +52,11 @@ def profile_link(alias, raw_url):
     return f"[{label}](<{destination}>)"
 
 
-def weights(value, exploration):
+def weights(value, exploration, cpu=False):
     if not isinstance(value, dict) or set(value) != set(CONTEXTS):
         raise ValueError("snapshot requires exactly the 81 fixed contexts")
     if any(type(weight) not in (int, float) or not math.isfinite(weight)
-           or not exploration / 81 - 1e-12 <= weight <= 1 for weight in value.values()):
+           or weight<=0 or not (0 if cpu else exploration / 81 - 1e-12) <= weight <= 1 for weight in value.values()):
         raise ValueError("invalid or underexploring allocation weight")
     if not math.isclose(sum(value.values()), 1, rel_tol=0, abs_tol=1e-9):
         raise ValueError("allocation weights do not sum to one")
@@ -78,7 +78,7 @@ def validated_state(report, policy):
     contexts = policy["contexts"]
     if not isinstance(contexts, list) or len(contexts) != 81:
         raise ValueError("invalid policy context list")
-    current = weights({row["id"]: row["weight"] for row in contexts}, exploration)
+    current = weights({row["id"]: row["weight"] for row in contexts}, exploration,policy.get('policy_version')=='mg114-cpu-budget-v1')
     history = report.get("calibration_history", [])
     if not isinstance(history, list):
         raise ValueError("invalid calibration history")
@@ -88,7 +88,7 @@ def validated_state(report, policy):
         if (number <= previous or number > epoch
                 or integer(entry["through_verified_tasks"]) != number * size):
             raise ValueError("invalid calibration history boundary")
-        weights(entry["weights"], exploration)
+        weights(entry["weights"], exploration,entry.get('policy_version')=='mg114-cpu-budget-v1')
         previous = number
     if epoch and (not history or history[-1]["epoch"] != epoch
                   or history[-1]["weights"] != current):
@@ -105,7 +105,7 @@ def validated_state(report, policy):
 def render_snapshot(report, policy, config=None):
     total, epoch, size, through, exploration, current, history, stamp = validated_state(report, policy)
     counters = report["totals"]["counters"]
-    geometric = policy.get('policy_version') == 'mg114-geometric-cost-v1'
+    geometric = policy.get('policy_version') in ('mg114-geometric-cost-v1','mg114-cpu-budget-v1')
     allocation_label = 'geometry-weighted curve exposure / cost' if geometric else 'measured replay efficiency'
     method = policy.get('reason', 'Legacy cost allocation; no discovery probability.')
     count = lambda key: f"{integer(counters.get(key, 0)):,}"
@@ -155,7 +155,8 @@ def render_snapshot(report, policy, config=None):
     lines += [f'    Policy["Current policy: epoch {epoch}"]']
     if recent:
         lines.append(f"    H{len(recent)-1} --> Policy")
-    lines += [f'    Policy --> Explore["{100*exploration:g}% uniform exploration across 81 contexts"]',
+    unit='predicted CPU exploration across 81 contexts' if policy.get('exploration_unit')=='predicted_cpu' else 'uniform exploration across 81 contexts'
+    lines += [f'    Policy --> Explore["{100*exploration:g}% {unit}"]',
               f'    Policy --> Cost["{100*(1-exploration):g}% weighted by {allocation_label}"]',
               '    Explore --> Mix["Combined task-selection weights"]', '    Cost --> Mix']
     top = sorted(current, key=lambda c: (-current[c], c))[:3]

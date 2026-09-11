@@ -1,5 +1,35 @@
 # Geometry, cost and what the policy can claim
 
+## CPU-budget policy, 12 September
+
+New epochs migrate to `mg114-cpu-budget-v1`; old epochs remain frozen. With the
+geometry/cost score S below and predicted task cost C, define a target CPU share
+`B_c = .4/81 + .6 S_c/sum(S)` and dispatch probability
+`P_c = (B_c/C_c)/sum(B_j/C_j)`. Thus `P_c*C_c/sum(P*C)=B_c` under the reference
+cost estimates. All contexts retain positive support. These are predicted CPU
+shares, not guarantees for a browser, a new kernel or a changed proposer.
+
+Compatible clients use exact outward integer tile bounds before dispatch,
+holding the selected context fixed while proposing another row/block. After 31
+empty proposals they permit a normal task, ensuring bounded overhead and
+liveness. A skipped proposal is neither banked nor credited nor added to exact
+coverage. The equation, admissible task domain and completed receipt digest are
+unchanged. Older runners can fall back to their bundled policy; upgrade to 0.6.0
+for the new policy and preflight.
+
+Two 32-seed local Python trials compared current, proof-only, CPU-budget and
+combined proposals. The independent-seed confirmation used 0.5 CPU-seconds per
+arm/pool and measured actual-D weighted **band** exposure. Combined median lift
+was 2.00 with a paired-bootstrap interval 1.74–2.38; CPU-budget alone was 1.73.
+Proof alone did not pass the uncertainty gate. These are reference-engine proxy
+results, not client/network benchmarks or discovery odds. The confirmation
+supports this limited policy change; shadow ML is not promoted. See the
+[experiment record](../research/experiments/2026-09-12/proposals.json) and
+`tools/benchmark_proposals.py`. The continuous band proxy still approximates
+discrete endpoints and does not prove root exchangeability.
+
+## Historical geometry policy
+
 The production policy `mg114-geometric-cost-v1` repairs the estimator and changes its objective together. Historical epochs retain the method that produced them. `data/policy-config.json` fixes the migration at the first new 64-task boundary; rerunning aggregation cannot rewrite an old policy.
 
 The old per-context median of quotient positions per CPU collapsed to zero in zero-heavy observations. Clipping then made all contexts equal. Replacing that median with an aggregate throughput ratio alone would favor the widest quotient band, whose positions are cheaper but are not equally valuable under the ambient density heuristic.

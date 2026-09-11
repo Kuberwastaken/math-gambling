@@ -6,7 +6,7 @@ $$x^3+y^3+z^3=114,\qquad x,y,z\in\mathbb{Z}.$$
 
 The coordinates may be positive or negative, and enormous cubes can nearly cancel. An answer is one exactly verified integer triple. There is no known small search bound that guarantees our campaign will contain one.
 
-Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. Measured cost and a declared geometric prior adjust allocation after each 64 verified tasks, while preserving 40% uniform task proposals. It has not learned where a solution is likely to be.
+Our current approach generates modular roots through **cubic-field norms**, rejects impossible candidates with exact arithmetic, and searches 81 explicitly bounded contexts. A shared completed-task index avoids work already known to be finished. Measured cost and a declared geometric prior adjust allocation after each 64 verified tasks. New epochs reserve 40% of predicted CPU for exploration, and exact tile proofs avoid dispatching provably empty work. It has not learned where a solution is likely to be.
 
 This is an open computational research project by Kuber Mehta. The gamble is spare processor time for a possible mathematical discovery. We publish the algorithms, finite search definitions, unsuccessful experiments, verification records and evolving model so the work can be inspected and reproduced.
 
@@ -38,7 +38,7 @@ These finite generators and ratio bands do not cover every integer triple, every
 
 ## What the model learns
 
-Every 64 verified tasks freezes a policy. The production method combines a declared geometric band/shell prior with measured curve yield and aggregate CPU, including empty tasks. It keeps 40% uniform task proposals; those are selection shares, not CPU budgets or discovery probabilities.
+Every 64 verified tasks freezes a policy. The production method combines a declared geometric band/shell prior with measured curve yield and aggregate CPU. Its exploration reserve is expressed in predicted CPU; actual device costs and discovery probabilities remain uncertain. A separate [shared-feature model](docs/LEARNING.md) learns residual workload patterns against a proof-aware baseline, with unseen geometry withheld. The [positive unit-phase experiment](docs/UNIT_PHASE_EXPERIMENT.md) tests a distinct generator family separately from production.
 
 ```mermaid
 flowchart TD

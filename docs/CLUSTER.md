@@ -55,7 +55,7 @@ A display name and the payload's optional handle remain self-declared. The publi
 
 ## What calibration actually does
 
-Every 64 newly verified unique tasks completes an epoch. Existing epochs stay frozen. The [versioned geometry/cost policy](GEOMETRIC_POLICY.md) replaces the legacy median of quotient positions per CPU with shrinkage estimates of curve yield and aggregate CPU, including empty tasks. Exploitation weights those estimates by an uncalibrated geometric band/shell prior. A 40% uniform task-proposal floor remains; it does not reserve 40% of CPU time.
+Every 64 newly verified unique tasks completes an epoch. Existing epochs stay frozen. The [versioned geometry/cost policy](GEOMETRIC_POLICY.md) uses shrinkage estimates of curve yield and aggregate CPU. New epochs reserve 40% of predicted CPU equally across contexts, then convert CPU shares into task probabilities. Exact tile proofs avoid dispatching provably empty proposals. Costs remain device-dependent estimates, and the geometric objective remains an uncalibrated proxy.
 
 This policy has not demonstrated better discovery odds. Timing differs across devices; submitted work is selection-biased. The geometric prior assumes more than our selected norm families have established. The spatial challenger remains in shadow and needs a controlled equal-compute experiment before promotion.
 

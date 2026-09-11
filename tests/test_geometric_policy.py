@@ -4,13 +4,22 @@ from pathlib import Path
 import sys
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from geometric_policy import calibrate, mass, prior_value
+from geometric_policy import calibrate, mass, prior_value, cpu_budget_policy
 from search_core import CONTEXT_BY_ID
 
 def record(context,cpu=1.,curves=0):
     return {'result':{'task':{'context':context},'counters':{'curves':curves}},'server_replay_cpu_ms':cpu}
 
 class GeometricPolicyTests(unittest.TestCase):
+    def test_cpu_exploration_is_a_cost_share_and_every_context_survives(self):
+        rows=[record(f'c{i:02d}',1+i,100) for i in range(81)]*8
+        base=calibrate(rows,10);p=cpu_budget_policy(base)
+        total=sum(c['weight']*c['predicted_cpu_ms_per_task'] for c in p['contexts'])
+        for c in p['contexts']:
+            self.assertGreater(c['weight'],0)
+            self.assertAlmostEqual(c['weight']*c['predicted_cpu_ms_per_task']/total,c['target_cpu_share'])
+            self.assertGreaterEqual(c['target_cpu_share'],.4/81)
+        self.assertAlmostEqual(sum(c['weight'] for c in p['contexts']),1)
     def test_geometry_prefers_lower_ratio_and_divisor(self):
         self.assertGreater(mass(0,64),mass(64,256))
         self.assertGreater(mass(64,256),mass(256,4096))

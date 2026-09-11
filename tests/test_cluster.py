@@ -245,7 +245,7 @@ class ClusterTests(unittest.TestCase):
         after = ag.aggregate(self.data)
         self.assertEqual(after["calibration_history"][:1], old_history)
         policy = ig.read_json(self.data / "strategy.json")
-        self.assertEqual(policy["policy_version"], "mg114-geometric-cost-v1")
+        self.assertEqual(policy["policy_version"], "mg114-cpu-budget-v1")
         self.assertEqual(after["totals"]["verified_computations"], str(sum(r["counters"]["generators"] for r in results)))
         # Recover a missing new history entry without reinterpreting the old epoch.
         after["calibration_history"] = old_history

@@ -1,0 +1,82 @@
+{
+  "source": "validated historical28543 ledger",
+  "training": 16384,
+  "test": 12159,
+  "status": "exploratory historical evaluation; used during development, not an untouched promotion gate",
+  "elapsed": 0.9887068329990143,
+  "results": {
+    "future_all": {
+      "tasks": 12159,
+      "nonzero_exact_tasks": 1249,
+      "mean_absolute_log1p_error": {
+        "context_baseline": {
+          "cpu_ms": 1.1499786101154852,
+          "quotient_points": 8.85660875059358,
+          "curves": 4.019250841302912,
+          "exact_tests": 0.33326485149758706
+        },
+        "spatial": {
+          "cpu_ms": 0.2374305607231261,
+          "quotient_points": 0.16491291621209767,
+          "curves": 0.10396360779395322,
+          "exact_tests": 0.09439615946090221
+        },
+        "proof_baseline": {
+          "cpu_ms": 0.24414657899534836,
+          "quotient_points": 0.20056898083411825,
+          "curves": 0.11394374410258767,
+          "exact_tests": 0.10678533470186473
+        }
+      }
+    },
+    "future_unseen_geometry": {
+      "tasks": 2065,
+      "nonzero_exact_tasks": 197,
+      "mean_absolute_log1p_error": {
+        "context_baseline": {
+          "cpu_ms": 1.1099515325778446,
+          "quotient_points": 8.629191810674222,
+          "curves": 3.8150458355760173,
+          "exact_tests": 0.30534411464721234
+        },
+        "spatial": {
+          "cpu_ms": 0.2736002082130169,
+          "quotient_points": 0.2128395107541547,
+          "curves": 0.15456094071427506,
+          "exact_tests": 0.09632635641694258
+        },
+        "proof_baseline": {
+          "cpu_ms": 0.2834629807015498,
+          "quotient_points": 0.2527222950211496,
+          "curves": 0.155350517238238,
+          "exact_tests": 0.11092518894426831
+        }
+      }
+    },
+    "future_nonempty": {
+      "tasks": 3126,
+      "nonzero_exact_tasks": 1249,
+      "mean_absolute_log1p_error": {
+        "context_baseline": {
+          "cpu_ms": 0.884197910917488,
+          "quotient_points": 0.9721895278901357,
+          "curves": 1.2989772296575874,
+          "exact_tests": 0.41520341084767637
+        },
+        "spatial": {
+          "cpu_ms": 0.4031662282855113,
+          "quotient_points": 0.6414511030783415,
+          "curves": 0.40438052052676815,
+          "exact_tests": 0.36716663559984325
+        },
+        "proof_baseline": {
+          "cpu_ms": 0.45688518195133915,
+          "quotient_points": 0.7801401912866424,
+          "curves": 0.44319961117829926,
+          "exact_tests": 0.41535600916185966
+        }
+      }
+    }
+  },
+  "input_gzip_sha256": "d35a7b806a22d03e8eaebdf4f15fe3c09b775fc7ef481c0117249fa1a15a1c21"
+}

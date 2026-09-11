@@ -1,5 +1,39 @@
 # Learning from exact searches
 
+## Shared-feature residual model, 12 September
+
+`mg114-spatial-shadow-v2` replaces cell lookup with regularized shared features:
+coefficient ratios, band/shell, block position, interactions and exact outward
+norm-shell bounds. It learns log1p residuals over a strong proof-aware context
+baseline. That baseline already knows that a proved-empty tile has zero curve,
+quotient and exact-test exposure. ML receives no credit for discovering this
+theorem. No low model prediction can exclude a task.
+
+Training is limited to the latest 32,768 eligible observations, excluding the
+permanent held-out geometry cells. A new source version starts at the current
+complete boundary, with no retroactive sweep of every historical prefix. A
+linear SHA-256 chain authenticates frozen prefixes, including early tampering.
+Old source-addressed histories remain intact. Future 1,024-task windows report
+legacy context, proof-aware baseline and residual-model errors; nonempty tasks
+are also reported separately. Public charts compare against the proof-aware
+baseline, not the weaker historical baseline.
+
+An exploratory historical development test trained through 16,384 and evaluated
+12,159 later records, including 2,065 unseen-geometry records. On unseen geometry,
+relative log-error reductions over the proof-aware baseline were 3.48% CPU,
+15.78% quotient positions, 0.51% curves and 13.16% exact tests. This test was used
+during development and is **not** an untouched promotion test. New production
+arrivals provide the prospective evaluation. No discovery or allocation lift is
+inferred. [Development results](../research/experiments/2026-09-12/shared-model.json).
+
+New trusted ledger rows record the audit-selection source and its conditional
+inclusion probability, separately from contributor attribution. This is not a
+dispatch propensity and is not enough to debias all historical arrivals. No
+missing probability is invented. Randomized reference trials remain necessary
+for causal scheduling comparisons.
+
+## Historical model and general evaluation requirements
+
 Production uses the [geometry/cost preference](GEOMETRIC_POLICY.md), with historical epochs preserved. A separate deterministic spatial challenger now learns from authoritative replay records. No browser copy, task definition, random seed, leaderboard unit or mathematical exclusion is changed.
 
 ## What is implemented

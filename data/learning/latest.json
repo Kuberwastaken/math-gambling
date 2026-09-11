@@ -1,52 +1,52 @@
 {
-  "completed_evaluations": 159,
+  "completed_evaluations": 161,
   "history": "learning/mg114-spatial-shadow-v1/1df1bb496828a2dc",
   "latest_evaluation": {
-    "evaluation_hash": "54e62a76a181c5bb851e97fad494d542447f3ac939635301031ce32b88529930",
-    "evaluation_ledger_hash": "19e367951d05cba38064e5a5fbb595c24aeb0f6b41591886a604a1f959cab330",
-    "from": 162817,
-    "model_hash": "53d1589fb3863a3352583228c2e33595fc4797b11d9633f5a309d505eca9468b",
+    "evaluation_hash": "31a7974ac20258640622ee6eb626b5f07d5ac0df88228840ee98cc76dd6e0916",
+    "evaluation_ledger_hash": "dcce7146f04ea97bf91b6b322c54f21870b3efcc0c2edb863a3c34d6d29a52a4",
+    "from": 164865,
+    "model_hash": "302ba7a9c84303e4ded050199b0077c84d4e0f479915f8a0aa380c025c19fd6d",
     "results": {
       "future_all": {
         "mean_absolute_log1p_error": {
           "context_baseline": {
-            "cpu_ms": 1.2624653424112517,
-            "curves": 3.963877027867598,
-            "exact_tests": 0.1442020844162721,
-            "quotient_points": 7.6318533452161414
+            "cpu_ms": 1.2588414888406412,
+            "curves": 3.9466843180343885,
+            "exact_tests": 0.15907117621920222,
+            "quotient_points": 7.602712291545582
           },
           "spatial": {
-            "cpu_ms": 1.0958862847393431,
-            "curves": 3.6578950154935383,
-            "exact_tests": 0.13075223454490162,
-            "quotient_points": 7.3171739201551125
+            "cpu_ms": 1.1155262600986002,
+            "curves": 3.685458009442846,
+            "exact_tests": 0.14603762163631995,
+            "quotient_points": 7.330899227719689
           }
         },
-        "nonzero_exact_tasks": 48,
+        "nonzero_exact_tasks": 63,
         "tasks": 1024
       },
       "future_unseen_geometry": {
         "mean_absolute_log1p_error": {
           "context_baseline": {
-            "cpu_ms": 1.149303494026192,
-            "curves": 3.5936427208800272,
-            "exact_tests": 0.12142447528784288,
-            "quotient_points": 6.933732932664248
+            "cpu_ms": 1.175077017204423,
+            "curves": 3.684625013752949,
+            "exact_tests": 0.18282674201798577,
+            "quotient_points": 7.3490163625457035
           },
           "spatial": {
-            "cpu_ms": 1.149303494026192,
-            "curves": 3.5936427208800272,
-            "exact_tests": 0.12142447528784288,
-            "quotient_points": 6.933732932664248
+            "cpu_ms": 1.175077017204423,
+            "curves": 3.684625013752949,
+            "exact_tests": 0.18282674201798577,
+            "quotient_points": 7.3490163625457035
           }
         },
-        "nonzero_exact_tasks": 7,
-        "tasks": 172
+        "nonzero_exact_tasks": 10,
+        "tasks": 156
       }
     },
-    "through": 163840
+    "through": 165888
   },
-  "latest_model_hash": "653c4dba7cfb3a74f08efbe3234461a4b9588fd545083b44f7a73b852f38c6ef",
+  "latest_model_hash": "a3ee603151da1a0150e766214067bf9c65b2f8b96fcfdc142733655fc1bd6e66",
   "limitations": [
     "Arrival order is not dispatch time.",
     "Held-out errors describe submitted tasks, not an unbiased sampling population.",
@@ -55,14 +55,14 @@
     "No production exclusions, seed changes, leaderboard changes or automatic promotion."
   ],
   "mode": "shadow",
-  "model_count": 160,
-  "next_boundary": 164864,
-  "observed_tasks": 164765,
+  "model_count": 162,
+  "next_boundary": 166912,
+  "observed_tasks": 166557,
   "promotion": {
     "allowed": false,
     "reason": "Prediction validation is not controlled search-policy validation. No discovery advantage established."
   },
   "schema": "mg114-spatial-shadow-v1",
   "source_hash": "1df1bb496828a2dc81a210a1acce8c9e9cd8ceb93a342544e467f8473dc62116",
-  "through": 163840
+  "through": 165888
 }

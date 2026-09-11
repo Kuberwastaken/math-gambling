@@ -1,6 +1,6 @@
 {
   "baseline": "proof-aware context baseline",
-  "completed_evaluations": 0,
+  "completed_evaluations": 1,
   "metrics": {
     "cpu_ms": "Server CPU cost",
     "curves": "Curve intervals",
@@ -8,9 +8,9 @@
     "quotient_points": "Quotient positions"
   },
   "mode": "shadow",
-  "model_count": 1,
-  "next_boundary": 280576,
-  "observed_tasks": 280427,
+  "model_count": 2,
+  "next_boundary": 281600,
+  "observed_tasks": 281209,
   "pilot": [
     {
       "label": "Uniform",
@@ -26,7 +26,32 @@
     }
   ],
   "schema": "mg114-learning-visuals-v1",
-  "series": [],
+  "series": [
+    {
+      "from": 279553,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": 4.572403317119871,
+          "future_unseen_geometry": 2.7574358020997347
+        },
+        "curves": {
+          "future_all": 5.901863729802161,
+          "future_unseen_geometry": 1.540411958264207
+        },
+        "exact_tests": {
+          "future_all": 0.8526954191598151,
+          "future_unseen_geometry": -1.9319677312399781
+        },
+        "quotient_points": {
+          "future_all": 13.771316584694166,
+          "future_unseen_geometry": 12.884861767123525
+        }
+      },
+      "model_hash": "29290bf89da3f1f9efd69d3ff3e3be53f4e6f7de27c02cd39a5d0539b1a22d40",
+      "through": 280576,
+      "unseen_tasks": 180
+    }
+  ],
   "source_hash": "79b17fb84ec4793d65fb95b908efe91f67f5aca3f8fc49e3363c9867a8c0964c",
-  "through": 279552
+  "through": 280576
 }

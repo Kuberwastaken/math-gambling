@@ -241,8 +241,11 @@ python3 tools/runner.py --name "Your name" --github your-handle --mark-banked ba
 ```
 
 This marks it **reported submitted**, not independently verified. An explicit
-`--submit` flag instead authorizes authenticated GitHub CLI issue creation, at
-most one bank per minute. The runner checks for an existing bank issue first.
+`--submit` flag instead authorizes authenticated GitHub CLI issue creation.
+From v0.5.2, successful submissions are normally paced ten seconds apart.
+GitHub rate-limit headers and persistent exponential backoff can extend this;
+account limits are shared across computers. The runner checks for an existing
+bank issue first.
 Ambiguous submissions are retained and require manual inspection rather than
 blindly repeating a possibly successful external action. `--offline` and
 `--submit` cannot be combined.

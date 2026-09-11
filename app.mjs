@@ -5,14 +5,14 @@ import {
   canonicalJSON,
   verifyTriple,
   validateTask,
-} from "./engine.mjs?v=ec631fabe88d";
-import { createLiveVisuals } from "./live-viz.mjs?v=ec631fabe88d";
-import { createJackpot } from "./jackpot.mjs?v=ec631fabe88d";
-import { loadChallenger } from "./challenger-viz.mjs?v=ec631fabe88d";
-import { renderModelEvolution } from "./model-viz.mjs?v=ec631fabe88d";
-import { setupRunnerDownload } from "./runner-setup.mjs?v=ec631fabe88d";
+} from "./engine.mjs?v=5a55584caa37";
+import { createLiveVisuals } from "./live-viz.mjs?v=5a55584caa37";
+import { createJackpot } from "./jackpot.mjs?v=5a55584caa37";
+import { loadChallenger } from "./challenger-viz.mjs?v=5a55584caa37";
+import { renderModelEvolution } from "./model-viz.mjs?v=5a55584caa37";
+import { setupRunnerDownload } from "./runner-setup.mjs?v=5a55584caa37";
 setupRunnerDownload();
-import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=ec631fabe88d";
+import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=5a55584caa37";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -886,6 +886,18 @@ async function reconcileBanks() {
     if (changed) await refreshSaved();
   } catch {}
 }
+// Keep prefilled links below a conservative request-URL budget. Large banks
+// remain whole: splitting them just to fit a URL would multiply GitHub issues.
+const BANK_URL_LIMIT = 7400;
+function bankIssueLink(bank) {
+  const url = new URL(`${REPO}/issues/new`);
+  url.searchParams.set("template", "compute.yml");
+  url.searchParams.set("title", `[compute] Bank ${bank.ids.length} tasks`);
+  const manual = url.href;
+  url.searchParams.set("receipt", JSON.stringify(bank.payload));
+  return { manual, href: url.href.length <= BANK_URL_LIMIT ? url.href : manual,
+    prefilled: url.href.length <= BANK_URL_LIMIT };
+}
 function validProfile(p) {
   return (
     typeof p.name === "string" &&
@@ -967,8 +979,14 @@ async function prepareBank(priorityId = null, attribution = null) {
     "bank-count",
     `${bank.ids.length} completed tasks · ${bank.payload.contributor.name}`,
   );
-  $("bank-open").href =
-    `${REPO}/issues/new?template=compute.yml&title=${encodeURIComponent("[compute] Bank " + bank.ids.length + " tasks")}`;
+  const link = bankIssueLink(bank);
+  $("bank-open").href = link.href;
+  text("bank-open", link.prefilled ? "Submit on GitHub ↗" : "Copy & open GitHub ↗");
+  $("bank-manual").href = link.manual;
+  $("bank-manual").hidden = true;
+  text("copy-status", link.prefilled
+    ? "Your receipt is filled in. Review it on GitHub and click Create."
+    : "This bank is too large to prefill. Copy & open GitHub, then paste into Bank JSON and click Create.");
   updateBankUI();
   $("bank-panel").scrollIntoView({
     behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -1032,6 +1050,35 @@ $("close-bank")?.addEventListener("click", () => {
   $("bank-panel").hidden = true;
 });
 $("bank-profile-form")?.addEventListener("submit", submitBankProfile);
+$("bank-open")?.addEventListener("click", async (event) => {
+  if (!activeBank) { event.preventDefault(); return; }
+  const link = bankIssueLink(activeBank);
+  if (link.prefilled) return; // Native link navigation preserves mobile user activation.
+  event.preventDefault();
+  let popup;
+  try {
+    // Start the clipboard request and reserve the tab within the same click.
+    // Waiting before opening the tab can trigger mobile popup blockers.
+    const copying = navigator.clipboard.writeText(JSON.stringify(activeBank.payload));
+    try {
+      popup = window.open("about:blank", "_blank");
+      if (popup) popup.opener = null;
+    } catch {}
+    await copying;
+    if (popup && !popup.closed) popup.location.replace(link.manual);
+    else $("bank-manual").hidden = false;
+    text("copy-status", popup && !popup.closed
+      ? "Copied. Paste into Bank JSON on GitHub, then click Create."
+      : "Copied. Use Open GitHub below, paste into Bank JSON, then click Create.");
+  } catch {
+    if (popup && !popup.closed) popup.close();
+    $("bank-json-details").open = true;
+    $("bank-body").focus();
+    $("bank-body").select();
+    $("bank-manual").hidden = false;
+    text("copy-status", "Clipboard unavailable. Copy the selected receipt, then use Open GitHub and paste into Bank JSON.");
+  }
+});
 $("copy-bank")?.addEventListener("click", async () => {
   try {
     await navigator.clipboard.writeText($("bank-body").value);
@@ -1040,6 +1087,7 @@ $("copy-bank")?.addEventListener("click", async () => {
       "Copied. Open GitHub, paste into the receipt field, and submit the issue.",
     );
   } catch {
+    $("bank-json-details").open = true;
     $("bank-body").focus();
     $("bank-body").select();
     text(
@@ -1271,7 +1319,7 @@ async function start(e) {
   // The processor slider remains adjustable during a run.
   text("session-message", "");
   try {
-    worker = new Worker(new URL("search-worker.mjs?v=ec631fabe88d", BASE), { type: "module" });
+    worker = new Worker(new URL("search-worker.mjs?v=5a55584caa37", BASE), { type: "module" });
   } catch (e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;

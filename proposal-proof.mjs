@@ -1,5 +1,5 @@
 // Outward integer bounds only. Shared derivation: tools/search_features.py.
-import {CONTEXTS, validateTask} from './engine.mjs?v=027258560b2e';
+import {CONTEXTS, validateTask} from './engine.mjs?v=eee5288cd1a6';
 const S=10n**18n,A=4848807585839879338n,A2=23510935004498358839n;
 if (!(A**3n<=114n*S**3n && (A+1n)**3n>114n*S**3n &&
       A2**3n<=12996n*S**3n && (A2+1n)**3n>12996n*S**3n)) throw Error('Invalid outward root bounds');

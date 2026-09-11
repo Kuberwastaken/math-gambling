@@ -1,6 +1,6 @@
 // Only real dispatched tasks and durably saved results drive these displays.
 // Celebrations reflect an independently checked identity, never a near miss.
-import { verifyTriple } from "./engine.mjs?v=027258560b2e";
+import { verifyTriple } from "./engine.mjs?v=eee5288cd1a6";
 const NS = "http://www.w3.org/2000/svg";
 const number = new Intl.NumberFormat("en-US", {
   notation: "compact",

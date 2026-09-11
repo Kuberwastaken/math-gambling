@@ -1,9 +1,9 @@
-import {runTask, verifyTriple, ENGINE} from './engine.mjs?v=027258560b2e';
+import {runTask, verifyTriple, ENGINE} from './engine.mjs?v=eee5288cd1a6';
 
 // A worker accepts one task at a time. The page decides when to queue the next.
 // Stop is a task-boundary instruction; terminating a worker discards only its
 // unfinished task, which must never be submitted as completed coverage.
-import {loadWasmKernel} from './wasm-kernel.mjs?v=027258560b2e';
+import {loadWasmKernel} from './wasm-kernel.mjs?v=eee5288cd1a6';
 const accelerated = await loadWasmKernel();
 let busy = false;
 self.onmessage = async ({data}) => {

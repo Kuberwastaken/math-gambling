@@ -133,6 +133,7 @@ def aggregate(data):
     totals = Counter()
     context_tasks = defaultdict(list)
     people = {}
+    profile_times = {}
     for task in tasks:
         result = task["result"]
         for key, value in result["counters"].items():
@@ -148,6 +149,7 @@ def aggregate(data):
         if not provenance or task["source"].get("kind") != "issue":
             continue
         key = provenance.casefold()
+        profile_times[key] = task["verified_at"]
         if key not in people:
             people[key] = dict(name=person["name"], github=provenance, github_verified=True,
                                claimed_github=person["github"], submitter=provenance,
@@ -170,7 +172,26 @@ def aggregate(data):
         contexts.append({"id": context, "verified_tasks": len(rows), "replay_cpu_ms": cpu,
                          "exposure": str(sum(exposure(x["result"]) for x in rows)),
                          "mean_cpu_ms": cpu / len(rows) if rows else None})
-    ranked = sorted(people.values(), key=lambda x: (-x["verified_computations"], -x["verified_tasks"], x["github"]))[:100]
+    from contribution_credit import provisional_credit
+    provisional = provisional_credit(receipts, set(ids))
+    for key, credit in provisional.items():
+        record = credit['record']; provenance = record['source']['submitter']; person = record['contributor']
+        if key not in people:
+            people[key] = dict(name=person['name'], github=provenance, github_verified=True,
+                               claimed_github=person.get('github', ''), submitter=provenance,
+                               verified_tasks=0, verified_computations=0)
+        if credit['profile_at'] > profile_times.get(key, ''):
+            people[key].update(name=person['name'], claimed_github=person.get('github',''))
+            url = safe_profile_url(person.get('url'))
+            if url: people[key]['url'] = url
+            else: people[key].pop('url', None)
+    for key, person in people.items():
+        credit = provisional.get(key, {})
+        person['provisional_tasks'] = credit.get('tasks', 0)
+        person['provisional_computations'] = str(credit.get('inputs', 0))
+        person['contributed_tasks'] = person['verified_tasks'] + credit.get('tasks', 0)
+        person['contributed_computations'] = str(person['verified_computations'] + credit.get('inputs', 0))
+    ranked = sorted(people.values(), key=lambda x: (-int(x['contributed_computations']), -x['contributed_tasks'], x['github']))[:100]
     for person in ranked:
         person["verified_computations"] = str(person["verified_computations"])
     banks = [{"issue": x["source"].get("number"), "url": x["source"].get("url", ""),
@@ -186,6 +207,10 @@ def aggregate(data):
     cluster = {"schema": "math-gambling-cluster-v1", "updated_at": now(),
                "totals": {"reported_receipts": len(receipts),
                           "reported_tasks": sum(x["reported_tasks"] for x in receipts),
+                          "contributed_computations": str(int(totals.get('generators', 0)) + sum(x['inputs'] for x in provisional.values())),
+                          "contributed_tasks": len(tasks) + sum(x['tasks'] for x in provisional.values()),
+                          "provisional_computations": str(sum(x['inputs'] for x in provisional.values())),
+                          "provisional_tasks": sum(x['tasks'] for x in provisional.values()),
                           "unreplayed_claims": sum(len(x.get("unreplayed_tasks", [])) for x in receipts),
                           "sampled_banks": sum(bool(x.get("negative_audit")) for x in receipts),
                           "verified_unique_tasks": len(tasks),
@@ -206,7 +231,9 @@ def aggregate(data):
                "integrity": {"method": "independent bounded Python replay and exact integer identity checks",
                              "coverage_scope": "unique deterministic tasks in selected finite norm-coordinate domains; not an exhaustive height search",
                              "epoch_size": EPOCH_SIZE, "reported_is_not_verified": True,
-                             "unreplayed_claims_used_for_credit_coverage_or_learning": False,
+                             "unreplayed_claims_used_for_verified_credit_coverage_or_learning": False,
+                             "leaderboard_policy": "mg114-contribution-credit-v1",
+                             "provisional_credit": "unique inputs from complete banks with at least one matched random challenge; revoked on failed account audit; not certified coverage",
                              "client_timing_used": False, "negative_replay_task_cap_per_run": MAX_REPLAYS,
                              "replay_time_budget_seconds": 120, "api_time_budget_seconds": 60,
                              "identity_claims": "Leaderboard credit belongs to the first accepted GitHub issue creator; display names and payload handles remain self-declared."}}

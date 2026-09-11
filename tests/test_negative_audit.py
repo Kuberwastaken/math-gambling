@@ -41,6 +41,23 @@ class AuditTests(unittest.TestCase):
         full=self.submit(bank([item]),number=2)
         self.assertEqual(full['status'],'accepted')
         self.assertEqual(ag.aggregate(self.data)['totals']['verified_unique_tasks'],len(self.calls))
+    def test_contribution_backfill_and_revocation_leave_verified_policy_unchanged(self):
+        with patch('negative_audit.secrets.token_hex', return_value='00'*32):
+            record=self.submit(bank(self.results))
+        self.assertGreater(len(record['accepted_tasks']), 0)
+        report=ag.aggregate(self.data)
+        self.assertEqual(report['totals']['contributed_tasks'],40)
+        self.assertEqual(int(report['contributors'][0]['contributed_computations']),sum(r['counters']['generators'] for r in self.results))
+        verified=report['totals']['verified_computations']
+        policy=(self.data/'strategy.json').read_bytes()
+        bad=bank([run_task(make_task('c00',128*99))]);bad['tasks'][0]['digest']='0'*64
+        with patch('negative_audit.selected',return_value=True):self.submit(bad,number=3)
+        after=ag.aggregate(self.data)
+        self.assertEqual(after['totals']['provisional_tasks'],0)
+        self.assertEqual(after['totals']['verified_computations'],verified)
+        self.assertEqual(after['totals']['contributed_computations'],verified)
+        self.assertEqual((self.data/'strategy.json').read_bytes(),policy)
+
     def test_challenge_persisted_before_replay_and_fixed_on_resume(self):
         receipt=bank(self.results);first=self.submit(receipt,budget=ig.Budget(count=0))
         self.assertIn('negative_audit',first)

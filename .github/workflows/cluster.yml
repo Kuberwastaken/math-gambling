@@ -35,6 +35,7 @@ jobs:
         run: |
           python3 -m unittest discover -s tests -p test_cluster.py
           python3 -m unittest discover -s tests -p test_negative_audit.py
+          python3 -m unittest discover -s tests -p test_contribution_credit.py
           python3 -m unittest discover -s tests -p test_readme.py
           python3 -m unittest discover -s tests -p test_replay_pool.py
           python3 -m unittest discover -s tests -p test_coverage.py

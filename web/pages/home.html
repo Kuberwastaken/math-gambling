@@ -90,7 +90,7 @@
           </button>
         </div>
 
-        <p class="bank-explanation">Banking opens a GitHub issue; eligible banks are sampled, and only replay-verified tasks earn leaderboard credit.</p>
+        <p class="bank-explanation">Banking opens a GitHub issue. Passed sampled banks earn contribution credit; exact verification is shown separately.</p>
         <div id="discovery" class="discovery" hidden></div>
       </section>
     </div>
@@ -226,23 +226,25 @@
   <div class="section-heading">
     <h2 id="leaderboard-heading">Global leaderboard</h2>
   </div>
-  <p><strong id="cluster-inputs">—</strong> verified inputs on the table.</p>
+  <p><strong id="cluster-inputs">—</strong> contributed inputs on the table.</p>
   <div class="table-wrap">
     <table class="leaderboard-table">
       <thead>
         <tr>
           <th>Alias</th>
           <th>GitHub</th>
+          <th>Contributed inputs</th>
           <th>Verified inputs</th>
         </tr>
       </thead>
       <tbody id="contributors">
         <tr>
-          <td colspan="3">Loading verified scores…</td>
+          <td colspan="4">Loading contributions…</td>
         </tr>
       </tbody>
     </table>
   </div>
+  <p id="cluster-note" class="table-note">Contribution includes provisional credit from passed sampled banks; it is not certified coverage.</p>
   <p id="cluster-updated" class="table-note">Loading the shared ledger.</p>
   <a class="text-link" href="{{BASE}}cluster/">See the whole cluster ↗</a>
 </section>

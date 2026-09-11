@@ -121,7 +121,7 @@ def render_snapshot(report, policy, config=None):
              "", "![Verified work and changing allocation](data/readme-progress.svg)", "",
              "These are actual fixed-task units from independent replay, not claimed client seconds or independent chances of discovery. The separate [Mac snapshot](data/mac.json) uses different domains and is not added to these totals.", "",
              "### Global leaderboard", "",
-             "| Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |",
+             "| Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |",
              "| ---: | --- | --- | ---: | ---: |"]
     aliases = (config or {}).get("display_aliases", {})
     urls = (config or {}).get("display_urls", {})
@@ -132,18 +132,18 @@ def render_snapshot(report, policy, config=None):
                 or not GITHUB_NAME.fullmatch(account)
                 or str(person.get("submitter", "")).casefold() != account.casefold()):
             continue
-        people.append((integer(person["verified_computations"]), integer(person["verified_tasks"]), account, person))
+        people.append((integer(person.get("contributed_computations", person["verified_computations"])), integer(person.get("contributed_tasks", person["verified_tasks"])), account, person))
     for rank, (inputs, tasks, account, person) in enumerate(sorted(people, key=lambda p: (-p[0], -p[1], p[2].casefold()))[:10], 1):
         alias = aliases.get(account.casefold(), person.get("name", "Anonymous")) if isinstance(aliases, dict) else person.get("name", "Anonymous")
         url = safe_profile_url(person.get("url")) or (urls.get(account.casefold()) if isinstance(urls, dict) else None)
-        lines.append(f"| {rank} | {profile_link(alias, url)} | [@{account}](https://github.com/{account}) | {inputs:,} | {tasks:,} |")
+        lines.append(f"| {rank} | {profile_link(alias, url)} | [@{account}](https://github.com/{account}) | {inputs:,} | {integer(person['verified_computations']):,} |")
     if not people:
         lines += ["", "No participants have independently verified work yet."]
     if 'zero_curve_tasks' in report['totals']:
         empty = integer(report['totals']['zero_curve_tasks'])
         lines += ["", f"**{empty:,} / {total:,} verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.", "",
                   "[Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](docs/MATHEMATICAL_COVERAGE.md)", ""]
-    lines += ["", "Rank is based on replayed coefficient inputs. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.", "",
+    lines += ["", "Rank counts unique contributed inputs: exact replays plus provisional work from complete banks with a matched random audit. The verified column is the exact subset. A failed account audit revokes provisional credit; unchecked claims never certify coverage or train the model. Alias websites are optional and self-declared; account attribution comes from the accepted GitHub issue creator.", "",
               "### The current allocation", "",
               f"**Epoch {epoch}**, frozen from **{through:,} verified tasks**. The next policy update needs **{next_tasks:,} more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.", "", "```mermaid", "flowchart TD"]
     recent = history[-4:]

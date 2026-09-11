@@ -2,7 +2,7 @@
 
 The public ingestion job no longer has to replay every submitted negative task. New compact banks from accounts with at least 256 previously replay-verified tasks use **independent 1-in-20 sampling**. New accounts, existing pending banks and legacy full receipts retain full replay. Every supplied candidate identity receives an exact check regardless of sampling or queue budget.
 
-**An unreplayed claim earns no verified leaderboard credit, supplies no model-training counters or timings, and enters no exact completed-task or mathematical-coverage index.** It is retained in the issue audit as `unreplayed_tasks`. A bank labelled `sampled` is processed, not certified as wholly correct. The site's leaderboard continues to mean what it says: replay-verified inputs. Sampling does not multiply a sampled score by twenty.
+**An unreplayed claim earns no verified leaderboard credit, supplies no model-training counters or timings, and enters no exact completed-task or mathematical-coverage index.** It is retained in the issue audit as `unreplayed_tasks`. A bank labelled `sampled` is processed, not certified as wholly correct. The leaderboard now ranks **contributed inputs**, with the replay-verified portion shown separately. Complete sampled banks with no rejected tasks and at least one matched random challenge receive provisional credit for unique unreplayed tasks. A bank with no random checks receives no provisional credit yet. Input counts come from fixed task bounds, not client counters. Claims are deduplicated across banks and accounts, and an exact replay replaces rather than adds to provisional credit. Any failed account audit revokes that account’s entire provisional balance, preserving exact verified work. Historical retained claims are treated by the same rule; no contributor receives a manual adjustment. Sampling does not multiply a sampled score by twenty.
 
 ## Selection and failures
 
@@ -18,7 +18,7 @@ There is less new **certified coverage** per bank. Unsampled tasks can be select
 
 Random audits detect widespread cheating more readily than isolated omissions. If a fixed fraudulent task has a 5% audit probability, its omission escapes that audit 95% of the time. For 100 independently selected fraudulent tasks the chance all escape is about 0.6%. These are audit-sampling calculations, not solution probabilities. Probation does not prove future honesty. This implementation deliberately does **not** convert a passed sample into a claim about all other tasks in that batch.
 
-The shell-count and progression-conservation identities are useful additional checks, but a client can fabricate those counts. They cannot replace a proof of execution. GitHub issues remain the transport, with up to 256 tasks per bank and one automatic bank/minute per runner. There is no per-computer account restriction; deduplication and first verified attribution still apply.
+The shell-count and progression-conservation identities are useful additional checks, but a client can fabricate those counts. They cannot replace a proof of execution. GitHub issues remain the transport, with up to 256 tasks per bank and one automatic bank per ten seconds per runner, with persistent rate-limit backoff. There is no per-computer account restriction; deduplication and first verified attribution still apply.
 
 ## Operations
 

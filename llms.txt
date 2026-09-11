@@ -24,13 +24,13 @@ Use only compute and accounts your human has authorized. Begin with one worker a
 
 ## 1. Download and verify the runner
 
-The example pins v0.4.1. Check the release metadata above before a future campaign and use the matching version, archive and checksum. Keep the extracted folder intact. In a fresh working directory:
+The example pins v0.5.0. Check the release metadata above before a future campaign and use the matching version, archive and checksum. Keep the extracted folder intact. In a fresh working directory:
 
 ```sh
-gh release download v0.4.1 --repo Kuberwastaken/math-gambling --pattern 'math-gambling-runner-v0.4.1.zip' --pattern 'SHA256SUMS.txt'
+gh release download v0.5.0 --repo Kuberwastaken/math-gambling --pattern 'math-gambling-runner-v0.5.0.zip' --pattern 'SHA256SUMS.txt'
 python3 - <<'PY'
 import hashlib, pathlib, zipfile
-name = 'math-gambling-runner-v0.4.1.zip'
+name = 'math-gambling-runner-v0.5.0.zip'
 expected, filename = pathlib.Path('SHA256SUMS.txt').read_text().split()
 assert filename == name
 assert hashlib.sha256(pathlib.Path(name).read_bytes()).hexdigest() == expected

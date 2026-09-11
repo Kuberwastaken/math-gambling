@@ -5,14 +5,14 @@ import {
   canonicalJSON,
   verifyTriple,
   validateTask,
-} from "./engine.mjs?v=5a4349624612";
-import { createLiveVisuals } from "./live-viz.mjs?v=5a4349624612";
-import { createJackpot } from "./jackpot.mjs?v=5a4349624612";
-import { loadChallenger } from "./challenger-viz.mjs?v=5a4349624612";
-import { renderModelEvolution } from "./model-viz.mjs?v=5a4349624612";
-import { setupRunnerDownload } from "./runner-setup.mjs?v=5a4349624612";
+} from "./engine.mjs?v=91edbf56d67b";
+import { createLiveVisuals } from "./live-viz.mjs?v=91edbf56d67b";
+import { createJackpot } from "./jackpot.mjs?v=91edbf56d67b";
+import { loadChallenger } from "./challenger-viz.mjs?v=91edbf56d67b";
+import { renderModelEvolution } from "./model-viz.mjs?v=91edbf56d67b";
+import { setupRunnerDownload } from "./runner-setup.mjs?v=91edbf56d67b";
 setupRunnerDownload();
-import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=5a4349624612";
+import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=91edbf56d67b";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -849,7 +849,7 @@ function updateBankUI() {
       const p = document.createElement("p");
       p.className = "form-note";
       p.textContent = b.observed
-        ? `Bank ${b.digest.slice(0, 8)}: ${b.status}. ${b.accepted || 0} accepted, ${b.duplicates || 0} duplicates, ${b.rejected || 0} rejected; ${b.processed || 0}/${b.ids.length} processed.`
+        ? `Bank ${b.digest.slice(0, 8)}: ${b.status}. ${b.accepted || 0} accepted, ${b.duplicates || 0} duplicates, ${b.rejected || 0} rejected, ${b.unreplayed || 0} unreplayed (no verified credit); ${b.processed || 0}/${b.ids.length} processed.`
         : `Bank ${b.digest.slice(0, 8)}: ${b.posted ? "marked posted locally; not yet in published ledger" : "prepared locally; not submitted"}. ${b.ids.length} tasks.`;
       if (b.issue) {
         const a = document.createElement("a");
@@ -877,6 +877,7 @@ async function reconcileBanks() {
         bank.accepted = entry.accepted_tasks;
         bank.duplicates = entry.duplicate_tasks;
         bank.rejected = entry.rejected_tasks;
+        bank.unreplayed = entry.unreplayed_tasks || 0;
         bank.processed = entry.processed_tasks;
         await save("banks", bank);
         changed = true;
@@ -1270,7 +1271,7 @@ async function start(e) {
   // The processor slider remains adjustable during a run.
   text("session-message", "");
   try {
-    worker = new Worker(new URL("search-worker.mjs?v=5a4349624612", BASE), { type: "module" });
+    worker = new Worker(new URL("search-worker.mjs?v=91edbf56d67b", BASE), { type: "module" });
   } catch (e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;

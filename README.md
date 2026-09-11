@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-11 11:22:49 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-11 16:00:32 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 259,883 |
-| Coefficient-generator inputs | 489,697,280 |
-| Bounded curve intervals | 35,703,342 |
-| Logical quotient positions | 26,219,560,199 |
-| Exact integer square tests | 54,145 |
+| Unique finite tasks | 265,490 |
+| Coefficient-generator inputs | 500,282,368 |
+| Bounded curve intervals | 36,440,891 |
+| Logical quotient positions | 26,773,855,877 |
+| Exact integer square tests | 55,307 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,10 +35,10 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Verified inputs | Unique tasks |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 455,100,416 | 241,524 |
-| 2 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 28,519,424 | 15,121 |
-| 3 | Vasudev | [@VasudevCodeReaper](https://github.com/VasudevCodeReaper) | 963,584 | 512 |
-| 4 | culnaen | [@culnaen](https://github.com/culnaen) | 959,488 | 512 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 461,543,424 | 244,939 |
+| 2 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 32,177,152 | 17,050 |
+| 3 | culnaen | [@culnaen](https://github.com/culnaen) | 1,443,840 | 775 |
+| 4 | Vasudev | [@VasudevCodeReaper](https://github.com/VasudevCodeReaper) | 963,584 | 512 |
 | 5 | James | [@JamesT-cmd](https://github.com/JamesT-cmd) | 954,368 | 512 |
 | 6 | [Ijtihed](<https://ijtihed.com>) | [@Ijtihed](https://github.com/Ijtihed) | 487,424 | 256 |
 | 7 | V01D0 | [@V01D0](https://github.com/V01D0) | 483,328 | 256 |
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | [grim](<https://ripgrim.com>) | [@ripgrim](https://github.com/ripgrim) | 482,304 | 256 |
 | 10 | [Shourya](<https://shouryadav.info/>) | [@shourya0523](https://github.com/shourya0523) | 479,232 | 256 |
 
-**193,561 / 259,883 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**197,783 / 265,490 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank is based on replayed coefficient inputs. Alias websites are optional and se
 
 ### The current allocation
 
-**Epoch 4060**, frozen from **259,840 verified tasks**. The next policy update needs **21 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 4148**, frozen from **265,472 verified tasks**. The next policy update needs **46 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 4057: 259,648 tasks; c63 4.37%"]
-    H1["Epoch 4058: 259,712 tasks; c63 4.33%"]
+    H0["Epoch 4145: 265,280 tasks; c18 4.04%"]
+    H1["Epoch 4146: 265,344 tasks; c18 4.03%"]
     H0 --> H1
-    H2["Epoch 4059: 259,776 tasks; c63 4.33%"]
+    H2["Epoch 4147: 265,408 tasks; c18 4.03%"]
     H1 --> H2
-    H3["Epoch 4060: 259,840 tasks; c63 4.33%"]
+    H3["Epoch 4148: 265,472 tasks; c18 3.99%"]
     H2 --> H3
-    Policy["Current policy: epoch 4060"]
+    Policy["Current policy: epoch 4148"]
     H3 --> Policy
     Policy --> Explore["40% uniform exploration across 81 contexts"]
     Policy --> Cost["60% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c63: 4.33%"]
-    Mix --> C1["c72: 4.25%"]
-    Mix --> C2["c36: 4.12%"]
-    Mix --> Rest["Other 78 contexts: 87.31% combined"]
+    Mix --> C0["c18: 3.99%"]
+    Mix --> C1["c45: 3.93%"]
+    Mix --> C2["c63: 3.89%"]
+    Mix --> Rest["Other 78 contexts: 88.19% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -91,11 +91,11 @@ Weights describe task-selection shares, not CPU-time shares or discovery probabi
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 4056 | 259,584 | c63 | 4.3767% |
-| 4057 | 259,648 | c63 | 4.3653% |
-| 4058 | 259,712 | c63 | 4.3339% |
-| 4059 | 259,776 | c63 | 4.3284% |
-| 4060 | 259,840 | c63 | 4.3255% |
+| 4144 | 265,216 | c18 | 4.0342% |
+| 4145 | 265,280 | c18 | 4.0397% |
+| 4146 | 265,344 | c18 | 4.0287% |
+| 4147 | 265,408 | c18 | 4.0343% |
+| 4148 | 265,472 | c18 | 3.9921% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -123,7 +123,9 @@ Every 64 verified tasks freezes a policy. The production method combines a decla
 
 ```mermaid
 flowchart TD
-    Source[Reviewed source on main] --> Replay[Independently replay banked tasks]
+    Source[Reviewed source on main] --> Audit[Freeze post-submission random audit]
+    Audit --> Replay[Independently replay selected tasks]
+    Audit --> Claims[Retain other claims without verified credit]
     Replay --> Ledger[Canonical receipts on cluster-data]
     Ledger --> Geometry[Geometry prior plus measured curve yield and cost]
     Ledger --> Shadow[Spatial challenger: frozen predictions and later errors]
@@ -132,7 +134,7 @@ flowchart TD
     Policy --> Pages[Build gh-pages every 20 minutes]
     Evidence --> Pages
     Pages --> Clients[Independent local seeds and exact coverage checks]
-    Clients --> Replay
+    Clients --> Audit
 ```
 
 [Policy equations and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/GEOMETRIC_POLICY.md) · [Mathematical coverage scope](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md) · [Branch and deployment design](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/BRANCHES.md)
@@ -141,11 +143,11 @@ The initial discovery-learning experiment failed its promotion test. The new geo
 
 ## What verified work means
 
-Browser workers use `BigInt`; the portable Python kernel uses arbitrary-precision integers. Each result has a fixed task descriptor and deterministic digest. GitHub ingestion independently replays every unseen task, compares the full result digest, and credits the actual issue creator once. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
+Browser workers use the Rust WebAssembly kernel with a BigInt fallback. The local runner can use the same fixed-width Rust kernel, with arbitrary-precision arithmetic for the final check and an independent Python reference. [Matched benchmarks](https://github.com/Kuberwastaken/math-gambling/blob/main/research/benchmarks/native-wasm-2026-09-11.json) measured **20.2× native vs Python** and **5.2× WASM vs JavaScript** on this Mac; these are kernel comparisons, not discovery odds or guaranteed whole-campaign speedups. [Build, bounds and tests](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/NATIVE_KERNEL.md). Each result has a fixed task descriptor and deterministic digest. GitHub ingestion fully replays new-account tasks, then samples eligible new negative banks at 1-in-20 after submission. Only independently replayed tasks with matching digests credit the actual issue creator; other claims stay unverified. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
 
 The [shared completed-task index](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/data/coverage/index.json) contains exact task IDs in SHA-256 checked, immutable hash-routed chunks. Runners v0.3.1 and newer read coverage v2; older runners need an upgrade. Clients skip IDs in their checked snapshot and local completed records. There is no probabilistic membership filter that could discard unvisited work. Simultaneous clients can still select the same unfinished task, and stale or offline snapshots cannot know about later completions; the server deduplicates accepted work.
 
-A digest detects changed bytes, but does not prove who physically supplied CPU time. Full negative replay is the current trust model and creates a central cost. Expected analytic counts and conservation checks are useful diagnostics; they do not prove that each candidate was visited. See the [protocol](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/PROTOCOL.md), [cluster design](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/CLUSTER.md), and [response to the external critique](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/REVIEW_RESPONSE.md).
+A digest detects changed bytes, but does not prove who physically supplied CPU time. The exact ledger still requires full task replay, but the [negative-audit policy](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/NEGATIVE_AUDITS.md) leaves most eligible claims outside that ledger to reduce replay load. Unsampled claims earn no verified score, train no model and cannot suppress future searches. Existing scores are preserved; score growth after sampling reflects only checked tasks. Expected analytic counts and conservation checks are useful diagnostics; they do not prove that each candidate was visited. See the [protocol](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/PROTOCOL.md), [cluster design](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/CLUSTER.md), and [response to the external critique](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/REVIEW_RESPONSE.md).
 
 ## Participate, reproduce and review
 
@@ -164,7 +166,7 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **259,072 verified tasks**; **253 models** and **252 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **265,216 verified tasks**; **259 models** and **258 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
 The challenger predicts server CPU, quotient positions, curves and exact-test counts from context and coarse coefficient/block geometry. Shrinkage keeps sparse regions close to their context baseline. These are arithmetic and cost predictions, not winning probabilities.
 
@@ -183,16 +185,16 @@ flowchart TD
 
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 
-Latest evaluation: tasks 258,049–259,072. Lower mean absolute log1p prediction error is better.
+Latest evaluation: tasks 264,193–265,216. Lower mean absolute log1p prediction error is better.
 
 | Quantity | Context baseline | Spatial challenger |
 | --- | ---: | ---: |
-| cpu_ms | 1.2270 | 1.0710 |
-| quotient_points | 7.6950 | 7.3316 |
-| curves | 4.0143 | 3.6616 |
-| exact_tests | 0.1554 | 0.1420 |
+| cpu_ms | 1.3151 | 1.1203 |
+| quotient_points | 7.9795 | 7.5960 |
+| curves | 4.0390 | 3.6646 |
+| exact_tests | 0.1881 | 0.1639 |
 
-Unseen-geometry evaluation: 170 tasks. Full errors and nonzero-count support are in the report.
+Unseen-geometry evaluation: 171 tasks. Full errors and nonzero-count support are in the report.
 
 ![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 

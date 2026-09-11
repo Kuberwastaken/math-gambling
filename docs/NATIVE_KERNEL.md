@@ -39,6 +39,10 @@ Rust release builds retain overflow checks. A bound violation aborts the task; i
 
 A separately tested Montgomery path supports **odd moduli below `2^63`**, including composite moduli. Even moduli use ordinary wide multiplication/reduction. The norm root check needs only two modular multiplications per D, so conversion/setup costs can outweigh savings. The benchmark compares both paths; ordinary reduction remains the default rather than assuming Montgomery is automatically faster. The small-prime sieve uses precomputed residue masks, not Montgomery multiplication.
 
+## Measured speed
+
+The [567-task matched benchmark](../research/benchmarks/native-wasm-2026-09-11.json) measured median 2.340 s in Python and 0.116 s in native Rust (**20.2×**), and 1.227 s in JavaScript versus 0.237 s in WASM (**5.2×**, Node on this Mac). All receipts matched. Three warm rounds follow one discarded warmup. Montgomery was slightly slower overall in these measurements, so remains optional. This includes empty and curve-bearing tasks, 79,374 curves and 218 final square tests. Process startup/JSON are included for native; banking, coverage fetches and server verification are not.
+
 ## Evidence and limits
 
 Run `cargo test --manifest-path native/Cargo.toml --locked`, then `python -m unittest discover -s tests -p test_native_kernel.py` and the WASM gate above. Tests include all 243 frozen boundary tasks, 648 seeded random tasks, invalid descriptor rejection, 20,000 Montgomery comparisons, known positive curves, a k=3 identity whose cubes exceed 128 bits, and a complete spawned-runner checkpoint/bank round trip. Fixtures create no public submissions or leaderboard credit.

@@ -25,7 +25,7 @@ class PublishSnapshotTests(unittest.TestCase):
         campaign.mkdir(parents=True)
         (campaign/'status.json').write_text(json.dumps({'state':'running','updated_utc':'2026-09-10T10:00:00Z',
             'totals':{'curve_checks':12345678901234567890},'jobs':{'complete':1,'running':1},'solutions':[]}))
-        self.pair=dict(zip(FILES,export(root/'lab',root/'public')))
+        self.pair=dict(zip(FILES,export(root/'lab',root/'public',now='2026-09-11T12:00:00Z')))
 
     def test_actual_export_validates(self):
         self.assertEqual(validate_pair(self.pair)[0]['totals']['curve_checks'],'12345678901234567890')

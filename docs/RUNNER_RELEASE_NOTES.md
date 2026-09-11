@@ -1,3 +1,15 @@
+# Math Gambling runner v0.5.0
+
+The search kernel can now run in Rust with bounded 64/128-bit arithmetic and an arbitrary-precision final check. Choose a platform ZIP and pass `--kernel rust`; the universal ZIP retains the dependency-free Python fallback and Rust sources. Python 3.11+ continues to handle authentication, seeds, checkpoints and banking. The browser uses the same kernel through WebAssembly.
+
+Matched warm measurements on the development Mac were 20.2× faster than Python and 5.2× faster than JavaScript in Node. These are kernel timings, not whole-campaign speedups or discovery odds. Montgomery multiplication is implemented and tested but is not the default because it did not improve this workload overall.
+
+Exact task definitions, counters, result digests and saved output remain compatible. Release gates test known positives, wide final arithmetic, cross-language fixtures, malformed tasks and a real spawned Rust runner on Linux, Windows and macOS. Platform binaries are built from this tag; checksums accompany all archives.
+
+The server may now sample eligible negative banks after 256 verified tasks/account. Unreplayed claims earn no verified credit, train no model and certify no coverage. Every submitted identity still receives exact verification. This reduces replay task volume without pretending that sampling proves a complete negative result.
+
+## Previous releases
+
 # Math Gambling runner v0.4.1
 
 Exact norm-shell pruning skips provably excluded coefficient intervals using integer bounds and bisection. Logical counters, task definitions and old receipt digests are preserved. The runner keeps independent local seeds and reads the same public policy and exact completed-task index as the browser.

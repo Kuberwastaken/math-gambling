@@ -12,6 +12,7 @@ export async function createWasmKernel(bytesOrResponse) {
   }}};
   const bytes = bytesOrResponse instanceof Response ? await bytesOrResponse.arrayBuffer() : bytesOrResponse;
   ({instance} = await WebAssembly.instantiate(bytes, imports));
+  if (instance.exports.mg_self_test() !== 1) throw Error("WASM positive/negative self-test failed");
   return {runTask(task, options = {}) {
     task = validateTask(task);
     const input = new TextEncoder().encode(JSON.stringify(task));

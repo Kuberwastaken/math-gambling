@@ -85,7 +85,7 @@ def main():
       'ALGORITHM_REVIEW':'research/archive/research-2026-09-09/ALGORITHM_REVIEW.md',
       'GEOMETRY_REVIEW':'research/archive/research-2026-09-09/GEOMETRY_REVIEW.md',
       'DISCOVERY_LEARNING':'research/archive/research-2026-09-09/DISCOVERY_LEARNING.md',
-      'SHELL_PRUNING':'docs/SHELL_PRUNING.md','GEOMETRIC_POLICY':'docs/GEOMETRIC_POLICY.md','MATHEMATICAL_COVERAGE':'docs/MATHEMATICAL_COVERAGE.md',
+      'SHELL_PRUNING':'docs/SHELL_PRUNING.md','GEOMETRIC_POLICY':'docs/GEOMETRIC_POLICY.md','MATHEMATICAL_COVERAGE':'docs/MATHEMATICAL_COVERAGE.md','NATIVE_KERNEL':'docs/NATIVE_KERNEL.md','NEGATIVE_AUDITS':'docs/NEGATIVE_AUDITS.md',
       'DOMAIN_PROOF':'research/archive/phase3/DOMAIN_PROOF.md'}
     articles = {slug: rel for slug, rel in articles.items() if (ROOT / rel).exists()}
     rendered = render_research(articles)
@@ -108,6 +108,7 @@ def main():
                                                content, article_path, math=True), encoding='utf-8')
     downloads=OUT/'downloads';downloads.mkdir()
     local_files=['tools/runner.py','tools/search_core.py','tools/coverage_client.py','tools/coverage_format.py','tools/client_audit.py','data/runner-release.json','data/readme-progress.svg','data/strategy.json','data/site-config.json','docs/PROTOCOL.md','docs/RUNNER_SETUP.md','README.md','LICENSE']
+    local_files += ['tools/native_kernel.py','tools/build_native.py','native/Cargo.toml','native/Cargo.lock','native/src/lib.rs','native/src/main.rs','docs/NATIVE_KERNEL.md','docs/NEGATIVE_AUDITS.md']
     local_files += ['data/coverage/' + name for name in referenced_files(ROOT/'data/coverage', coverage)]
     with zipfile.ZipFile(downloads/'math-gambling-runner.zip','w',zipfile.ZIP_DEFLATED) as z:
         for rel in sorted(set(local_files)):

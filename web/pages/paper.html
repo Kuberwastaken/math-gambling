@@ -82,13 +82,15 @@
   <section>
     <h3>3. Volunteer execution and verification</h3>
     <p>
-      Opt-in browser clients use BigInt arithmetic in a worker; the portable
-      local runner uses Python integers. Bounded deterministic task receipts are
+      Opt-in browser clients use a Rust WebAssembly kernel with a BigInt fallback;
+      the local runner offers Rust computation with exact wider final checks. Bounded deterministic task receipts are
       banked as GitHub issues. The authenticated issue author supplies
       attribution; posting establishes submission, not correctness. A scheduled
       verifier independently replays accepted tasks, deduplicates task
       identifiers and preserves exact positive identities. Display names are
-      self-reported; leaderboard identity comes from the issue author.
+      self-reported; leaderboard identity comes from the issue author. Eligible negative
+      banks are randomly sampled after submission. Unreplayed claims earn no
+      verified credit, certify no coverage and supply no learning observations.
     </p>
   </section>
   <section>

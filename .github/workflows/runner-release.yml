@@ -30,6 +30,13 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts --user-agent='OpenAI File Downloader, XaiImageApiFetch/1.0'
+      - name: Build and test the native mathematical kernel
+        env:
+          CARGO_HTTP_USER_AGENT: 'OpenAI File Downloader, XaiImageApiFetch/1.0'
+        run: |
+          python tools/build_native.py
+          cargo test --locked --manifest-path native/Cargo.toml
+          python -m unittest discover -s tests -p test_native_kernel.py -v
       - run: python tools/build_site.py
       - name: Check exact arithmetic, spawn, resume, banking, seed logs and coverage
         run: python -m unittest discover -s tests -p 'test_runner*.py' -v
@@ -39,6 +46,13 @@ jobs:
           node --test tests/test_shell_pruning.mjs
       - name: Check mathematical positive fixtures and independent search kernel
         run: python -m unittest discover -s tests -p test_search.py -v
+      - name: Package native runner for this OS and architecture
+        run: python tools/package_native.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: native-${{ matrix.os }}
+          path: native-assets/*.zip
+          if-no-files-found: error
   release:
     if: github.event.repository.private == false
     needs: compatibility
@@ -59,6 +73,11 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts --user-agent='OpenAI File Downloader, XaiImageApiFetch/1.0'
       - run: python tools/build_site.py
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: native-*
+          path: release-assets
+          merge-multiple: true
       - name: Package the tested tag and checksum
         run: |
           python - <<'PY'
@@ -66,11 +85,12 @@ jobs:
           meta = json.loads(pathlib.Path('data/runner-release.json').read_text())
           assert os.environ['GITHUB_REF_NAME'] == 'v' + meta['version'], 'Tag must match runner metadata'
           out = pathlib.Path('release-assets')
-          out.mkdir()
+          out.mkdir(exist_ok=True)
+          assert len(list(out.glob("*.zip"))) == 3, "All three platform artifacts required"
           name = 'math-gambling-runner-v' + meta['version'] + '.zip'
           archive = out / name
           shutil.copyfile('dist/math-gambling/downloads/math-gambling-runner.zip', archive)
-          (out / 'SHA256SUMS.txt').write_text(hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + name + '\n')
+          (out / 'SHA256SUMS.txt').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest() + '  ' + p.name + '\n' for p in sorted(out.glob('*.zip'))))
           shutil.copyfile('docs/RUNNER_SETUP.md', out / 'RUNNER_SETUP.md')
           shutil.copyfile('data/runner-release.json', out / 'runner-release.json')
           PY

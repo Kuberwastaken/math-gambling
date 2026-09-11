@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - '.gitattributes'
+      - 'native/**'
+      - 'tools/native_kernel.py'
+      - 'tools/build_native.py'
+      - 'tests/test_native_kernel.py'
       - 'tools/runner.py'
       - 'tools/search_core.py'
       - 'tools/ingest.py'
@@ -33,7 +37,7 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-2022, macos-14]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
+    timeout-minutes: 12
     env:
       PYTHONUTF8: '1'
       MG_RUNNER_ARCHIVE: dist/math-gambling/downloads/math-gambling-runner.zip
@@ -49,6 +53,13 @@ jobs:
           cache: npm
       - name: Install pinned site-build dependencies
         run: npm ci --ignore-scripts --user-agent='OpenAI File Downloader, XaiImageApiFetch/1.0'
+      - name: Build and cross-check Rust
+        env:
+          CARGO_HTTP_USER_AGENT: 'OpenAI File Downloader, XaiImageApiFetch/1.0'
+        run: |
+          python tools/build_native.py
+          cargo test --locked --manifest-path native/Cargo.toml
+          python -m unittest discover -s tests -p test_native_kernel.py -v
       - name: Build the actual portable download
         run: python tools/build_site.py
       - name: Test spawn, checkpoint resume, locking, links and extracted ZIP

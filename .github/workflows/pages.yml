@@ -29,6 +29,19 @@ jobs:
           cache: npm
       - name: Install pinned research-rendering dependencies
         run: npm ci --ignore-scripts --user-agent='OpenAI File Downloader, XaiImageApiFetch/1.0'
+      - name: Require the linked runner release before publishing a new download link
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(python3 -c "import json; print(json.load(open('data/runner-release.json'))['version'])")
+          gh api -H 'User-Agent: OpenAI File Downloader, XaiImageApiFetch/1.0' "repos/Kuberwastaken/math-gambling/releases/tags/v${version}" --jq .html_url
+      - name: Build the exact WebAssembly kernel
+        env:
+          CARGO_HTTP_USER_AGENT: 'OpenAI File Downloader, XaiImageApiFetch/1.0'
+        run: |
+          rustup target add wasm32-unknown-unknown
+          python3 tools/build_native.py --wasm
+          test -s web/assets/kernel/math_gambling_kernel.wasm
       - name: Test mathematical kernels and public protocols
         run: |
           node --test tests/*.mjs

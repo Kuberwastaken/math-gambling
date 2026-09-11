@@ -493,6 +493,12 @@ mod wasm {
         fn identity(ptr: *const u8, len: usize);
     }
     #[no_mangle]
+    pub extern "C" fn mg_self_test() -> u32 {
+        (candidate(39, -24904, 117367, true).is_some()
+            && candidate(3, 108398887211, -472715493453327032, true).is_some()
+            && candidate(3, 108398887211, -472715493453327031, true).is_none()) as u32
+    }
+    #[no_mangle]
     pub extern "C" fn mg_input_ptr() -> *mut u8 {
         std::ptr::addr_of_mut!(INPUT).cast()
     }

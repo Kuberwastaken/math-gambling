@@ -25,7 +25,7 @@ test("scan publishes a checked identity synchronously and isolates observers", (
 const engineSource = await fs.readFile(new URL("../web/engine.mjs", import.meta.url), "utf8");
 const workerSource = await fs.readFile(new URL("../web/search-worker.mjs", import.meta.url), "utf8");
 
-for (const failure of ["hash", "later-row"]) {
+for (const failure of ["hash", "later-row", "wasm-trap"]) {
   test(`worker emits a positive before ${failure} failure, without negative coverage`, async () => {
     const first = engineSource.indexOf("function runRow("),
       last = engineSource.indexOf("export function runTaskCore", first);
@@ -49,14 +49,18 @@ for (const failure of ["hash", "later-row"]) {
         verifyTriple: xyz => verifyTriple(xyz, 39)};
     `, context);
     const messages = [], self = {postMessage(value) { messages.push(structuredClone(value)); }};
-    vm.runInNewContext(workerSource.replace(
+    const fixtureWorker = workerSource.replace(
       /import \{[^}]+\} from '\.\/engine\.mjs';/,
       "const {runTask, verifyTriple, ENGINE} = __engine;",
-    ), {__engine: context.__engine, self, performance});
+    ).replace(/import \{loadWasmKernel\} from '\.\/wasm-kernel\.mjs';/,
+      failure === 'wasm-trap'
+        ? `const loadWasmKernel = async () => ({runTask(task, options) { options.onHit({xyz: ${JSON.stringify(xyz)}}); throw Error('injected WASM trap'); }});`
+        : 'const loadWasmKernel = async () => null;');
+    await vm.runInNewContext('(async () => {' + fixtureWorker + '})()', {__engine: context.__engine, self, performance});
     await self.onmessage({data: {type: "start", task: context.__engine.makeTask("c00", 0)}});
     assert.deepEqual(messages.map(message => message.type), ["ready", "identity", "error"]);
     assert.equal(verifyTriple(messages[1].hit.xyz, 39), true);
     assert.equal(messages.some(message => message.type === "result"), false);
-    assert.match(messages[2].message, failure === "hash" ? /digest failure/ : /later row failure/);
+    assert.match(messages[2].message, failure === "hash" ? /digest failure/ : failure === "wasm-trap" ? /WASM trap/ : /later row failure/);
   });
 }

@@ -59,6 +59,10 @@ def publish(root, tag, token, request=api_request):
     archive = 'math-gambling-runner-v' + version + '.zip'
     expected = {name: (root/'release-assets'/name).read_bytes()
                 for name in (archive, 'SHA256SUMS.txt', 'RUNNER_SETUP.md', 'runner-release.json')}
+    for path in sorted((root/'release-assets').glob('math-gambling-runner-v' + version + '-*.zip')):
+        if not re.fullmatch(r'math-gambling-runner-v' + re.escape(version) + r'-(linux|macos|windows)-(x86_64|arm64)\.zip',path.name):
+            raise RuntimeError('Unexpected native asset name')
+        expected[path.name] = path.read_bytes()
     checksums = {name: 'sha256:' + hashlib.sha256(raw).hexdigest() for name, raw in expected.items()}
     try:
         release = request(token, 'GET', API + '/releases/tags/' + quote(tag, safe=''))

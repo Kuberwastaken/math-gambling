@@ -1,0 +1,76 @@
+{
+  "schema": "math-gambling-kernel-benchmark-v1",
+  "date": "2026-09-11",
+  "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.6",
+  "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25) (Homebrew)",
+  "node": "v26.3.1",
+  "tasks": 567,
+  "task_corpus_sha256": "8acf5ac3bf1228e921d98e93fb2cb7aadd096912e31e9f274aba78e37be12362",
+  "results_sha256": "a8a3fdccefec39b2207e3637271701cf7a675209ee00ca254f83a03f11f59ab8",
+  "counters": {
+    "generators": 951864,
+    "outside_shell": 737293,
+    "invalid_d": 71541,
+    "signed_excluded": 56134,
+    "noninvertible": 7522,
+    "curves": 79374,
+    "quotient_points": 113804563,
+    "rejected_mod243": 108184584,
+    "rejected_parity": 2250215,
+    "rejected_prime": 3369546,
+    "exact_tests": 218,
+    "hits": 0
+  },
+  "wall_seconds": {
+    "python": [
+      2.2865247080007975,
+      2.3397681660026137,
+      2.343029750001733
+    ],
+    "rust": [
+      0.11601366700051585,
+      0.11510374999852502,
+      0.12037633300133166
+    ],
+    "rust_montgomery": [
+      0.11240195800201036,
+      0.15899679100039066,
+      0.11759708300087368
+    ],
+    "javascript": [
+      1.223832292,
+      1.2302256669999998,
+      1.227472667
+    ],
+    "wasm": [
+      0.2364968340000005,
+      0.23670983399999931,
+      0.24040658299999995
+    ],
+    "wasm_montgomery": [
+      0.23845849999999974,
+      0.23474854099999992,
+      0.24363125000000035
+    ]
+  },
+  "median_seconds": {
+    "python": 2.3397681660026137,
+    "rust": 0.11601366700051585,
+    "rust_montgomery": 0.11759708300087368,
+    "javascript": 1.227472667,
+    "wasm": 0.23670983399999931,
+    "wasm_montgomery": 0.23845849999999974
+  },
+  "speedups": {
+    "python_over_rust": 20.168039046573796,
+    "javascript_over_wasm": 5.185558395516443
+  },
+  "notes": [
+    "One full warmup round excluded, then three timed rounds.",
+    "Rust timings include process startup, JSON pipe I/O and parsing; Python runs in-process.",
+    "JS and WASM measured in Node, including per-task parity serialization; not a mobile-browser guarantee.",
+    "Same fixed-width enumeration, exact wider final check and identical logical counters.",
+    "These are not zcubes-equivalent work units or measured discovery odds."
+  ]
+}

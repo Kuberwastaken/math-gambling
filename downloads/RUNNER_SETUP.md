@@ -1,6 +1,6 @@
 # Run Math Gambling locally
 
-Release **v0.5.0** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.5.0 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
+Release **v0.5.2** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.5.2 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
 
 Use a normal Python **3.11 or newer** installation with SQLite support. Download it from [python.org](https://www.python.org/downloads/) if needed. This is the portable volunteer client; the separate native C/PARI research campaign has different build requirements and performance.
 
@@ -11,13 +11,13 @@ Eligible negative banks now use random audits. Only actually replayed tasks earn
 
 ## 1. Download and extract
 
-[Download runner v0.5.0](https://github.com/Kuberwastaken/math-gambling/releases/download/v0.5.0/math-gambling-runner-v0.5.0.zip). The [GitHub release](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.5.0) includes SHA-256 checksums and the setup guide. The archive contains a `math-gambling` folder with `tools`, `data` and these instructions. Keep that folder together.
+[Download runner v0.5.2](https://github.com/Kuberwastaken/math-gambling/releases/download/v0.5.2/math-gambling-runner-v0.5.2.zip). The [GitHub release](https://github.com/Kuberwastaken/math-gambling/releases/tag/v0.5.2) includes SHA-256 checksums and the setup guide. The archive contains a `math-gambling` folder with `tools`, `data` and these instructions. Keep that folder together.
 
 On macOS or Linux, open Terminal. If you saved the ZIP in Downloads:
 
 ```sh
 cd ~/Downloads
-unzip math-gambling-runner-v0.5.0.zip
+unzip math-gambling-runner-v0.5.2.zip
 cd math-gambling
 ```
 
@@ -25,7 +25,7 @@ On Windows, open PowerShell:
 
 ```powershell
 cd "$HOME\Downloads"
-Expand-Archive .\math-gambling-runner-v0.5.0.zip -DestinationPath .\math-gambling-runner
+Expand-Archive .\math-gambling-runner-v0.5.2.zip -DestinationPath .\math-gambling-runner
 cd .\math-gambling-runner\math-gambling
 ```
 
@@ -51,7 +51,7 @@ py -3 tools\runner.py --login --submit --bank-every 256 --minutes 60 --workers 1
 
 Replace `Your name` with your alias. `--login` uses GitHub's browser sign-in through the official CLI and reads your authenticated username. The runner does not ask for a personal access token or put a token in a receipt. The CLI manages its own authentication. If already signed in, the current GitHub account is used.
 
-`--submit` explicitly authorizes bank issue creation. Every 256 completed tasks creates a bank by default; `--bank-every N` accepts 1 to 256. At most one bank is submitted per minute. The terminal reports pending, uncertain and submitted banks separately from verified coverage. GitHub Actions still needs to replay a submitted bank before leaderboard credit.
+`--submit` explicitly authorizes bank issue creation. Every 256 completed tasks creates a bank by default; `--bank-every N` accepts 1 to 256. Banks normally submit ten seconds apart. Rate-limit failures honor GitHub’s Retry-After/reset headers and exponential backoff, saved across restarts. Two computers can share an account, but GitHub’s account limits apply across both. The terminal reports pending, uncertain and submitted banks separately from verified coverage. GitHub Actions must process the bank before contribution credit. Complete banks with a passed random audit receive provisional credit for unique tasks; independently verified inputs remain a separate total.
 
 When computation ends, automatic mode uses the rest of your chosen time budget to submit queued banks. Ctrl+C stops that wait and leaves the queue on disk. Later runs with `--submit` resume it. An uncertain GitHub response is retained for manual inspection rather than blindly retried.
 
@@ -126,7 +126,7 @@ Up to 256 task claims go into each bank; a byte limit can produce smaller files.
 
 ### GitHub submission behavior
 
-Automatic mode uses the [GitHub CLI](https://cli.github.com/) with your explicit `--submit` option. Add `--login` for the browser sign-in flow, or use an existing `gh auth login` session. It attempts at most one bank submission per minute. It checks for an identical existing issue before creating one and retains uncertain submissions for manual inspection. `--offline` and `--submit` cannot be combined.
+Automatic mode uses the [GitHub CLI](https://cli.github.com/) with your explicit `--submit` option. Add `--login` for the browser sign-in flow, or use an existing `gh auth login` session. Successful submissions are paced ten seconds apart; failures back off persistently. It checks for an identical existing issue before creating one and retains uncertain submissions for manual inspection. `--offline` and `--submit` cannot be combined.
 
 The manual commands omit `--submit`; the automatic quickstart includes it explicitly.
 
@@ -157,4 +157,4 @@ A published snapshot is not a live task reservation. Concurrent clients can choo
 
 ## Upgrading an existing run
 
-Version 0.5.0 reads both coverage v1 and v2. Older runners pause on the new published coverage and should be upgraded. Stop the old runner, extract the new release, and point `--output` at your existing stopped output folder. Saved tasks and banks remain valid; startup also checks for saved exact discoveries. Operational failures now exit nonzero after preserving results. Keep uncertain bank files for reconciliation rather than posting them repeatedly.
+Version 0.5.2 reads both coverage v1 and v2. Older runners pause on the new published coverage and should be upgraded. Stop the old runner, extract the new release, and point `--output` at your existing stopped output folder. Saved tasks and banks remain valid; startup also checks for saved exact discoveries. Operational failures now exit nonzero after preserving results. Keep uncertain bank files for reconciliation rather than posting them repeatedly.

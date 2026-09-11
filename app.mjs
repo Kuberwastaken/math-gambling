@@ -5,14 +5,14 @@ import {
   canonicalJSON,
   verifyTriple,
   validateTask,
-} from "./engine.mjs?v=5a55584caa37";
-import { createLiveVisuals } from "./live-viz.mjs?v=5a55584caa37";
-import { createJackpot } from "./jackpot.mjs?v=5a55584caa37";
-import { loadChallenger } from "./challenger-viz.mjs?v=5a55584caa37";
-import { renderModelEvolution } from "./model-viz.mjs?v=5a55584caa37";
-import { setupRunnerDownload } from "./runner-setup.mjs?v=5a55584caa37";
+} from "./engine.mjs?v=024bd3fee838";
+import { createLiveVisuals } from "./live-viz.mjs?v=024bd3fee838";
+import { createJackpot } from "./jackpot.mjs?v=024bd3fee838";
+import { loadChallenger } from "./challenger-viz.mjs?v=024bd3fee838";
+import { renderModelEvolution } from "./model-viz.mjs?v=024bd3fee838";
+import { setupRunnerDownload } from "./runner-setup.mjs?v=024bd3fee838";
 setupRunnerDownload();
-import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=5a55584caa37";
+import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=024bd3fee838";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -560,7 +560,7 @@ async function loadCluster() {
     const urls = config.display_urls || {};
     const t = clusterData.totals || {};
     text("cluster-reported", fmt(t.reported_tasks));
-    text("cluster-inputs", fmt(t.verified_computations));
+    text("cluster-inputs", fmt(t.contributed_computations ?? t.verified_computations));
     text("cluster-verified", fmt(t.verified_unique_tasks));
     text("cluster-duplicates", fmt(t.duplicate_tasks));
     text("cluster-hits", fmt(t.verified_hits));
@@ -573,15 +573,15 @@ async function loadCluster() {
     text(
       "cluster-note",
       Number(t.verified_unique_tasks)
-        ? "Ranked by independently verified inputs. Duplicate tasks earn no extra credit."
+        ? "Ranked by contributed inputs: verified work plus unique claims from passed sampled banks. The verified portion is shown separately. Provisional credit can be revoked after a failed audit."
         : "The volunteer ledger starts at zero. Be the first to bank a verified computation.",
     );
     const body = $("contributors");
     if (body) {
       body.replaceChildren();
       const people = [...(clusterData.contributors || [])].sort((a, b) => {
-        const x = BigInt(a.verified_computations || 0),
-          y = BigInt(b.verified_computations || 0);
+        const x = BigInt(a.contributed_computations ?? a.verified_computations ?? 0),
+          y = BigInt(b.contributed_computations ?? b.verified_computations ?? 0);
         return y > x ? 1 : y < x ? -1 : 0;
       });
       for (const [rank, p] of people.entries()) {
@@ -613,6 +613,7 @@ async function loadCluster() {
           a.textContent = `@${user}`;
           account.append(a);
         } else account.textContent = "Unattributed";
+        row.insertCell().textContent = fmt(p.contributed_computations ?? p.verified_computations);
         row.insertCell().textContent = fmt(p.verified_computations);
       }
       // Empty ranks invite participation without fabricating people or work.
@@ -624,6 +625,7 @@ async function loadCluster() {
         place.className = "rank-number";
         place.textContent = String(rank + 1).padStart(2, "0");
         first.append(place, document.createTextNode("—"));
+        row.insertCell().textContent = "—";
         row.insertCell().textContent = "—";
         row.insertCell().textContent = "—";
       }
@@ -1319,7 +1321,7 @@ async function start(e) {
   // The processor slider remains adjustable during a run.
   text("session-message", "");
   try {
-    worker = new Worker(new URL("search-worker.mjs?v=5a55584caa37", BASE), { type: "module" });
+    worker = new Worker(new URL("search-worker.mjs?v=024bd3fee838", BASE), { type: "module" });
   } catch (e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;

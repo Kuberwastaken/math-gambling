@@ -80,6 +80,18 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(report['totals']['unreplayed_claims'],0)
         self.assertEqual(len(report['contributors']),1)
 
+    def test_quarantine_also_disables_preplanned_pending_banks(self):
+        receipt=bank(self.results)
+        with patch('negative_audit.selected',return_value=True):
+            pending=self.submit(receipt,budget=ig.Budget(count=0))
+        self.assertFalse(pending['complete'])
+        self.policy.eligible.clear()
+        with patch('negative_audit.selected',return_value=False):
+            complete=self.submit(receipt)
+        self.assertEqual(len(self.calls),40)
+        self.assertEqual(complete['unreplayed_tasks'],[])
+        self.assertEqual(pending['negative_audit'],complete['negative_audit'])
+
     def test_sampling_decision_rate_and_bounds(self):
         plan={'one_in':20,'salt':'00'*32}
         count=sum(selected(plan,'body',str(i)) for i in range(10000))

@@ -421,7 +421,9 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                 path = ledger_path(data, "tasks", identifier)
                 saved = read_json(path)
                 from negative_audit import selected
-                if (not saved and bank and not claimed.get("hits")
+                sampling_allowed = (audit_policy is not None and audit_policy.one_in > 1
+                                    and source.get('submitter', '').casefold() in audit_policy.eligible)
+                if (sampling_allowed and not saved and bank and not claimed.get("hits")
                         and not record.get("audit_sample_failed")
                         and not selected(record.get("negative_audit"), body_hash, identifier)):
                     retained = {"task": task, "digest": claimed["digest"], "received_at": now()}

@@ -37,6 +37,12 @@ BANK_LIMIT = 256
 OUTBOX_LIMIT = 4096
 MIN_PYTHON = (3, 11)
 
+class PolicyWeights(list):
+    def __init__(self, values, policy):
+        super().__init__(values)
+        self.preflight = policy.get('proposal_preflight') == 'mg114-shell-tile-v1'
+        self.unit = policy.get('exploration_unit', 'tasks')
+
 
 def profile_url(value):
     """Validate an optional public attribution link without fetching it."""
@@ -156,11 +162,12 @@ def load_strategy(offline=False):
             if set(weights) != {v['id'] for v in CONTEXTS}:
                 continue
             values = [weights[c['id']] for c in CONTEXTS]
-            if any(type(w) not in (int, float) or not math.isfinite(w) or w < 0.4/81-1e-12 or w > 1 for w in values):
+            floor=0 if policy.get('policy_version')=='mg114-cpu-budget-v1' else 0.4/81-1e-12
+            if any(type(w) not in (int, float) or not math.isfinite(w) or w <= 0 or w < floor or w > 1 for w in values):
                 continue
             if abs(sum(values)-1) > 1e-8:
                 continue
-            return values, policy.get('epoch', 0)
+            return PolicyWeights(values,policy), policy.get('epoch', 0)
         except (KeyError, TypeError, ValueError):
             continue
     return [1/81]*81, 0
@@ -187,10 +194,16 @@ def choose_task(rng, weights, db, coverage=None, seed=None):
     # prefix once; subsequent allocations checkpoint the cursor atomically.
     legacy = seed is not None and db.execute('SELECT 1 FROM rng_states WHERE seed=?', (seed,)).fetchone() is None
     attempts = 100 + (db.execute('SELECT count(*) FROM tasks').fetchone()[0] if legacy else 0)
-    for _ in range(attempts):
-        c = rng.choices(CONTEXTS, weights=weights, k=1)[0]
+    from search_features import certified_empty
+    preflight=getattr(weights,'preflight',False)
+    c = rng.choices(CONTEXTS, weights=weights, k=1)[0] if preflight else None
+    for attempt in range(attempts):
+        if not preflight:c = rng.choices(CONTEXTS, weights=weights, k=1)[0]
         row = rng.randrange(int(c['rowTasks']))*c['rowStride']
         task = make_task(c['id'], row, rng.randrange(c['blocks']))
+        # Hold context fixed: rejection must not silently reweight contexts.
+        # Bounded fallback retains liveness even if every tile is empty.
+        if preflight and attempt<31 and certified_empty(task):continue
         tid = task_id(task)
         if coverage is not None and coverage.contains(task):
             continue
@@ -582,7 +595,7 @@ def run_campaign(args, out, db, contributor):
         return 2
     print(f'Coverage: {snapshot["revision"]:,} published tasks, {snapshot["updated_at"]} ({snapshot["mode"]}). Concurrent or not-yet-published work can still overlap.', flush=True)
     weights, epoch = load_strategy(args.offline)
-    print(f'Scheduling policy epoch {epoch}; at least 40% uniform task proposals, not CPU shares.', flush=True)
+    print(f'Scheduling policy epoch {epoch}; exploration unit: {getattr(weights,"unit","tasks")}. Costs are estimates, not discovery odds.', flush=True)
     audit.policy(weights, epoch, snapshot)
     rng, resumed_seed = restore_rng(db, seed)
     audit.write('rng', resumed=resumed_seed, state=rng.getstate())

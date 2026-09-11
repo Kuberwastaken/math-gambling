@@ -113,7 +113,7 @@ def main():
                                                content, article_path, math=True), encoding='utf-8')
     downloads=OUT/'downloads';downloads.mkdir()
     local_files=['tools/runner.py','tools/search_core.py','tools/coverage_client.py','tools/coverage_format.py','tools/client_audit.py','data/runner-release.json','data/readme-progress.svg','data/strategy.json','data/site-config.json','docs/PROTOCOL.md','docs/RUNNER_SETUP.md','README.md','LICENSE']
-    local_files += ['tools/native_kernel.py','tools/build_native.py','native/Cargo.toml','native/Cargo.lock','native/src/lib.rs','native/src/main.rs','docs/NATIVE_KERNEL.md','docs/NEGATIVE_AUDITS.md']
+    local_files += ['tools/native_kernel.py','tools/build_native.py','tools/search_features.py','native/Cargo.toml','native/Cargo.lock','native/src/lib.rs','native/src/main.rs','docs/NATIVE_KERNEL.md','docs/NEGATIVE_AUDITS.md']
     local_files += ['data/coverage/' + name for name in referenced_files(ROOT/'data/coverage', coverage)]
     with zipfile.ZipFile(downloads/'math-gambling-runner.zip','w',zipfile.ZIP_DEFLATED) as z:
         for rel in sorted(set(local_files)):

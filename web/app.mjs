@@ -11,6 +11,7 @@ import { createJackpot } from "./jackpot.mjs";
 import { loadChallenger } from "./challenger-viz.mjs";
 import { renderModelEvolution } from "./model-viz.mjs";
 import { setupRunnerDownload } from "./runner-setup.mjs";
+import {certifiedEmpty} from './proposal-proof.mjs';
 setupRunnerDownload();
 import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs";
 const BASE = new URL("./", import.meta.url),
@@ -45,6 +46,7 @@ const date = (v) => {
     : "No timestamp";
 };
 const reportRequests = new Map();
+const parsedReports = new Map();
 const REPORT_TIMEOUT_MS = 12000, REPORT_BYTE_LIMIT = 16 * 1024 * 1024;
 function fetchJSON(file) {
   if (reportRequests.has(file)) return reportRequests.get(file);
@@ -61,6 +63,11 @@ function fetchJSON(file) {
       cache: "no-cache", signal: controller.signal,
     });
     if (!response.ok) throw new Error(`Report unavailable (${response.status})`);
+    const etag=response.headers.get('etag'),cached=parsedReports.get(file);
+    if (etag && cached?.etag===etag) {
+      await response.body?.cancel();
+      return cached.value;
+    }
     if (Number(response.headers.get("content-length")) > REPORT_BYTE_LIMIT) {
       controller.abort();
       throw Error("Report exceeds its size limit");
@@ -83,7 +90,9 @@ function fetchJSON(file) {
     const bytes = new Uint8Array(length);
     let offset = 0;
     for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
-    return JSON.parse(new TextDecoder("utf-8", {fatal: true}).decode(bytes));
+    const value=JSON.parse(new TextDecoder("utf-8", {fatal: true}).decode(bytes));
+    if (etag) parsedReports.set(file,{etag,value});
+    return value;
   })();
   const request = Promise.race([reading, deadline]).finally(() => {
     clearTimeout(timer);
@@ -527,7 +536,7 @@ async function loadStrategy() {
         (c) =>
           !CONTEXTS.some((x) => x.id === c.id) ||
           !Number.isFinite(c.weight) ||
-          c.weight < 0.4 / 81 - 1e-10,
+          c.weight <= 0 || c.weight < (s.policy_version === 'mg114-cpu-budget-v1' ? 0 : 0.4 / 81 - 1e-10),
       ) ||
       Math.abs(entries.reduce((a, c) => a + c.weight, 0) - 1) > 0.001
     )
@@ -1148,18 +1157,24 @@ async function nextTask(generation) {
     strategy?.contexts || CONTEXTS.map((c) => ({ id: c.id, weight: 1 / 81 }));
   const policyEpoch = strategy?.epoch ?? 0;
   const rng = randomStream;
+  const preflight=strategy?.proposal_preflight === 'mg114-shell-tile-v1';
+  let context=null;
   for (let attempt = 0; attempt < 100; attempt++) {
+    if (!context || !preflight) {
     let draw = Number(await rng.below(1n << 53n)) / 2 ** 53;
     let id = weights.at(-1).id;
     for (const c of weights) {
       draw -= c.weight;
       if (draw <= 0) { id = c.id; break; }
     }
-    const c = CONTEXTS.find((c) => c.id === id);
-    const task = makeTask(id,
+    context = CONTEXTS.find((c) => c.id === id);
+    }
+    const c=context;
+    const task = makeTask(c.id,
       (await rng.below(c.rowTasks)) * BigInt(c.rowStride),
       Number(await rng.below(c.blocks)));
     if (generation !== sessionGeneration || !running) return null;
+    if (preflight && attempt<31 && certifiedEmpty(task)) continue;
     if (seen.has(taskId(task))) continue;
     if (await sharedCoverage.has(task)) continue;
     if (generation !== sessionGeneration || !running) return null;

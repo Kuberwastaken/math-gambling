@@ -1,7 +1,7 @@
 // Exact accelerated kernel. Each worker owns its instance and its hit callback.
 // Returning null means the optional artifact could not load; the BigInt engine
 // remains available. Arithmetic traps after a task starts are never negatives.
-import {validateTask, verifyTriple} from './engine.mjs?v=91edbf56d67b';
+import {validateTask, verifyTriple} from './engine.mjs?v=ec631fabe88d';
 export async function createWasmKernel(bytesOrResponse) {
   let instance, onHit;
   const decode = (ptr, len) => JSON.parse(new TextDecoder().decode(new Uint8Array(instance.exports.memory.buffer, ptr, len)));

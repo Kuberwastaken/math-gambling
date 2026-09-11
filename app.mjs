@@ -5,14 +5,14 @@ import {
   canonicalJSON,
   verifyTriple,
   validateTask,
-} from "./engine.mjs?v=91edbf56d67b";
-import { createLiveVisuals } from "./live-viz.mjs?v=91edbf56d67b";
-import { createJackpot } from "./jackpot.mjs?v=91edbf56d67b";
-import { loadChallenger } from "./challenger-viz.mjs?v=91edbf56d67b";
-import { renderModelEvolution } from "./model-viz.mjs?v=91edbf56d67b";
-import { setupRunnerDownload } from "./runner-setup.mjs?v=91edbf56d67b";
+} from "./engine.mjs?v=ec631fabe88d";
+import { createLiveVisuals } from "./live-viz.mjs?v=ec631fabe88d";
+import { createJackpot } from "./jackpot.mjs?v=ec631fabe88d";
+import { loadChallenger } from "./challenger-viz.mjs?v=ec631fabe88d";
+import { renderModelEvolution } from "./model-viz.mjs?v=ec631fabe88d";
+import { setupRunnerDownload } from "./runner-setup.mjs?v=ec631fabe88d";
 setupRunnerDownload();
-import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=91edbf56d67b";
+import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=ec631fabe88d";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -1271,7 +1271,7 @@ async function start(e) {
   // The processor slider remains adjustable during a run.
   text("session-message", "");
   try {
-    worker = new Worker(new URL("search-worker.mjs?v=91edbf56d67b", BASE), { type: "module" });
+    worker = new Worker(new URL("search-worker.mjs?v=ec631fabe88d", BASE), { type: "module" });
   } catch (e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;

@@ -1,4 +1,4 @@
-import { verifyTriple } from "./engine.mjs?v=91edbf56d67b";
+import { verifyTriple } from "./engine.mjs?v=ec631fabe88d";
 
 // This display never validates task coverage or changes a receipt. The default
 // target is fixed in the app; other targets are for known-positive test fixtures.

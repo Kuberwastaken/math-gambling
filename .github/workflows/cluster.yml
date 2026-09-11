@@ -19,7 +19,8 @@ jobs:
   verify:
     if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[bank]') || startsWith(github.event.issue.title, '[compute]')
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    # Data transfer/publication can exceed ten minutes; replay stays capped at 120 seconds.
+    timeout-minutes: 20
     env:
       GITHUB_TOKEN: ${{ github.token }}
     steps:

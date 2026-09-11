@@ -12,6 +12,8 @@ import shutil
 import subprocess
 import tarfile
 import tempfile
+import time
+import sys
 from urllib.parse import quote, urlsplit, urlunsplit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -166,11 +168,16 @@ def overlay(repo, ref):
     repo = Path(repo).resolve()
     state_path(repo).unlink(missing_ok=True)
     revision = commit_oid(repo, ref)
-    with tempfile.TemporaryDirectory(prefix='math-gambling-overlay-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='math-gambling-overlay-', dir=repo.parent) as temporary:
         stage = Path(temporary)
-        export_data(repo, revision, stage)
+        started = time.monotonic()
+        exported = export_data(repo, revision, stage)
+        print(f'Overlay exported {len(exported)} files in {time.monotonic()-started:.1f}s', file=sys.stderr)
+        started = time.monotonic()
         # Validate the whole imported coverage closure using trusted main code.
         validate_snapshot(stage / 'data')
+        print(f'Overlay validated ledger/coverage in {time.monotonic()-started:.1f}s', file=sys.stderr)
+        started = time.monotonic()
         mac_present = {root for root in OPTIONAL_MAC if (stage / root).exists()}
         if mac_present and mac_present != OPTIONAL_MAC:
             raise BranchError('Data branch contains an incomplete Mac snapshot pair')
@@ -186,8 +193,12 @@ def overlay(repo, ref):
             if root in OPTIONAL_MAC and not mac_present: continue
             if target.is_dir(): shutil.rmtree(target)
             elif target.exists(): target.unlink()
-            if source.is_dir(): shutil.copytree(source, target)
-            elif source.exists(): target.parent.mkdir(parents=True, exist_ok=True); shutil.copyfile(source, target)
+            # Stage sits on the same filesystem as the checkout. Move already
+            # validated files instead of copying every receipt a second time.
+            if source.exists():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                source.replace(target)
+        print(f'Overlay installed validated roots in {time.monotonic()-started:.1f}s', file=sys.stderr)
     metadata = dict(schema='math-gambling-overlay-v1', source=commit_oid(repo, 'HEAD'),
                     data=revision, branch=DATA_BRANCH)
     marker = state_path(repo)
@@ -351,7 +362,9 @@ def main():
     try:
         if args.command == 'overlay':
             state_path(repo).unlink(missing_ok=True)
+            started = time.monotonic()
             ref = fetch_branch(repo, DATA_BRANCH, remote=args.remote) if args.fetch else args.ref
+            print(f'Data reference fetched in {time.monotonic()-started:.1f}s', file=sys.stderr)
             if not ref: raise BranchError('Specify --fetch or an explicitly pinned --ref')
             result = overlay(repo, ref)
         elif args.command == 'init-data': result = init_data(repo, args.source_ref, remote=args.remote, push=args.push)

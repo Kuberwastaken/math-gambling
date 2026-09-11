@@ -143,12 +143,12 @@ class BranchStateTests(unittest.TestCase):
     def test_interrupted_overlay_invalidates_an_earlier_publication_token(self):
         initial = self.initialize()
         branches.overlay(self.repo, initial)
-        copy = shutil.copyfile
+        replace = Path.replace
         def interrupted(source, target, *args, **kwargs):
             if Path(target).resolve() == (self.repo / 'data/strategy.json').resolve():
                 raise OSError('fixture interrupted replacement')
-            return copy(source, target, *args, **kwargs)
-        with mock.patch.object(branches.shutil, 'copyfile', side_effect=interrupted):
+            return replace(source, target, *args, **kwargs)
+        with mock.patch.object(Path, 'replace', interrupted):
             with self.assertRaisesRegex(OSError, 'interrupted'):
                 branches.overlay(self.repo, initial)
         self.assertFalse(branches.state_path(self.repo).exists())

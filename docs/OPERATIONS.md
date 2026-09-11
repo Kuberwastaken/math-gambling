@@ -37,3 +37,8 @@ The reviewed exporter reads the Mac campaign locally and sends only the two publ
 Run `npm test`, `python3 tools/build_site.py`, and `python3 tools/check_site.py` before publication. Keep the original ledgers, journals and source identity records locally. The scientific archive documents its intentional omission of multi-gigabyte runtime data. Its original/source hashes provide provenance; sanitized archived bytes have their own hashes.
 
 For a suspected solution, stop scheduling that client, preserve its receipts and journals, verify the full integer identity independently, and record the authenticated submission and discovery evidence. Do not fill the paper's result or finder fields from a counter, near miss, unverified bank, or locally entered name.
+
+
+## Publication budget (11 September)
+
+The live ledger reached 265,490 individual accepted-task files. One observed verifier spent 257 seconds loading the data branch and hit its old ten-minute job limit during publication, after successful replay and model fitting. Workflow wall-clock limits are now twenty minutes; the mathematical replay budget remains 120 seconds. Validated overlay directories are moved on the same filesystem instead of copied again. Fetch, extraction, validation and installation timings are logged separately. This provides publication headroom and reduces duplicate filesystem work; it does not establish linear scaling or remove GitHub transport/ledger I/O limits.

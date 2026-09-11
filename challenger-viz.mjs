@@ -59,7 +59,7 @@ export async function loadChallenger(fetchJSON) {
       const p=r.series[chosen], m=p.metrics[key];
       const describe=v=>v===null?'unavailable':`${Math.abs(v).toFixed(2)}% ${v>=0?'lower':'higher'} error`;
       document.getElementById('challenger-selected').textContent=`Evaluation ${chosen+1} of ${r.series.length}`;
-      document.getElementById('challenger-detail').textContent=`Tasks ${p.from.toLocaleString()}–${p.through.toLocaleString()}: ${describe(m.future_all)} on later submissions; ${describe(m.future_unseen_geometry)} on ${p.unseen_tasks} tasks in held-out geometry. Compared with the context-only predictor.`;
+      document.getElementById('challenger-detail').textContent=`Tasks ${p.from.toLocaleString()}–${p.through.toLocaleString()}: ${describe(m.future_all)} on later submissions; ${describe(m.future_unseen_geometry)} on ${p.unseen_tasks} tasks in held-out geometry. Compared with the ${r.baseline || 'context-only predictor'}.`;
     }
     select.onchange=draw;range.oninput=draw;draw();
   } catch {

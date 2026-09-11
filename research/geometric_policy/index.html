@@ -1,13 +1,38 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Geometry, cost and what the policy can claim · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
-<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=024bd3fee838">
-<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=024bd3fee838">
-<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=024bd3fee838"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=024bd3fee838" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=024bd3fee838"><link rel="canonical" href="https://kuber.studio/math-gambling/research/geometric_policy/">
-<script type="module" src="/math-gambling/app.mjs?v=024bd3fee838"></script></head><body data-page="research/geometric_policy/">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=027258560b2e">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=027258560b2e">
+<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=027258560b2e"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=027258560b2e" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=027258560b2e"><link rel="canonical" href="https://kuber.studio/math-gambling/research/geometric_policy/">
+<script type="module" src="/math-gambling/app.mjs?v=027258560b2e"></script></head><body data-page="research/geometric_policy/">
 <a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
 <main id="main"><article class="article research-document"><div class="research-tools"><a href="/math-gambling/research/">← The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/GEOMETRIC_POLICY.md">Markdown source ↗</a></div><h1 id="geometry-cost-and-what-the-policy-can-claim">Geometry, cost and what the policy can claim</h1>
-<details class="research-contents"><summary>On this page</summary><ol><li><a href="#declared-preference">Declared preference</a></li><li><a href="#exclusions-and-coverage">Exclusions and coverage</a></li><li><a href="#what-learning-must-establish-next">What learning must establish next</a></li></ol></details>
+<details class="research-contents"><summary>On this page</summary><ol><li><a href="#cpu-budget-policy-12-september">CPU-budget policy, 12 September</a></li><li><a href="#historical-geometry-policy">Historical geometry policy</a></li><li><a href="#declared-preference">Declared preference</a></li><li><a href="#exclusions-and-coverage">Exclusions and coverage</a></li><li><a href="#what-learning-must-establish-next">What learning must establish next</a></li></ol></details>
+<h2 id="cpu-budget-policy-12-september">CPU-budget policy, 12 September</h2>
+<p>New epochs migrate to <code>mg114-cpu-budget-v1</code>; old epochs remain frozen. With the
+geometry/cost score S below and predicted task cost C, define a target CPU share
+<code>B_c = .4/81 + .6 S_c/sum(S)</code> and dispatch probability
+<code>P_c = (B_c/C_c)/sum(B_j/C_j)</code>. Thus <code>P_c*C_c/sum(P*C)=B_c</code> under the reference
+cost estimates. All contexts retain positive support. These are predicted CPU
+shares, not guarantees for a browser, a new kernel or a changed proposer.</p>
+<p>Compatible clients use exact outward integer tile bounds before dispatch,
+holding the selected context fixed while proposing another row/block. After 31
+empty proposals they permit a normal task, ensuring bounded overhead and
+liveness. A skipped proposal is neither banked nor credited nor added to exact
+coverage. The equation, admissible task domain and completed receipt digest are
+unchanged. Older runners can fall back to their bundled policy; upgrade to 0.6.0
+for the new policy and preflight.</p>
+<p>Two 32-seed local Python trials compared current, proof-only, CPU-budget and
+combined proposals. The independent-seed confirmation used 0.5 CPU-seconds per
+arm/pool and measured actual-D weighted <strong>band</strong> exposure. Combined median lift
+was 2.00 with a paired-bootstrap interval 1.74–2.38; CPU-budget alone was 1.73.
+Proof alone did not pass the uncertainty gate. These are reference-engine proxy
+results, not client/network benchmarks or discovery odds. The confirmation
+supports this limited policy change; shadow ML is not promoted. See the
+<a href="https://github.com/Kuberwastaken/math-gambling/blob/main/research/experiments/2026-09-12/proposals.json">experiment record</a> and
+<code>tools/benchmark_proposals.py</code>. The continuous band proxy still approximates
+discrete endpoints and does not prove root exchangeability.</p>
+<h2 id="historical-geometry-policy">Historical geometry policy</h2>
 <p>The production policy <code>mg114-geometric-cost-v1</code> repairs the estimator and changes its objective together. Historical epochs retain the method that produced them. <code>data/policy-config.json</code> fixes the migration at the first new 64-task boundary; rerunning aggregation cannot rewrite an old policy.</p>
 <p>The old per-context median of quotient positions per CPU collapsed to zero in zero-heavy observations. Clipping then made all contexts equal. Replacing that median with an aggregate throughput ratio alone would favor the widest quotient band, whose positions are cheaper but are not equally valuable under the ambient density heuristic.</p>
 <h2 id="declared-preference">Declared preference</h2>

@@ -1,5 +1,8 @@
 # Banking computations and calibrating the cluster
 
+**11 September update:** [Negative audits](NEGATIVE_AUDITS.md) now distinguish processed banks from fully verified tasks. New eligible banks may be sampled; unreplayed claims earn no verified score or coverage and never train the model. The exact replay protocol below still governs every task that enters the verified ledger.
+
+
 The browser and the Python runner produce the same bounded tasks. A volunteer explicitly **banks** completed work through a GitHub issue. GitHub Actions independently replays each unique task before its finite coverage enters the public total. **A SHA-256 digest detects differences; it is not proof that someone spent CPU time.** Replay establishes the result, and cannot prove who physically computed it first.
 
 ## Data flow

@@ -42,7 +42,9 @@ Every 64 verified tasks freezes a policy. The production method combines a decla
 
 ```mermaid
 flowchart TD
-    Source[Reviewed source on main] --> Replay[Independently replay banked tasks]
+    Source[Reviewed source on main] --> Audit[Freeze post-submission random audit]
+    Audit --> Replay[Independently replay selected tasks]
+    Audit --> Claims[Retain other claims without verified credit]
     Replay --> Ledger[Canonical receipts on cluster-data]
     Ledger --> Geometry[Geometry prior plus measured curve yield and cost]
     Ledger --> Shadow[Spatial challenger: frozen predictions and later errors]
@@ -51,7 +53,7 @@ flowchart TD
     Policy --> Pages[Build gh-pages every 20 minutes]
     Evidence --> Pages
     Pages --> Clients[Independent local seeds and exact coverage checks]
-    Clients --> Replay
+    Clients --> Audit
 ```
 
 [Policy equations and limitations](docs/GEOMETRIC_POLICY.md) · [Mathematical coverage scope](docs/MATHEMATICAL_COVERAGE.md) · [Branch and deployment design](docs/BRANCHES.md)
@@ -60,11 +62,11 @@ The initial discovery-learning experiment failed its promotion test. The new geo
 
 ## What verified work means
 
-Browser workers use `BigInt`; the portable Python kernel uses arbitrary-precision integers. Each result has a fixed task descriptor and deterministic digest. GitHub ingestion independently replays every unseen task, compares the full result digest, and credits the actual issue creator once. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
+Browser workers use the Rust WebAssembly kernel with a BigInt fallback. The local runner can use the same fixed-width Rust kernel, with arbitrary-precision arithmetic for the final check and an independent Python reference. [Matched benchmarks](research/benchmarks/native-wasm-2026-09-11.json) measured **20.2× native vs Python** and **5.2× WASM vs JavaScript** on this Mac; these are kernel comparisons, not discovery odds or guaranteed whole-campaign speedups. [Build, bounds and tests](docs/NATIVE_KERNEL.md). Each result has a fixed task descriptor and deterministic digest. GitHub ingestion fully replays new-account tasks, then samples eligible new negative banks at 1-in-20 after submission. Only independently replayed tasks with matching digests credit the actual issue creator; other claims stay unverified. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.
 
 The [shared completed-task index](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/data/coverage/index.json) contains exact task IDs in SHA-256 checked, immutable hash-routed chunks. Runners v0.3.1 and newer read coverage v2; older runners need an upgrade. Clients skip IDs in their checked snapshot and local completed records. There is no probabilistic membership filter that could discard unvisited work. Simultaneous clients can still select the same unfinished task, and stale or offline snapshots cannot know about later completions; the server deduplicates accepted work.
 
-A digest detects changed bytes, but does not prove who physically supplied CPU time. Full negative replay is the current trust model and creates a central cost. Expected analytic counts and conservation checks are useful diagnostics; they do not prove that each candidate was visited. See the [protocol](docs/PROTOCOL.md), [cluster design](docs/CLUSTER.md), and [response to the external critique](docs/REVIEW_RESPONSE.md).
+A digest detects changed bytes, but does not prove who physically supplied CPU time. The exact ledger still requires full task replay, but the [negative-audit policy](docs/NEGATIVE_AUDITS.md) leaves most eligible claims outside that ledger to reduce replay load. Unsampled claims earn no verified score, train no model and cannot suppress future searches. Existing scores are preserved; score growth after sampling reflects only checked tasks. Expected analytic counts and conservation checks are useful diagnostics; they do not prove that each candidate was visited. See the [protocol](docs/PROTOCOL.md), [cluster design](docs/CLUSTER.md), and [response to the external critique](docs/REVIEW_RESPONSE.md).
 
 ## Participate, reproduce and review
 

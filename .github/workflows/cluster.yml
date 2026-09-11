@@ -33,15 +33,16 @@ jobs:
       - name: Test verification, aggregation and safe README rendering
         run: |
           python3 -m unittest discover -s tests -p test_cluster.py
+          python3 -m unittest discover -s tests -p test_negative_audit.py
           python3 -m unittest discover -s tests -p test_readme.py
           python3 -m unittest discover -s tests -p test_replay_pool.py
           python3 -m unittest discover -s tests -p test_coverage.py
           python3 -m unittest discover -s tests -p test_geometric_policy.py
           python3 -m unittest discover -s tests -p test_branch_state.py
-      - name: Independently replay bounded receipts
+      - name: Independently replay selected tasks; retain other claims as unverified
         id: replay
         continue-on-error: true
-        run: python3 tools/ingest.py --issues
+        run: python3 tools/ingest.py --issues --sample-negatives 20
       - name: Fit frozen spatial challenger and score later arrivals
         id: learning
         continue-on-error: true

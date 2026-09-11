@@ -175,6 +175,7 @@ def aggregate(data):
         person["verified_computations"] = str(person["verified_computations"])
     banks = [{"issue": x["source"].get("number"), "url": x["source"].get("url", ""),
               "submitter": x["source"].get("submitter", ""), "status": x["status"],
+              "unreplayed_tasks": len(x.get("unreplayed_tasks", [])), "audit_sample_failed": x.get("audit_sample_failed", False),
               "complete": x.get("complete", True), "processed_tasks": x.get("next_index", 0),
               "operational_error": x.get("operational_error"),
               "total_tasks": x["reported_tasks"], "accepted_tasks": len(x["accepted_tasks"]),
@@ -185,6 +186,8 @@ def aggregate(data):
     cluster = {"schema": "math-gambling-cluster-v1", "updated_at": now(),
                "totals": {"reported_receipts": len(receipts),
                           "reported_tasks": sum(x["reported_tasks"] for x in receipts),
+                          "unreplayed_claims": sum(len(x.get("unreplayed_tasks", [])) for x in receipts),
+                          "sampled_banks": sum(bool(x.get("negative_audit")) for x in receipts),
                           "verified_unique_tasks": len(tasks),
                           "verified_computations": str(totals.get("generators", 0)),
                           "zero_curve_tasks": sum(int(t["result"]["counters"].get("curves", 0)) == 0 for t in tasks),
@@ -203,6 +206,7 @@ def aggregate(data):
                "integrity": {"method": "independent bounded Python replay and exact integer identity checks",
                              "coverage_scope": "unique deterministic tasks in selected finite norm-coordinate domains; not an exhaustive height search",
                              "epoch_size": EPOCH_SIZE, "reported_is_not_verified": True,
+                             "unreplayed_claims_used_for_credit_coverage_or_learning": False,
                              "client_timing_used": False, "negative_replay_task_cap_per_run": MAX_REPLAYS,
                              "replay_time_budget_seconds": 120, "api_time_budget_seconds": 60,
                              "identity_claims": "Leaderboard credit belongs to the first accepted GitHub issue creator; display names and payload handles remain self-declared."}}

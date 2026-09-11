@@ -353,7 +353,7 @@ class Budget:
         self.remaining -= 1
 
 
-def process_receipt(receipt, source, data, budget, replay=replay_task):
+def process_receipt(receipt, source, data, budget, replay=replay_task, audit_policy=None):
     """Replay a bank incrementally; its durable cursor survives the hourly budget."""
     from search_core import validate_task, task_id
     source_id = source["id"]
@@ -371,6 +371,13 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
               "body_sha256": body_hash, "processed_at": now(), "status": "pending", "complete": False,
               "reported_tasks": 0, "next_index": 0, "accepted_tasks": [], "duplicate_tasks": [], "rejected_tasks": [],
               "discoveries": discoveries, "contributor": contributor(receipt)}
+    if previous is None and audit_policy is not None:
+        plan = audit_policy.plan(receipt, source)
+        if plan is not None:
+            record["negative_audit"] = plan
+            record["unreplayed_tasks"] = []
+            # Commit the challenge with its immutable body before evaluating it.
+            atomic_json(record_path, record)
     if previous and previous["body_sha256"] != body_hash:
         raise ValueError("immutable bank revision changed payload")
     try:
@@ -413,6 +420,14 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
                 identifier = task_id(task)
                 path = ledger_path(data, "tasks", identifier)
                 saved = read_json(path)
+                from negative_audit import selected
+                if (not saved and bank and not claimed.get("hits")
+                        and not record.get("audit_sample_failed")
+                        and not selected(record.get("negative_audit"), body_hash, identifier)):
+                    record["unreplayed_tasks"].append({"task": task, "digest": claimed["digest"]})
+                    record["next_index"] = index + 1
+                    atomic_json(record_path, record)
+                    continue
                 if saved:
                     expected, cpu_ms = saved["result"], saved["server_replay_cpu_ms"]
                 else:
@@ -429,6 +444,10 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
                 else:
                     matching = canonical(claimed) == canonical(expected)
                 if not matching:
+                    if record.get("negative_audit"):
+                        record["audit_sample_failed"] = True
+                        if audit_policy is not None:
+                            audit_policy.eligible.discard(source.get("submitter", "").casefold())
                     raise ValueError("claim differs from independently replayed result")
                 record.pop("operational_error", None)
                 record.pop("deferred_reason", None)
@@ -462,6 +481,8 @@ def process_receipt(receipt, source, data, budget, replay=replay_task):
             record["discoveries"] = sorted(set(discoveries))
             atomic_json(record_path, record)
         record["status"] = "accepted" if not record["rejected_tasks"] else "partial" if record["accepted_tasks"] or record["duplicate_tasks"] else "rejected"
+        if record.get("unreplayed_tasks"):
+            record["status"] = "sampled_rejected" if record.get("audit_sample_failed") else "sampled"
         record["complete"] = True
     except (ValueError, TypeError, KeyError, OverflowError, RecursionError) as exc:
         record.update(reason=str(exc)[:180], status="rejected", complete=True)
@@ -510,7 +531,7 @@ def parse_issue(issue, repo):
     return receipt, source
 
 
-def collect_issues(repo, token, data):
+def collect_issues(repo, token, data, audit_policy=None):
     """Fast updated scan plus a persistent creation-order reconciliation sweep."""
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repo):
         raise ValueError("invalid repository name")
@@ -545,7 +566,7 @@ def collect_issues(repo, token, data):
         pending[origin["number"]] = {"number": origin["number"], "updated_at": origin["updated_at"]}
         available[origin["number"]] = parsed
         # Publish received/pending and check positives before any costly negative replay.
-        queued = process_receipt(receipt, origin, data, Budget(count=0))
+        queued = process_receipt(receipt, origin, data, Budget(count=0), audit_policy=audit_policy)
         if queued["complete"]:
             pending.pop(origin["number"], None)
             available.pop(origin["number"], None)
@@ -624,7 +645,10 @@ def main():
     parser.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", "Kuberwastaken/math-gambling"))
     parser.add_argument("--replay-one", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--replay-stream", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--sample-negatives", type=int, default=1, metavar="N", help="replay 1/N new negative tasks after 256 verified tasks/account; unreplayed claims receive no verified credit or coverage")
     args = parser.parse_args()
+    from negative_audit import AuditPolicy
+    audit_policy = AuditPolicy(args.data, args.sample_negatives) if args.sample_negatives != 1 else None
     if args.input and args.data.resolve() == (ROOT / "data").resolve():
         raise ValueError("fixture ingestion requires a separate --data directory")
     if args.replay_stream:
@@ -649,14 +673,14 @@ def main():
             raise ValueError("fixture exceeds receipt cap")
         entries = [(x["receipt"], {"id": "fixture:" + str(x["id"]), "kind": "fixture", "submitter": str(x.get("submitter", ""))[:39]}) for x in payload["receipts"]]
     elif args.issues:
-        entries, poll = collect_issues(args.repo, os.environ.get("GITHUB_TOKEN", ""), args.data)
+        entries, poll = collect_issues(args.repo, os.environ.get("GITHUB_TOKEN", ""), args.data, audit_policy=audit_policy)
     else:
         entries = []
     budget = Budget()  # Replay receives its own 120 seconds after bounded API collection.
     completed = set()
     with WarmReplay() as replay:
         for receipt, source in entries:
-            record = process_receipt(receipt, source, args.data, budget, replay=replay)
+            record = process_receipt(receipt, source, args.data, budget, replay=replay, audit_policy=audit_policy)
             summary["processed_receipts"] += 1
             if record["complete"]:
                 completed.add(source.get("number"))

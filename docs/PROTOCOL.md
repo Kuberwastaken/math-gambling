@@ -1,5 +1,8 @@
 # Public search protocol, version 1
 
+**11 September update:** [Negative audits](NEGATIVE_AUDITS.md) now distinguish processed banks from fully verified tasks. New eligible banks may be sampled; unreplayed claims earn no verified score or coverage and never train the model. The exact replay protocol below still governs every task that enters the verified ledger.
+
+
 `mg114-offset-v1` is a deterministic, selective search for integer solutions of
 \(x^3+y^3+z^3=114\). The browser and the local runner compute real high-parameter
 candidates. This is not a toy animation, an exhaustive height-box search, a

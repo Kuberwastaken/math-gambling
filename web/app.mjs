@@ -849,7 +849,7 @@ function updateBankUI() {
       const p = document.createElement("p");
       p.className = "form-note";
       p.textContent = b.observed
-        ? `Bank ${b.digest.slice(0, 8)}: ${b.status}. ${b.accepted || 0} accepted, ${b.duplicates || 0} duplicates, ${b.rejected || 0} rejected; ${b.processed || 0}/${b.ids.length} processed.`
+        ? `Bank ${b.digest.slice(0, 8)}: ${b.status}. ${b.accepted || 0} accepted, ${b.duplicates || 0} duplicates, ${b.rejected || 0} rejected, ${b.unreplayed || 0} unreplayed (no verified credit); ${b.processed || 0}/${b.ids.length} processed.`
         : `Bank ${b.digest.slice(0, 8)}: ${b.posted ? "marked posted locally; not yet in published ledger" : "prepared locally; not submitted"}. ${b.ids.length} tasks.`;
       if (b.issue) {
         const a = document.createElement("a");
@@ -877,6 +877,7 @@ async function reconcileBanks() {
         bank.accepted = entry.accepted_tasks;
         bank.duplicates = entry.duplicate_tasks;
         bank.rejected = entry.rejected_tasks;
+        bank.unreplayed = entry.unreplayed_tasks || 0;
         bank.processed = entry.processed_tasks;
         await save("banks", bank);
         changed = true;

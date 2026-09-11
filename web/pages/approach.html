@@ -105,11 +105,11 @@
         test.
       </p>
       <p>
-        There is a cost to strong verification: replaying every negative task
-        repeats the work. This first version prioritizes verifiable results and
-        may bottleneck at the verifier. It has not demonstrated linear speedup
-        from more volunteers. Future cheaper audit schemes would need weaker,
-        explicit coverage claims.
+        New accounts receive full replay. After 256 verified tasks, eligible
+        new negative banks use 1-in-20 random audits chosen after submission.
+        Only replayed tasks earn verified credit, certify coverage or train the
+        model. Other claims are retained as unverified; every submitted identity
+        still gets an exact check. <a href="{{BASE}}research/negative_audits/">Audit policy</a>.
       </p>
       <a href="{{BASE}}cluster/"
         >Inspect the current allocation and evidence →</a

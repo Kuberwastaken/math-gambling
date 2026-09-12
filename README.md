@@ -92,3 +92,9 @@ The spatial model learns cost and arithmetic counts from verified task geometry.
 [Live learning report](https://github.com/Kuberwastaken/math-gambling/blob/cluster-data/README.md#experimental-task-learning) · [Design and promotion gates](docs/LEARNING.md)
 
 <!-- LEARNING:END -->
+
+[13 September controlled search trial](docs/GEOMETRY_TRIAL.md): the frozen
+geometry ranker measured **+0.37% median weighted exposure per CPU** on fresh
+paired seeds (95% bootstrap interval −0.56% to +2.92%). It failed the preset
+promotion screen; production allocation remains unchanged. Prediction gains
+alone did not establish a useful search gain.

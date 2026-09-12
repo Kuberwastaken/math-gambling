@@ -1,0 +1,28 @@
+{
+  "schema": "mg114-distinct-geometry-trial-v1",
+  "seed": 11420260913,
+  "repeats": 32,
+  "cpu_seconds_per_arm": 2.0,
+  "model_hash": "9b341f41ce2dfa5b1ff3f7e6b064a3d90d3c28e3e0e3efe3e8df0563302a3c47",
+  "policy_hash": "632e96977170fb512d07f752d29ce466c687de7615a2e3de1edd01c897e655bd",
+  "source_hashes": {
+    "benchmark_geometry.py": "6e1b0e169034423ffed18776186a0d415d5c7b2d29d118a23128dff893ea2b8a",
+    "search_core.py": "d7f0d89b684dc27309f3495e5c661fe05d0b5f7abb942b82e69f7417e96b4edb",
+    "geometric_policy.py": "afda60fb694f39b8ac4976cbca875adc48e52654acb7a2600662c33aeba21599",
+    "strategy_model.py": "59291745a0cb941304a9ba958f4ad04bf5f8359264978ed47d061014621de91a",
+    "shared_model.py": "75a9fa2271f397e48d304a85018044f29df7e1c5a8a17fb034c60ea6668a47d1",
+    "search_features.py": "1b5151155eccfd0b54122fbe7688649cb7f30232efc3f7070fac9f3def58fd88"
+  },
+  "python": "3.14.6",
+  "machine": "arm64",
+  "primary": "distinct signed (D,r,q) exposure: D0/D times integral 1/sqrt(4t^3-1) over half-unit q cells above ordering cutoff",
+  "challenger": "same context weights/preflight; 40% ordinary proposals, 60% best of 8 by frozen predicted curves/CPU within context",
+  "gate": "paired median exposure/CPU ratio >1.10 and paired bootstrap 95% lower bound >1; no automatic promotion",
+  "limitations": [
+    "Uncalibrated geometric prior, not discovery probability.",
+    "Distinctness is within each arm/seed, not against global historical coverage. Arms intentionally start with identical empty trial ledgers.",
+    "In-memory task lookup, interval union, feature/preflight/scoring and engine CPU charged; no network, SQLite persistence or upload costs.",
+    "Python reference kernel only; learned 40% random branch is a task fraction, not a guarantee of CPU exploration share.",
+    "Final whole task may overshoot nominal budget; actual CPU charged in every rate. One machine and frozen model, exploratory inference."
+  ]
+}

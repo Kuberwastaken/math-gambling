@@ -58,6 +58,11 @@ Every 64 accepted tasks still updates the published geometry/cost policy. Challe
 
 ## Required gate before changing task selection
 
+The [13 September frozen geometry trial](GEOMETRY_TRIAL.md) measures the newer
+shared model against the current geometry/cost scheduler, with interval overlap
+removed from its score and local scheduling costs included. This remains an
+exploratory experiment; its scope and results do not replace the gates below.
+
 1. Freeze candidate source, feature schema, model hash, objective, reference scheduler and evaluation budget before measuring. Keep an untouched final test after exploratory tuning.
 2. Draw fresh task proposal pools from a declared distribution, excluding training tasks and already covered IDs. Uniform context sampling must not be described as uniform sampling of all tasks.
 3. Compare uniform, published scheduler and challenger on the same controlled execution environment. Randomize order, use repeated independent seeds, count scoring, coverage/network and verifier cost, and enforce equal CPU budgets rather than equal task counts. Preserve every encountered identity synchronously. Evaluate browser and Python clients separately.

@@ -1,6 +1,6 @@
 # Run Math Gambling locally
 
-Release **v0.6.0** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.6.0 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
+Release **v0.6.1** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.6.1 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
 
 Use a normal Python **3.11 or newer** installation with SQLite support. Download it from [python.org](https://www.python.org/downloads/) if needed. This is the portable volunteer client; the separate native C/PARI research campaign has different build requirements and performance.
 
@@ -75,7 +75,7 @@ py -3 tools\runner.py --minutes 60 --workers 1 --name "Your name" --github usern
 
 The version must be at least 3.11. Replace `Your name` and `username` with your alias and GitHub username. Do not include `@` in the local runner's GitHub argument. If you do not have a GitHub account yet, you can enter `anonymous`; an account is needed to submit a bank issue later. The authenticated account that posts the issue receives leaderboard credit.
 
-You can optionally link your alias with `--url "https://your-site.example"`. Keep your attribution identical on later invocations that use the same checkpoint folder.
+You can optionally link your alias with `--url "https://your-site.example"`. On restart, omitted name, GitHub and website options reuse the checkpoint's saved attribution.
 
 - `--minutes 60`: schedule work for up to an hour, then finish the active bounded tasks. The maximum is 1,440 minutes per invocation.
 - `--workers 1`: use one worker process. Try one first; raise it up to the available CPU count, with a maximum of 32. Workers may use their cores fully while running. This is a worker count, not the browser's duty-cycle slider.
@@ -92,7 +92,17 @@ The runner keeps computing when the terminal is behind other windows. It does no
 
 Press **Ctrl+C once**. The parent stops assigning tasks, waits for the current bounded tasks to finish, and writes final banks and status. Force-quitting can interrupt that drain; completed checkpoints remain, and unfinished reserved tasks are retried next time.
 
-Run the same command again from the same folder, with the same name, GitHub username, optional URL and output path. This resumes the saved checkpoint. You may change the worker count, time limit and task cap. A changed name or URL requires a separate output folder because existing receipts keep their original attribution.
+Run the same command again from the same folder, or omit the attribution options to reuse the saved profile:
+
+```sh
+python3 tools/runner.py --output "math-gambling-run" --minutes 60 --workers 2
+```
+
+Use `python` instead of `python3` on Windows if needed. Keep the same output path; an absolute path works even after extracting a new release elsewhere. Add `--kernel rust` to use the native kernel and `--submit` to resume automatic banking. Neither option is implicitly enabled by the saved profile.
+
+Version 0.6.1 reuses the saved name, GitHub username and website without asking again. GitHub capitalization differences are accepted while original receipt spelling stays intact. You may change workers, time and task caps. Explicitly changing the name, website or GitHub account still requires a separate output folder because existing work retains its original attribution.
+
+**Do not delete `banks/`, `checkpoint.sqlite3`, or SQLite sidecars to fix a restart.** They contain pending work and submission state. Older releases require the original name, exact GitHub capitalization and optional URL on every invocation; upgrading preserves that output folder.
 
 Only one runner may use an output folder at a time. A second process exits with a clear lock error. Use another `--output` if you intentionally want separate runs; that does not guarantee nonoverlapping random assignments across computers.
 
@@ -139,7 +149,7 @@ The manual commands omit `--submit`; the automatic quickstart includes it explic
 - **`unzip` was not found:** extract using your file manager instead, then open a terminal in the folder containing `tools`.
 - **`tools/runner.py` was not found:** your terminal is in the wrong folder. Look for the inner `math-gambling` folder with `tools` and `data`.
 - **The output directory is locked:** another runner uses it. Stop that process, or choose a different `--output`. The lock file may remain after a clean exit; its existence alone does not mean a process owns the lock.
-- **The checkpoint identity does not match:** use the original name, GitHub username and optional URL, or choose a new output folder.
+- **The checkpoint identity does not match:** update to v0.6.1 or later, stop the old runner, and resume the same `--output` with `--name`, `--github` and `--url` omitted. The saved profile is reused. With `--submit`, sign in to the same GitHub account. Keep existing banks and checkpoints intact; a different contributor needs a separate output folder.
 - **Strategy refresh unavailable:** cost scheduling falls back to the bundled or uniform policy. A separate coverage error pauses new dispatch; retry online or explicitly use `--offline`. The exact numerical verifier does not depend on network access.
 - **A stopped run has no new bank:** no additional task may have completed, or its work was already assigned to an earlier bank. Check `status.json` and existing files in `banks`.
 

@@ -1,0 +1,38 @@
+name: Label project issues
+on:
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: project-issue-label-${{ github.event.issue.number || 'reconcile' }}
+  cancel-in-progress: false
+jobs:
+  label:
+    # Ordinary bank traffic needs no runner. A renamed project issue is revisited
+    # so our label can be removed; all other labels stay untouched.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (!startsWith(github.event.issue.title, '[bank]') && !startsWith(github.event.issue.title, '[compute]')) ||
+      contains(github.event.issue.labels.*.name, 'project-issue')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: tools/label_project_issues.py
+          sparse-checkout-cone-mode: false
+      - name: Classify current issue or reconcile open project issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          if [ -n "$ISSUE_NUMBER" ]; then
+            python3 tools/label_project_issues.py --issue "$ISSUE_NUMBER"
+          else
+            python3 tools/label_project_issues.py
+          fi

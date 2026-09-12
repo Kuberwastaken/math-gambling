@@ -1,10 +1,12 @@
 import math
+import random
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
-from benchmark_geometry import Exposure, summary
+from benchmark_geometry import Exposure, summary, fast_mass
+from geometric_policy import mass, KAPPA
 
 
 def event(lo, hi, r=2, s=101):
@@ -12,6 +14,15 @@ def event(lo, hi, r=2, s=101):
 
 
 class ExposureTests(unittest.TestCase):
+    def test_fast_integral_against_original_quadrature(self):
+        rng=random.Random(913)
+        bands=[(0,0),(0,3),(0,16),(KAPPA,4096),(16,256),(256,4096)]
+        for _ in range(500):
+            lo=10**rng.uniform(-1,6)
+            bands.append((lo,lo+10**rng.uniform(-2,4)))
+        for lo,hi in bands:
+            self.assertTrue(math.isclose(fast_mass(lo,hi),mass(lo,hi),rel_tol=2e-8,abs_tol=1e-14),(lo,hi))
+
     def test_overlap_counts_only_new_integer_positions(self):
         e = Exposure()
         e.add(event(10, 19)); first = e.value

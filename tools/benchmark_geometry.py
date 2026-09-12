@@ -9,10 +9,33 @@ import statistics
 import time
 from pathlib import Path
 
-from geometric_policy import mass
+from geometric_policy import mass, KAPPA
 from search_core import CONTEXTS, D0, make_task, run_task, task_id, verify_triple
 from search_features import certified_empty
 from strategy_model import digest, predict
+
+
+def fast_mass(low, high):
+    """Six terms of the same density integral, not a different objective.
+
+    (1-u)^(-1/2) has positive binomial coefficients. Above KAPPA,
+    u=1/(4*t^3)<.0044; truncating after n=5 has relative tail below
+    .0044**6/(1-.0044) < 7.3e-15 in exact arithmetic. Floating-point
+    roundoff remains; none of this arithmetic can prune a search candidate.
+    """
+    low = max(float(low), KAPPA)
+    high = float(high)
+    if high <= low: return 0.
+    log_ratio = math.log1p((high-low)/low)
+    power = 1/math.sqrt(low)
+    step = 1/(low**3)
+    coefficient = 1.
+    terms = []
+    for n in range(6):
+        terms.append(coefficient*power*(-math.expm1(-(.5+3*n)*log_ratio))/(6*n+1))
+        coefficient *= (2*n+2)*(2*n+1)/(16*(n+1)**2)
+        power *= step
+    return math.fsum(terms)
 
 
 class Exposure:
@@ -31,10 +54,10 @@ class Exposure:
     def weight(d, r, lo, hi):
         a, b = lo + r/d - .5, hi + r/d + .5
         if b <= 0:
-            return D0/d * mass(-b, -a)
+            return D0/d * fast_mass(-b, -a)
         if a >= 0:
-            return D0/d * mass(a, b)
-        return D0/d * (mass(0, -a) + mass(0, b))
+            return D0/d * fast_mass(a, b)
+        return D0/d * (fast_mass(0, -a) + fast_mass(0, b))
 
     def add(self, event):
         d, r, s, lo, hi = (int(event[k]) for k in ('D', 'r', 's', 'qlo', 'qhi'))
@@ -178,7 +201,7 @@ def main():
     if {c['id'] for c in policy['contexts']} != {c['id'] for c in CONTEXTS}:
         raise ValueError('incomplete policy')
     source = Path(__file__).resolve().parent
-    manifest = {'schema':'mg114-distinct-geometry-trial-v1', 'seed':a.seed, 'repeats':a.repeats,
+    manifest = {'schema':'mg114-distinct-geometry-trial-v2', 'seed':a.seed, 'repeats':a.repeats,
         'cpu_seconds_per_arm':a.seconds, 'model_hash':record['model_hash'], 'policy_hash':digest(policy),
         'source_hashes':{n:hashlib.sha256((source/n).read_bytes()).hexdigest() for n in
             ('benchmark_geometry.py','search_core.py','geometric_policy.py','strategy_model.py','shared_model.py','search_features.py')},

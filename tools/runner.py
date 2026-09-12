@@ -133,9 +133,80 @@ def open_state(out, contributor):
     previous = db.execute("SELECT value FROM meta WHERE key='identity'").fetchone()
     if previous and previous[0] != identity:
         db.close()
-        raise SystemExit('This checkpoint belongs to another engine/name/GitHub identity; choose a new --output.')
+        raise SystemExit('Checkpoint attribution differs. Resume with its saved name, GitHub and website, '
+                         'or use a different --output for a different contributor. Keep the existing checkpoint and banks; do not delete them.')
     db.execute("INSERT OR IGNORE INTO meta VALUES('identity',?)", (identity,)); db.commit()
     return db
+
+
+def saved_identity(out):
+    """Read attribution while holding the output lock, before asking for it again."""
+    path=out/'checkpoint.sqlite3'
+    if not path.exists():return None
+    try:
+        db=sqlite3.connect(path.as_uri()+'?mode=ro',uri=True)
+        try:
+            tables={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            row=db.execute("SELECT value FROM meta WHERE key='identity'").fetchone() if 'meta' in tables else None
+            if not row:
+                for table in ('tasks','banks','discoveries'):
+                    if table in tables and db.execute(f'SELECT 1 FROM {table} LIMIT 1').fetchone():
+                        raise ValueError('saved work has no attribution record')
+        finally:db.close()
+        if not row:return None  # An interrupted, not-yet-initialized checkpoint.
+        value=json.loads(row[0])
+        if value['engine']!=ENGINE:
+            raise SystemExit('This checkpoint uses a different search engine. Use its original runner or a new --output; keep the existing banks.')
+        person=value['contributor']
+        if (not isinstance(person,dict) or set(person)-{'name','github','url'}
+                or not isinstance(person.get('name'),str) or not 1<=len(person['name'])<=80
+                or any(ord(c)<32 for c in person['name'])
+                or not isinstance(person.get('github'),str)
+                or not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?',person['github'])):
+            raise ValueError('invalid attribution')
+        if 'url' in person:
+            if not isinstance(person['url'],str) or not profile_url(person['url']):raise ValueError('invalid website')
+        return person
+    except (sqlite3.Error,ValueError,KeyError,TypeError,argparse.ArgumentTypeError) as exc:
+        raise SystemExit('Cannot read saved checkpoint attribution. Keep the checkpoint, SQLite sidecars and banks intact; '
+                         'do not reset or delete them. Use a new --output only for a separate run.') from exc
+
+
+def resolve_contributor(args, parser, saved=None):
+    # Missing options inherit saved attribution. Explicit changes never silently
+    # reassign existing receipts. GitHub usernames are case-insensitive.
+    for key in ('name','github','url'):
+        if getattr(args,key) is None and saved is not None:setattr(args,key,saved.get(key))
+    if args.name is None and sys.stdin.isatty():
+        args.name=input('Name for the draft discovery credits: ').strip()
+    if args.github is not None:args.github=args.github.strip().removeprefix('@')
+    if args.login or args.submit:
+        try:authenticated=github_identity(args.login)
+        except RuntimeError as exc:parser.error(str(exc))
+        if args.github and args.github.lower()!=authenticated.lower():
+            parser.error('The authenticated GitHub account differs from the requested/saved account. '
+                         'Sign in to the saved account or use another --output; keep the existing banks.')
+        args.github=authenticated
+        print(f'GitHub account: @{authenticated}. '+('Automatic banking enabled.' if args.submit else 'Manual banking selected.'),flush=True)
+    if args.github is None and sys.stdin.isatty():
+        args.github=input('GitHub username (self-reported; submission author is authenticated): ').strip().removeprefix('@')
+    if not args.name or len(args.name)>80 or any(ord(c)<32 for c in args.name):
+        parser.error('provide --name, 1..80 printable characters')
+    if not args.github or not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?',args.github):
+        parser.error('provide a valid --github username')
+    person=dict(name=args.name,github=args.github)
+    if args.url:person['url']=args.url
+    if saved is not None:
+        changed=[key for key in ('name','github','url')
+                 if (person.get(key,'').lower() if key=='github' else person.get(key))
+                 != (saved.get(key,'').lower() if key=='github' else saved.get(key))]
+        if changed:
+            parser.error('Checkpoint '+', '.join(changed)+' differs from this command. '
+                         'Omit --name, --github and --url to resume its saved attribution, '
+                         'or choose another --output for a separate contributor. Do not delete the checkpoint or banks.')
+        print(f'Resuming saved attribution: {saved["name"]} (@{saved["github"]}).',flush=True)
+        return dict(saved)  # Preserve original spelling and existing receipt identity.
+    return person
 
 
 def load_strategy(offline=False):
@@ -485,9 +556,9 @@ def main(argv=None):
     parser.add_argument('--version', action='version', version='Math Gambling runner ' + VERSION)
     parser.add_argument('--minutes', type=float, default=10)
     parser.add_argument('--workers', type=int, default=max(1, min(4, (os.cpu_count() or 2)//2)))
-    parser.add_argument('--name')
-    parser.add_argument('--github')
-    parser.add_argument('--url', type=profile_url, help='optional public HTTP(S) link for your leaderboard alias')
+    parser.add_argument('--name', help='credit name; reuse checkpoint attribution when omitted')
+    parser.add_argument('--github', help='GitHub username; reuse checkpoint attribution when omitted')
+    parser.add_argument('--url', type=profile_url, help='optional public HTTP(S) link; reuse saved link on resume when omitted')
     parser.add_argument('--output', type=Path, default=Path('math-gambling-run'))
     parser.add_argument('--offline', action='store_true', help='use the bundled strategy/coverage snapshot; it may miss work banked since release')
     parser.add_argument('--login', action='store_true', help='use the GitHub CLI browser login and read your authenticated username')
@@ -511,29 +582,10 @@ def main(argv=None):
         parser.error('--bank-every must be 1..256')
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', args.repo):
         parser.error('invalid repository')
-    if not args.name and sys.stdin.isatty():
-        args.name = input('Name for the draft discovery credits: ').strip()
-    if args.login or args.submit:
-        try:
-            authenticated = github_identity(args.login)
-        except RuntimeError as exc:
-            parser.error(str(exc))
-        if args.github and args.github.lower() != authenticated.lower():
-            parser.error('--github differs from the authenticated account; use its username or a separate output folder')
-        args.github = authenticated
-        print(f'GitHub account: @{authenticated}. ' + ('Automatic banking enabled.' if args.submit else 'Manual banking selected.'), flush=True)
-    if not args.github and sys.stdin.isatty():
-        args.github = input('GitHub username (self-reported; submission author is authenticated): ').strip()
-    if not args.name or len(args.name) > 80 or any(ord(c) < 32 for c in args.name):
-        parser.error('provide --name, 1..80 printable characters')
-    if not args.github or not re.fullmatch(r'[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?', args.github):
-        parser.error('provide a valid --github username')
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=True)
     lock = lock_output(out/'runner.lock')
-    contributor = dict(name=args.name, github=args.github)
-    if args.url:
-        contributor['url'] = args.url
     try:
+        contributor = resolve_contributor(args, parser, saved_identity(out))
         db = open_state(out, contributor)
     except BaseException:
         lock.close()

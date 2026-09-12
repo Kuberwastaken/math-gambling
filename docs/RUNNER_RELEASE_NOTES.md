@@ -1,3 +1,13 @@
+# Math Gambling runner v0.6.1
+
+Restarting an existing output directory now reuses its saved name, GitHub username and optional website. Omit those three options to resume without re-entering attribution. Case-only differences in a GitHub username are accepted, including capitalization returned by authenticated GitHub CLI login. Existing receipt spelling, bank bytes, submission records, seeds and task results remain intact.
+
+A different GitHub account, explicitly changed name or website, incompatible engine, or unreadable checkpoint still stops safely with recovery guidance. Do not delete banks or checkpoints to resume. Stop the old runner before pointing this release at its existing output folder. Add `--submit` to authorize automatic banking again, and `--kernel rust` if you want the native kernel.
+
+The reported Ctrl+C issue could not be tied to one exact original command. We reproduced attribution mismatches caused by case changes and omitted website flags. Regression checks now include an actual POSIX process-group Ctrl+C, draining active work, reopening the checkpoint without attribution flags, and checking old bank files byte-for-byte. All platforms test saved-profile inheritance and rejection of account changes. The mathematical kernel and receipt protocol are unchanged.
+
+## Previous release
+
 # Math Gambling runner v0.6.0
 
 Supports the CPU-budgeted policy and exact proposal preflight. All fixed task definitions, exact checks, stored results, receipt digests and contribution credits remain compatible. Stop the old runner before resuming its output directory with this release.

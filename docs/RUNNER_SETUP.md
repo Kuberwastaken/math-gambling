@@ -1,6 +1,6 @@
 # Run Math Gambling locally
 
-Release **v0.6.0** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.6.0 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
+Release **v0.6.1** is a portable Python program for macOS, Windows and Linux. It uses the Python standard library, exact integer arithmetic, multiple worker processes and durable SQLite checkpoints. The Python fallback needs no compiler or extra packages. Version 0.6.1 also offers a faster Rust search kernel; the release has platform archives with a prebuilt binary, plus the portable source archive. Both use the same tasks and banking protocol.
 
 Use a normal Python **3.11 or newer** installation with SQLite support. Download it from [python.org](https://www.python.org/downloads/) if needed. This is the portable volunteer client; the separate native C/PARI research campaign has different build requirements and performance.
 

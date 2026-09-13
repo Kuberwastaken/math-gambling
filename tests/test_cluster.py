@@ -343,6 +343,32 @@ class ClusterTests(unittest.TestCase):
             ig.collect_issues("example/test", "token", self.data)
         self.assertEqual(ag.aggregate(self.data)["banks"][0]["issue"], 120)
 
+    def test_issue_sweeps_stay_under_github_offset_pagination_cap(self):
+        # GitHub returns HTTP 422 once offset pagination reaches 10,000 items.
+        # A repository past that many issues must not crash the whole replay step.
+        issues = [{"number": n, "title": "Unrelated", "body": "", "user": {"login": "p"},
+                   "updated_at": "2026-09-10T00:00:00Z"} for n in range(1, 12501)]
+        requested = []
+
+        def api(url, token, **kwargs):
+            q = parse_qs(urlsplit(url).query)
+            page, per = int(q["page"][0]), int(q["per_page"][0])
+            requested.append(page)
+            if page * per >= 10000:
+                raise HTTPError(url, 422, "Unprocessable Entity", {}, None)
+            ordered = issues if q.get("direction") == ["asc"] else list(reversed(issues))
+            return ordered[(page - 1) * per:page * per]
+
+        # Seed the reconcile cursor just below the cap so one pass reaches the boundary.
+        ig.atomic_json(self.data / "receipts" / "poll.json",
+                       {"schema": "math-gambling-issue-poll-v1", "since": None,
+                        "pending": [], "scan_page": 1, "reconcile_page": 99})
+        with mock.patch.object(ig, "api_request", side_effect=api):
+            entries, poll = ig.collect_issues("example/test", "token", self.data)
+        self.assertTrue(requested, "expected paginated requests")
+        self.assertLess(max(requested) * 100, 10000, "requested a page past GitHub's offset cap")
+        self.assertEqual(poll["reconcile_page"], 1, "reconcile cursor must wrap at the cap, not advance into a 422")
+
     def test_api_deadline_does_not_advance_scan_or_spend_unbounded_requests(self):
         with mock.patch.object(ig.time, "monotonic", side_effect=[0, 61]), mock.patch.object(ig, "api_request") as api:
             entries, poll = ig.collect_issues("example/test", "token", self.data)

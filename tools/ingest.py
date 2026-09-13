@@ -29,6 +29,9 @@ MAX_RECEIPTS = 32
 MAX_REPLAYS = 16384
 MAX_HITS = 64
 MAX_DIGITS = 128
+# GitHub returns HTTP 422 once offset pagination reaches ~10,000 items
+# (page * per_page). Per_page is 100, so stay strictly under 100 pages.
+MAX_LIST_PAGE = 90
 USER_AGENT = "OpenAI File Downloader, XaiImageApiFetch/1.0"
 ROOT = Path(__file__).resolve().parents[1]
 REPLAY_KERNEL_SHA256 = hashlib.sha256((ROOT / "tools/search_core.py").read_bytes()).hexdigest()
@@ -631,7 +634,9 @@ def collect_issues(repo, token, data, audit_policy=None):
                 stamp = issue.get("updated_at")
                 if isinstance(stamp, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z", stamp):
                     poll["scan_high_water"] = max(poll.get("scan_high_water") or stamp, stamp)
-            if len(issues) < 100:
+            # Never page past GitHub's offset cap; advance the `since` window
+            # instead so the next pass resumes without a 422 on deep pages.
+            if len(issues) < 100 or page >= MAX_LIST_PAGE:
                 stamp = poll.get("scan_high_water")
                 if stamp:
                     from datetime import timedelta
@@ -639,19 +644,23 @@ def collect_issues(repo, token, data, audit_policy=None):
                 poll.update(scan_page=1, scan_high_water=None)
                 break
             poll["scan_page"] = page + 1
-        # Creation order is stable under ordinary edits. Cycle the whole history to recover
-        # update-sort reordering, equal-timestamp boundaries, deletions, and transfers.
+        # Reconcile recently created issues to recover update-sort reordering,
+        # equal-timestamp boundaries, deletions and transfers. Newest-first and
+        # bounded by MAX_LIST_PAGE because GitHub rejects offset pagination past
+        # ~10,000 items: older banks are already complete, immutable ledger
+        # records, and any still-pending bank is retried from the durable queue above.
         for _ in range(2):
             page = int(poll.get("reconcile_page", 1))
-            query = {"state": "all", "sort": "created", "direction": "asc", "per_page": 100, "page": page}
+            query = {"state": "all", "sort": "created", "direction": "desc", "per_page": 100, "page": page}
             issues = request(prefix + "?" + urlencode(query), 32 * 1024 * 1024)
             if not isinstance(issues, list):
                 raise ValueError("invalid GitHub issue response")
             for issue in issues:
                 retain(issue)
-            poll["reconcile_page"] = 1 if len(issues) < 100 else page + 1
-            if len(issues) < 100:
+            if len(issues) < 100 or page >= MAX_LIST_PAGE:
+                poll["reconcile_page"] = 1
                 break
+            poll["reconcile_page"] = page + 1
     except RetryLater as exc:
         poll["deferred_reason"] = str(exc)
     else:

@@ -22,7 +22,20 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
+      - name: Resolve the current cluster-data tip
+        id: datatip
+        run: echo "oid=$(git ls-remote origin refs/heads/cluster-data | cut -f1)" >> "$GITHUB_OUTPUT"
+      - name: Restore the validated data snapshot for this exact tip
+        id: datacache
+        # TODO pin to a SHA to match repo policy, e.g. actions/cache@<sha> # v4.x
+        uses: actions/cache@v4
+        with:
+          path: data
+          # The key is the exact commit OID, so it is only ever hit for the state
+          # it was saved from; a new cluster-data tip misses and re-overlays.
+          key: cluster-data-snapshot-${{ steps.datatip.outputs.oid }}
       - name: Overlay a coherent cluster-data snapshot with trusted main code
+        if: steps.datacache.outputs.cache-hit != 'true'
         run: python3 tools/branch_state.py overlay --fetch
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -36,13 +49,23 @@ jobs:
         run: |
           version=$(python3 -c "import json; print(json.load(open('data/runner-release.json'))['version'])")
           gh api -H 'User-Agent: OpenAI File Downloader, XaiImageApiFetch/1.0' "repos/Kuberwastaken/math-gambling/releases/tags/v${version}" --jq .html_url
+      - name: Restore the built kernel for this exact source
+        id: wasmcache
+        # TODO pin to a SHA to match repo policy, e.g. actions/cache@<sha> # v4.x
+        uses: actions/cache@v4
+        with:
+          path: web/assets/kernel/math_gambling_kernel.wasm
+          # Rebuild only when the kernel source or its build tooling changes.
+          key: wasm-kernel-${{ hashFiles('native/**', 'tools/build_native.py') }}
       - name: Build the exact WebAssembly kernel
+        if: steps.wasmcache.outputs.cache-hit != 'true'
         env:
           CARGO_HTTP_USER_AGENT: 'OpenAI File Downloader, XaiImageApiFetch/1.0'
         run: |
           rustup target add wasm32-unknown-unknown
           python3 tools/build_native.py --wasm
-          test -s web/assets/kernel/math_gambling_kernel.wasm
+      - name: Require the exact kernel is present before publishing
+        run: test -s web/assets/kernel/math_gambling_kernel.wasm
       - name: Test mathematical kernels and public protocols
         run: |
           node --test tests/*.mjs

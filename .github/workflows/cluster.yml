@@ -1,10 +1,12 @@
 name: Verify community compute
 
 on:
-  issues:
-    types: [opened, edited, reopened]
+  # Settle banks in batches on a cadence instead of one heavy run per issue.
+  # A new [bank]/[compute] issue is drained by the next scheduled run (<=10 min),
+  # or immediately via workflow_dispatch. collect_issues keeps a durable poll
+  # cursor, so each run drains up to MAX_RECEIPTS pending banks in one publish.
   schedule:
-    - cron: '17 * * * *'
+    - cron: '*/10 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -17,7 +19,6 @@ concurrency:
 
 jobs:
   verify:
-    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[bank]') || startsWith(github.event.issue.title, '[compute]')
     runs-on: ubuntu-24.04
     # Data transfer/publication can exceed ten minutes; replay stays capped at 120 seconds.
     timeout-minutes: 20

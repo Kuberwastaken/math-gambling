@@ -14,10 +14,35 @@ parallel path for the 40% cross-target allocation.
 """
 from __future__ import annotations
 import functools
+import hashlib
+import re
 
 import search_core as sc
 
 SCALE = sc.SCALE  # 10**18
+
+# Target tasks live in their own engine namespace, "mg{k}-offset-v1", so their
+# task IDs, receipts and coverage never collide with the 114 campaign's
+# "mg114-offset-v1". The 114 engine and its pipeline are never touched.
+ENGINE_RE = re.compile(r"mg([1-9][0-9]{0,3})-offset-v1")
+ELL1_CONTEXTS = tuple(c["id"] for c in sc.CONTEXTS if c["ell"] == 1)
+
+
+def target_engine(k):
+    return f"mg{k}-offset-v1"
+
+
+def parse_engine(engine):
+    """Return the target k for a 'mg{k}-offset-v1' tag, or None.
+
+    114 is excluded on purpose: it is the primary campaign's own engine
+    (search_core.ENGINE == 'mg114-offset-v1'), so the target namespace must never
+    reuse it or their task IDs, receipts and coverage would collide."""
+    m = ENGINE_RE.fullmatch(engine) if isinstance(engine, str) else None
+    if not m:
+        return None
+    k = int(m.group(1))
+    return k if admissible(k) and k != 114 else None
 
 
 def admissible(k):
@@ -110,3 +135,83 @@ def run_target(k, context, row, block=0, *, on_hit=None):
     if counters["quotient_points"] != sum(counters[x] for x in ("rejected_mod243", "rejected_parity", "rejected_prime", "exact_tests")):
         raise ArithmeticError("quotient accounting failed")
     return dict(counters=counters, hits=hits)
+
+
+def prove_empty_target(task):
+    """k-general scan-free emptiness proof (the target analogue of
+    search_core.prove_empty_task). True iff every generator lies outside the
+    shell for THIS target's norm — conservative, so a True can never skip a task
+    that would produce a curve for k. Uses k's constants, never 114's."""
+    task = validate_target_task(task)
+    k = parse_engine(task["engine"])
+    c = sc.CONTEXT_BY_ID[task["context"]]
+    radius = c["radius"]
+    width = 2 * radius + 1
+    tlo = c["tlo"] + sc.BLOCK_SIZE * task["block"]
+    thi = min(tlo + sc.BLOCK_SIZE - 1, c["thi"])
+    dlo, dhi = int(c["dlo"]), int(c["dhi"])
+    start = int(task["row"])
+    for row in range(start, min(start + sc.ROWS_PER_TASK, int(c["totalRows"]))):
+        b, cc = row % width - radius, row // width - radius
+        base = offset_base(k, b, cc)
+        constant, linear = k * b * b * b + k * k * cc * cc * cc, 3 * k * b * cc
+        first, last = sc._shell_interval(base, 1, tlo, thi, dlo, dhi, constant, linear)
+        if last >= first:
+            return False
+    return True
+
+
+def validate_target_task(task):
+    """Canonical target task: {version, engine 'mg{k}-...', context (ell=1), row, block}."""
+    if not isinstance(task, dict) or set(task) != {"version", "engine", "context", "row", "block"}:
+        raise ValueError("target task has unexpected or missing fields")
+    if type(task["version"]) is not int or task["version"] != 1:
+        raise ValueError("unsupported version")
+    k = parse_engine(task["engine"])
+    if k is None:
+        raise ValueError("unknown or inadmissible target engine")
+    if task["context"] not in ELL1_CONTEXTS:
+        raise ValueError("target tasks use ell=1 contexts only")
+    c = sc.CONTEXT_BY_ID[task["context"]]
+    if type(task["row"]) is not str or not re.fullmatch(r"0|[1-9][0-9]{0,14}", task["row"]):
+        raise ValueError("row must be a canonical bounded decimal string")
+    if int(task["row"]) >= int(c["totalRows"]) or int(task["row"]) % sc.ROWS_PER_TASK:
+        raise ValueError("row outside context or not aligned")
+    if type(task["block"]) is not int or not 0 <= task["block"] < c["blocks"]:
+        raise ValueError("block outside context")
+    return dict(version=1, engine=task["engine"], context=task["context"], row=task["row"], block=task["block"])
+
+
+def make_target_task(k, context, row, block=0):
+    return validate_target_task(dict(version=1, engine=target_engine(k), context=context, row=str(row), block=block))
+
+
+def target_task_id(task):
+    t = validate_target_task(task)
+    return f"{t['engine']}:{t['context']}:{t['row']}:{t['block']}"
+
+
+def run_target_task(task, on_hit=None):
+    """Full verifiable result for a target task: reuses run_target, adds the
+    canonical id + sha256 digest exactly like search_core.run_task."""
+    task = validate_target_task(task)
+    k = parse_engine(task["engine"])
+    found = run_target(k, task["context"], int(task["row"]), task["block"], on_hit=on_hit)
+    result = dict(task=task, id=target_task_id(task), counters=found["counters"], hits=found["hits"])
+    result["digest"] = hashlib.sha256(sc.canonical_json(result).encode("ascii")).hexdigest()
+    return result
+
+
+if __name__ == "__main__":
+    # Isolated replay entry for the target verifier: data-only stdin, no submitted
+    # code is ever imported or executed.
+    import json
+    import sys
+    import time
+    if sys.platform != "win32":
+        import resource
+        resource.setrlimit(resource.RLIMIT_CPU, (4, 5))
+    task = validate_target_task(json.loads(sys.stdin.read(2049)))
+    started = time.process_time()
+    result = run_target_task(task)
+    print(sc.canonical_json({"result": result, "cpu_ms": (time.process_time() - started) * 1000}))

@@ -79,6 +79,10 @@ flowchart TD
     Floor --> Result
 ```
 
+<!-- TARGETS:START -->
+_Live per-target progress appears here once the cross-target verifier has processed banks._
+<!-- TARGETS:END -->
+
 **Status:** the generalized engine and the allocation machinery are built, tested and open here. Wiring the cross-target share into the live cluster is in progress and kept deliberately separate, so the 114 pipeline and everyone's current runners are unaffected. No solution has been found for any target. The website and its jackpot stay centered on 114.
 
 ## What verified work means

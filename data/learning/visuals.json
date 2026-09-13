@@ -20,7 +20,7 @@
     }
   ],
   "baseline": "proof-aware context baseline",
-  "completed_evaluations": 60,
+  "completed_evaluations": 61,
   "first_training_boundary": 279552,
   "metrics": {
     "cpu_ms": "Server CPU cost",
@@ -29,10 +29,10 @@
     "quotient_points": "Quotient positions"
   },
   "mode": "shadow",
-  "model_count": 61,
+  "model_count": 62,
   "model_version": "mg114-spatial-shadow-v2",
-  "next_boundary": 342016,
-  "observed_tasks": 341702,
+  "next_boundary": 343040,
+  "observed_tasks": 342078,
   "pilot": [
     {
       "label": "Uniform",
@@ -1488,8 +1488,32 @@
       "model_hash": "8124b972368a8963a404b0647490e910cbeccfd1774269e1d34269a817aeffce",
       "through": 340992,
       "unseen_tasks": 184
+    },
+    {
+      "from": 340993,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": 2.631145512244622,
+          "future_unseen_geometry": 5.569025565386567
+        },
+        "curves": {
+          "future_all": 4.433111384270054,
+          "future_unseen_geometry": 6.527519008453888
+        },
+        "exact_tests": {
+          "future_all": -1.4627582526606484,
+          "future_unseen_geometry": -0.02853912726287312
+        },
+        "quotient_points": {
+          "future_all": 11.391255967016544,
+          "future_unseen_geometry": 9.626571350613181
+        }
+      },
+      "model_hash": "df53eb7f61e582208797ee6178add9987b86be0a3cffa8523bf671ed8c1c39ba",
+      "through": 342016,
+      "unseen_tasks": 172
     }
   ],
   "source_hash": "79b17fb84ec4793d65fb95b908efe91f67f5aca3f8fc49e3363c9867a8c0964c",
-  "through": 340992
+  "through": 342016
 }

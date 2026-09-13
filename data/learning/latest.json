@@ -1,90 +1,10 @@
 {
-  "completed_evaluations": 85,
+  "completed_evaluations": 0,
   "feature_model": "shared mathematical features with exact shell bounds; unseen geometry remains withheld",
-  "first_training_boundary": 279552,
-  "history": "learning/mg114-spatial-shadow-v2/79b17fb84ec4793d",
-  "latest_evaluation": {
-    "evaluation_hash": "5f9a16c76553c08b3f47034ad35c2e7d30ed76dca3f4eb6c55fc6b0c5f5265d7",
-    "evaluation_ledger_hash": "2ab0a9aebe8557ceaf2f1f1fd0cfb4c840cb16a0c741ef801ca970d668ad556e",
-    "from": 365569,
-    "model_hash": "c549d1a10e321a4e5428aca9d2a7bf7bf4bb9de75126a2e5b93424463385ef23",
-    "results": {
-      "future_all": {
-        "mean_absolute_log1p_error": {
-          "context_baseline": {
-            "cpu_ms": 1.1113720852145594,
-            "curves": 2.107937985884868,
-            "exact_tests": 0.21271402378125442,
-            "quotient_points": 3.6215104460884615
-          },
-          "proof_baseline": {
-            "cpu_ms": 0.31399255486122946,
-            "curves": 0.30089457943420866,
-            "exact_tests": 0.13331953726012352,
-            "quotient_points": 0.3502226555422093
-          },
-          "spatial": {
-            "cpu_ms": 0.3035335092067024,
-            "curves": 0.2899248247968269,
-            "exact_tests": 0.13152358702069333,
-            "quotient_points": 0.3010392483874644
-          }
-        },
-        "nonzero_exact_tasks": 131,
-        "tasks": 1024
-      },
-      "future_nonempty": {
-        "mean_absolute_log1p_error": {
-          "context_baseline": {
-            "cpu_ms": 0.8550214320312243,
-            "curves": 1.0779077563028376,
-            "exact_tests": 0.1695201058917969,
-            "quotient_points": 1.054576161344129
-          },
-          "proof_baseline": {
-            "cpu_ms": 0.35825188094071064,
-            "curves": 0.40119277257894487,
-            "exact_tests": 0.17775938301349803,
-            "quotient_points": 0.46696354072294577
-          },
-          "spatial": {
-            "cpu_ms": 0.3374228005658905,
-            "curves": 0.3865664330624359,
-            "exact_tests": 0.1753647826942578,
-            "quotient_points": 0.40138566451661917
-          }
-        },
-        "nonzero_exact_tasks": 131,
-        "tasks": 768
-      },
-      "future_unseen_geometry": {
-        "mean_absolute_log1p_error": {
-          "context_baseline": {
-            "cpu_ms": 1.0605045239720368,
-            "curves": 2.083180901731522,
-            "exact_tests": 0.22499783928153733,
-            "quotient_points": 3.746440979896577
-          },
-          "proof_baseline": {
-            "cpu_ms": 0.41716118814077013,
-            "curves": 0.5197029328959812,
-            "exact_tests": 0.13562934985834776,
-            "quotient_points": 0.5831181576737455
-          },
-          "spatial": {
-            "cpu_ms": 0.4022192699425962,
-            "curves": 0.4970455950485796,
-            "exact_tests": 0.13488244133332644,
-            "quotient_points": 0.5185541176654747
-          }
-        },
-        "nonzero_exact_tasks": 18,
-        "tasks": 162
-      }
-    },
-    "through": 366592
-  },
-  "latest_model_hash": "a3a07add963cedfca439edc2845dd49b587ff35abb0ffdf2b552cb09ba05e3e0",
+  "first_training_boundary": 367616,
+  "history": "learning/mg114-spatial-shadow-v2/248a93e660040c08",
+  "latest_evaluation": null,
+  "latest_model_hash": "ddbf6bf3fa54880b41d68759375b82335f61c67b8d5d532ab3eec068229d4f9a",
   "limitations": [
     "Arrival order is not dispatch time.",
     "Held-out errors describe submitted tasks, not an unbiased sampling population.",
@@ -93,14 +13,14 @@
     "No production exclusions, seed changes, leaderboard changes or automatic promotion."
   ],
   "mode": "shadow",
-  "model_count": 86,
-  "next_boundary": 367616,
-  "observed_tasks": 367569,
+  "model_count": 1,
+  "next_boundary": 368640,
+  "observed_tasks": 367985,
   "promotion": {
     "allowed": false,
     "reason": "Prediction validation is not controlled search-policy validation. No discovery advantage established."
   },
   "schema": "mg114-spatial-shadow-v2",
-  "source_hash": "79b17fb84ec4793d65fb95b908efe91f67f5aca3f8fc49e3363c9867a8c0964c",
-  "through": 366592
+  "source_hash": "248a93e660040c08c94b43026333a670417dbd84e9e76b0530b0d0710bad67c5",
+  "through": 367616
 }

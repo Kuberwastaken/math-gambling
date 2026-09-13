@@ -297,3 +297,75 @@ def run_task(task, on_hit=None, on_curve=None):
     result = dict(task=task, id=task_id(task), counters=counters, hits=hits)
     result["digest"] = hashlib.sha256(canonical_json(result).encode("ascii")).hexdigest()
     return result
+
+
+EMPTY_TASK_SCHEMA = "math-gambling-empty-task-v1"
+
+
+def prove_empty_task(task):
+    """Exact, scan-free proof that a task can contain no curve.
+
+    Returns True iff every (row, block) generator lies outside the context's norm
+    shell, decided by the same integer `_shell_interval` bound `run_task` uses.
+    This is conservative: when `_shell_interval` cannot prove monotonicity it keeps
+    the whole interval, so this returns False and the task is NOT treated as empty.
+    Consequently a True result guarantees `run_task` would report zero curves; it
+    never claims emptiness that a full scan would contradict. Cost is one shell
+    interval per row (~13 cubic evaluations), with no quotient scan or exact test.
+    """
+    task = validate_task(task)
+    c = CONTEXT_BY_ID[task["context"]]
+    ell, radius = c["ell"], c["radius"]
+    width = 2 * radius + 1
+    tlo = c["tlo"] + BLOCK_SIZE * task["block"]
+    thi = min(tlo + BLOCK_SIZE - 1, c["thi"])
+    dlo, dhi = int(c["dlo"]), int(c["dhi"])
+    start = int(task["row"])
+    for row in range(start, min(start + ROWS_PER_TASK, int(c["totalRows"]))):
+        b, cc = row % width - radius, row // width - radius
+        base = offset_base(ell, b, cc)
+        constant, linear = 114 * b * b * b + 12996 * cc * cc * cc, 342 * b * cc
+        first, last = _shell_interval(base, ell, tlo, thi, ell * dlo, ell * dhi, constant, linear)
+        if last >= first:
+            return False
+    return True
+
+
+def empty_certificate(task):
+    """Compact, independently re-verifiable record for a provably-empty task.
+
+    Returns None when the task is not provably empty, so a proven-empty span can
+    replace many zero-curve task records without asserting anything a scan would
+    disprove. Anyone can recompute the proof from the reviewed kernel.
+    """
+    task = validate_task(task)
+    if not prove_empty_task(task):
+        return None
+    return {"schema": EMPTY_TASK_SCHEMA, "engine": ENGINE, "id": task_id(task),
+            "task": task, "proof": "shell-interval-empty"}
+
+
+def verify_empty_certificate(cert):
+    """Recompute a claimed empty-task certificate against the trusted kernel."""
+    if (not isinstance(cert, dict) or cert.get("schema") != EMPTY_TASK_SCHEMA
+            or cert.get("engine") != ENGINE or cert.get("proof") != "shell-interval-empty"
+            or not isinstance(cert.get("task"), dict)):
+        return False
+    task = validate_task(cert["task"])
+    return cert.get("id") == task_id(task) and prove_empty_task(task)
+
+
+def first_nonempty_row(context, block=0, row_start=0, row_stop=None):
+    """First ROWS_PER_TASK-aligned row in [row_start, row_stop) whose task is not
+    provably empty, or None if the whole span is. Lets a scheduler collapse a
+    contiguous empty span into one certificate and jump straight to real work,
+    never dispatching, replaying or individually recording provably-empty tasks.
+    """
+    c = CONTEXT_BY_ID[context]
+    total = int(c["totalRows"])
+    stop = total if row_stop is None else min(row_stop, total)
+    aligned = (row_start // ROWS_PER_TASK) * ROWS_PER_TASK
+    for row in range(aligned, stop, ROWS_PER_TASK):
+        if not prove_empty_task(dict(version=1, engine=ENGINE, context=context, row=str(row), block=block)):
+            return row
+    return None

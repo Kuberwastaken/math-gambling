@@ -208,6 +208,47 @@ class SearchTests(unittest.TestCase):
             self.assertTrue(bank.exists())
             db.close()
 
+    def test_empty_prefilter_is_sound_against_the_real_scan(self):
+        # A task the shell-interval proof calls empty must actually produce zero
+        # curves under a full scan (never skip productive work), and its
+        # certificate must round-trip and re-verify. Any curve-bearing task in
+        # the sample must NOT be proven empty. Sampled across all 81 contexts.
+        rng = random.Random(11409)
+        proved = bearing = 0
+        for _ in range(320):
+            c = rng.choice(e.CONTEXTS)
+            row = rng.randrange(0, int(c['totalRows']) // e.ROWS_PER_TASK) * e.ROWS_PER_TASK
+            block = rng.randrange(0, c['blocks'])
+            task = e.make_task(c['id'], row, block)
+            provably_empty = e.prove_empty_task(task)
+            curves = e.run_task(task)['counters']['curves']
+            if curves:
+                bearing += 1
+                # Contrapositive of soundness: real work is never pruned.
+                self.assertFalse(provably_empty)
+                self.assertIsNone(e.empty_certificate(task))
+            if provably_empty:
+                proved += 1
+                self.assertEqual(curves, 0)
+                cert = e.empty_certificate(task)
+                self.assertTrue(e.verify_empty_certificate(cert))
+                self.assertEqual(cert['id'], e.task_id(task))
+                # A tampered certificate must not verify.
+                self.assertFalse(e.verify_empty_certificate({**cert, 'proof': 'trust-me'}))
+        self.assertGreater(proved, 0, 'sample should include provably-empty tasks')
+        self.assertGreater(bearing, 0, 'sample should include curve-bearing tasks')
+
+    def test_first_nonempty_row_collapses_empty_spans_soundly(self):
+        # first_nonempty_row must return a row that truly has curves (or None),
+        # and every row it skipped must be provably empty.
+        context = 'c12'  # historically productive band-0 context
+        stop = 64 * e.ROWS_PER_TASK
+        row = e.first_nonempty_row(context, block=0, row_stop=stop)
+        if row is not None:
+            self.assertGreater(e.run_task(e.make_task(context, row))['counters']['curves'], 0)
+            for skipped in range(0, row, e.ROWS_PER_TASK):
+                self.assertTrue(e.prove_empty_task(e.make_task(context, skipped)))
+
 
 if __name__ == '__main__':
     unittest.main()

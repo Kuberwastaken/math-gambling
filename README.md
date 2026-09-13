@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-13 03:09:26 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-13 03:17:24 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 347,025 |
-| Coefficient-generator inputs | 653,843,456 |
-| Bounded curve intervals | 60,209,509 |
-| Logical quotient positions | 39,650,271,044 |
-| Exact integer square tests | 81,619 |
+| Unique finite tasks | 347,429 |
+| Coefficient-generator inputs | 654,593,024 |
+| Bounded curve intervals | 60,390,760 |
+| Logical quotient positions | 39,726,797,662 |
+| Exact integer square tests | 81,766 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,8 +35,8 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 2,089,785,344 | 542,885,888 |
-| 2 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 961,796,096 | 48,868,352 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 2,093,641,728 | 543,076,352 |
+| 2 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 973,366,272 | 49,427,456 |
 | 3 | Anish Bhattacharya | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 122,512,384 | 8,753,152 |
 | 4 | [Anant](<https://anants.studio>) | [@GithubAnant](https://github.com/GithubAnant) | 87,754,752 | 5,852,160 |
 | 5 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 75,799,552 | 34,284,544 |
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | culnaen | [@culnaen](https://github.com/culnaen) | 1,909,760 | 1,443,840 |
 | 10 | Thanos | [@sparkingcharms](https://github.com/sparkingcharms) | 1,453,056 | 982,016 |
 
-**236,283 / 347,025 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**236,355 / 347,429 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 5422**, frozen from **347,008 verified tasks**. The next policy update needs **47 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 5428**, frozen from **347,392 verified tasks**. The next policy update needs **27 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 5419: 346,816 tasks; c00 5.82%"]
-    H1["Epoch 5420: 346,880 tasks; c00 5.82%"]
+    H0["Epoch 5425: 347,200 tasks; c00 5.84%"]
+    H1["Epoch 5426: 347,264 tasks; c00 5.85%"]
     H0 --> H1
-    H2["Epoch 5421: 346,944 tasks; c00 5.81%"]
+    H2["Epoch 5427: 347,328 tasks; c00 5.84%"]
     H1 --> H2
-    H3["Epoch 5422: 347,008 tasks; c00 5.84%"]
+    H3["Epoch 5428: 347,392 tasks; c00 5.85%"]
     H2 --> H3
-    Policy["Current policy: epoch 5422"]
+    Policy["Current policy: epoch 5428"]
     H3 --> Policy
     Policy --> Explore["40% predicted CPU exploration across 81 contexts"]
     Policy --> Cost["60% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c00: 5.84%"]
-    Mix --> C1["c27: 5.70%"]
-    Mix --> C2["c54: 5.60%"]
-    Mix --> Rest["Other 78 contexts: 82.87% combined"]
+    Mix --> C0["c00: 5.85%"]
+    Mix --> C1["c27: 5.64%"]
+    Mix --> C2["c54: 5.54%"]
+    Mix --> Rest["Other 78 contexts: 82.97% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -91,11 +91,11 @@ Weights describe task-selection shares, not CPU-time shares or discovery probabi
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 5418 | 346,752 | c00 | 5.7632% |
-| 5419 | 346,816 | c00 | 5.8161% |
-| 5420 | 346,880 | c00 | 5.8215% |
-| 5421 | 346,944 | c00 | 5.8139% |
-| 5422 | 347,008 | c00 | 5.8380% |
+| 5424 | 347,136 | c00 | 5.8538% |
+| 5425 | 347,200 | c00 | 5.8412% |
+| 5426 | 347,264 | c00 | 5.8499% |
+| 5427 | 347,328 | c00 | 5.8403% |
+| 5428 | 347,392 | c00 | 5.8493% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -166,7 +166,7 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **346,112 verified tasks**; **66 models** and **65 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **347,136 verified tasks**; **67 models** and **66 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
 The challenger learns residual log-cost and arithmetic exposure from shared coefficient, band and exact shell-bound features. Its comparator already knows provably empty tiles and context costs. Entire geometry cells remain withheld; no discoveries are predicted.
 
@@ -186,16 +186,16 @@ flowchart TD
 
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 
-Latest evaluation: tasks 345,089–346,112. Lower mean absolute log1p prediction error is better.
+Latest evaluation: tasks 346,113–347,136. Lower mean absolute log1p prediction error is better.
 
 | Quantity | proof baseline | Shared challenger |
 | --- | ---: | ---: |
-| cpu_ms | 0.2709 | 0.2527 |
-| quotient_points | 0.3500 | 0.3038 |
-| curves | 0.3064 | 0.2906 |
-| exact_tests | 0.1362 | 0.1340 |
+| cpu_ms | 0.3426 | 0.3276 |
+| quotient_points | 0.4092 | 0.3617 |
+| curves | 0.3581 | 0.3404 |
+| exact_tests | 0.1307 | 0.1298 |
 
-Unseen-geometry evaluation: 183 tasks. Full errors and nonzero-count support are in the report.
+Unseen-geometry evaluation: 191 tasks. Full errors and nonzero-count support are in the report.
 
 ![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 

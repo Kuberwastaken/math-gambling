@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-14 22:05:03 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-14 22:25:14 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 410,108 |
-| Coefficient-generator inputs | 772,449,280 |
-| Bounded curve intervals | 84,720,924 |
-| Logical quotient positions | 50,504,252,813 |
-| Exact integer square tests | 103,608 |
+| Unique finite tasks | 410,576 |
+| Coefficient-generator inputs | 773,334,016 |
+| Bounded curve intervals | 84,907,784 |
+| Logical quotient positions | 50,615,783,694 |
+| Exact integer square tests | 103,832 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,9 +35,9 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 2,879,437,824 | 582,534,144 |
-| 2 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 2,397,957,120 | 120,113,152 |
-| 3 | Anish Bhattacharya | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 248,007,680 | 15,196,160 |
+| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 2,884,741,120 | 582,844,416 |
+| 2 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 2,407,143,424 | 120,631,296 |
+| 3 | Anish Bhattacharya | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 248,974,336 | 15,252,480 |
 | 4 | [Anant](<https://anants.studio>) | [@GithubAnant](https://github.com/GithubAnant) | 93,116,416 | 6,163,456 |
 | 5 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 75,799,552 | 34,284,544 |
 | 6 | [1za.ch](<https://1za.ch>) | [@1-zach](https://github.com/1-zach) | 5,324,800 | 704,512 |
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | culnaen | [@culnaen](https://github.com/culnaen) | 1,909,760 | 1,443,840 |
 | 10 | Thanos | [@sparkingcharms](https://github.com/sparkingcharms) | 1,453,056 | 982,016 |
 
-**254,677 / 410,108 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**254,820 / 410,576 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 6407**, frozen from **410,048 verified tasks**. The next policy update needs **4 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 6415**, frozen from **410,560 verified tasks**. The next policy update needs **48 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 6404: 409,856 tasks; c54 5.58%"]
-    H1["Epoch 6405: 409,920 tasks; c54 5.59%"]
+    H0["Epoch 6412: 410,368 tasks; c54 5.76%"]
+    H1["Epoch 6413: 410,432 tasks; c54 5.75%"]
     H0 --> H1
-    H2["Epoch 6406: 409,984 tasks; c54 5.63%"]
+    H2["Epoch 6414: 410,496 tasks; c54 5.75%"]
     H1 --> H2
-    H3["Epoch 6407: 410,048 tasks; c54 5.64%"]
+    H3["Epoch 6415: 410,560 tasks; c54 5.75%"]
     H2 --> H3
-    Policy["Current policy: epoch 6407"]
+    Policy["Current policy: epoch 6415"]
     H3 --> Policy
     Policy --> Explore["40% predicted CPU exploration across 81 contexts"]
     Policy --> Cost["60% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c54: 5.64%"]
-    Mix --> C1["c00: 5.43%"]
-    Mix --> C2["c27: 5.43%"]
-    Mix --> Rest["Other 78 contexts: 83.51% combined"]
+    Mix --> C0["c54: 5.75%"]
+    Mix --> C1["c00: 5.50%"]
+    Mix --> C2["c27: 5.49%"]
+    Mix --> Rest["Other 78 contexts: 83.26% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -91,11 +91,11 @@ Weights describe task-selection shares, not CPU-time shares or discovery probabi
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 6403 | 409,792 | c54 | 5.5719% |
-| 6404 | 409,856 | c54 | 5.5840% |
-| 6405 | 409,920 | c54 | 5.5870% |
-| 6406 | 409,984 | c54 | 5.6290% |
-| 6407 | 410,048 | c54 | 5.6358% |
+| 6411 | 410,304 | c54 | 5.7371% |
+| 6412 | 410,368 | c54 | 5.7639% |
+| 6413 | 410,432 | c54 | 5.7533% |
+| 6414 | 410,496 | c54 | 5.7500% |
+| 6415 | 410,560 | c54 | 5.7461% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 

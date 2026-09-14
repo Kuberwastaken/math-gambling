@@ -60,6 +60,31 @@ flowchart TD
 
 The initial discovery-learning experiment failed its promotion test. The new geometric preference is uncalibrated for our selected norm families. A stronger sieve, reduced duplicate work and better cost predictions are useful, but none establishes the likelihood of finding 114.
 
+## Studying the whole problem
+
+114 is the jackpot and stays the hook — the majority of compute keeps looking for it. But the same exact search generalizes to every open case below 1000 — **390, 627, 633, 732, 921, 975** — which share the identical structure and differ only in one modular constant and their density. Searching them together **raises the probability of closing _some_ open problem** (627 alone carries roughly twice 114's odds per core-hour) and lets us study the family as a whole rather than a single number.
+
+The generalized search is a sound extension of the 114 engine, not a rewrite. It reuses the same exact scan and final check, is proven in tests to scan a **superset** of the 114 search — so it can never miss a solution the primary engine would find — and drops only k-specific prunes that are optimizations, never correctness. [Engine](tools/multi_target.py) · [allocation and bounds](tools/target_bounds.py).
+
+Compute is split with an exploration floor, weighted by a declared Heath-Brown density prior and corrected by **measured** cost and yield as data arrives: it learns where computation is cheap and productive, never where a solution "should" be. Bounds tighten per target as empties and unproductive regions accumulate — a low score is a preference, never a proof, and exact emptiness is only ever certified by the shell-interval proof.
+
+```mermaid
+flowchart TD
+    Pool[Donated compute] --> P114[60 percent: target 114, the jackpot]
+    Pool --> Cross[40 percent: the other open cases]
+    Cross --> Prior[Density prior: 627 above 390/633/732/921/975]
+    Prior --> Learn[Reweight by measured curve-yield per CPU]
+    Learn --> Floor[Exploration floor: every case still visited]
+    P114 --> Result[An exact verified solution, or a documented negative result]
+    Floor --> Result
+```
+
+<!-- TARGETS:START -->
+_Live per-target progress appears here once the cross-target verifier has processed banks._
+<!-- TARGETS:END -->
+
+**Status:** the generalized engine and the allocation machinery are built, tested and open here. Wiring the cross-target share into the live cluster is in progress and kept deliberately separate, so the 114 pipeline and everyone's current runners are unaffected. No solution has been found for any target. The website and its jackpot stay centered on 114.
+
 ## What verified work means
 
 Browser workers use the Rust WebAssembly kernel with a BigInt fallback. The local runner can use the same fixed-width Rust kernel, with arbitrary-precision arithmetic for the final check and an independent Python reference. [Matched benchmarks](research/benchmarks/native-wasm-2026-09-11.json) measured **20.2× native vs Python** and **5.2× WASM vs JavaScript** on this Mac; these are kernel comparisons, not discovery odds or guaranteed whole-campaign speedups. [Build, bounds and tests](docs/NATIVE_KERNEL.md). Each result has a fixed task descriptor and deterministic digest. GitHub ingestion fully replays new-account tasks, then samples eligible new negative banks at 1-in-20 after submission. The leaderboard ranks contributed inputs: independently replayed tasks plus provisional unique claims from complete banks that passed at least one random check. Verified inputs are shown separately. Failed account audits revoke provisional credit; unchecked claims never certify coverage or train the model. Submitted seconds and claimed machine speed do not increase the leaderboard. Any candidate identity receives a separate exact cube check, even when its surrounding receipt is malformed. A standalone identity can also be submitted for verification without claiming any completed search tasks; it earns no invented task credit.

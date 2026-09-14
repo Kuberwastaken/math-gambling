@@ -1,0 +1,50 @@
+name: Verify cross-target campaign
+
+# Strictly parallel to the 114 verifier (Verify community compute). It reads only
+# [bank-mt] issues and publishes to the separate targets-data branch, so the 114
+# ledger, cluster-data and everyone's current runners are never touched. Offset
+# from the 114 cron (:17) and Pages (:7,:27,:47) to avoid API contention.
+on:
+  schedule:
+    - cron: '37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: target-campaign-ledger
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Restore prior target data and README from the targets-data branch
+        run: |
+          if git ls-remote --exit-code --heads origin targets-data >/dev/null 2>&1; then
+            git fetch --no-tags --depth=1 origin targets-data
+            git checkout FETCH_HEAD -- data/targets README.md || true
+          fi
+      - name: Test the target verifier, allocation and renderer
+        run: |
+          python3 -m unittest discover -s tests -p test_multi_target.py
+          python3 -m unittest discover -s tests -p test_target_ingest.py
+          python3 -m unittest discover -s tests -p test_target_bounds.py
+          python3 -m unittest discover -s tests -p test_target_readme.py
+          python3 -m unittest discover -s tests -p test_publish_targets.py
+      - name: Independently replay [bank-mt] submissions into the target namespace
+        run: python3 tools/target_ingest.py --issues
+      - name: Render live target progress into the README block
+        run: python3 tools/target_readme.py
+      - name: Publish target data and README to the targets-data branch
+        run: python3 tools/publish_targets.py --push

@@ -76,6 +76,21 @@ class MultiTargetTests(unittest.TestCase):
             r, q = z2 % d, (z2 - z2 % d) // d
             self.assertEqual(len(sc.scan_curve(k, d, r, q, q)["hits"]), 1)
 
+    def test_prove_empty_target_is_sound_per_target(self):
+        # A task the k-general proof calls empty must scan to zero curves for k.
+        rng = random.Random(202)
+        ell1 = [c for c in sc.CONTEXTS if c["ell"] == 1]
+        proved = 0
+        for _ in range(80):
+            k = rng.choice((390, 627, 633, 732))
+            c = rng.choice(ell1)
+            row = rng.randrange(0, int(c["totalRows"]) // sc.ROWS_PER_TASK) * sc.ROWS_PER_TASK
+            task = mt.make_target_task(k, c["id"], row)
+            if mt.prove_empty_target(task):
+                proved += 1
+                self.assertEqual(mt.run_target_task(task)["counters"]["curves"], 0)
+        self.assertGreater(proved, 0, "sample should include provably-empty target tasks")
+
     def test_rejects_inadmissible_target_and_non_ell1_context(self):
         with self.assertRaises(ValueError):
             mt.run_target(113, 'c00', 0)   # 113 = -4 mod 9: provably no solution

@@ -1,4 +1,4 @@
-# Math Gambling runner v0.7.0 (upcoming)
+# Math Gambling runner v0.7.0 (17 September 2026)
 
 **Engine v2 tasks.** New work is proposed as `mg114-offset-v2` tasks that span 1,024 coefficient rows instead of 128. A v2 task is exactly its eight aligned v1 sub-tasks: the same positions, the same exact arithmetic, counters summed and hits concatenated in the same order. Eight times fewer dispatches, checkpoint writes and bank claims cover the same search. Version 1 task IDs, receipts, digests and banked bytes are unchanged, and a resumed checkpoint finishes its reserved v1 tasks and banks them normally. A bank may contain both versions.
 

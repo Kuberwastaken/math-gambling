@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-16 20:24:49 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-16 20:41:28 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 487,715 |
-| Coefficient-generator inputs | 918,673,408 |
-| Bounded curve intervals | 111,559,280 |
-| Logical quotient positions | 63,817,111,211 |
-| Exact integer square tests | 130,640 |
+| Unique finite tasks | 490,971 |
+| Coefficient-generator inputs | 924,826,624 |
+| Bounded curve intervals | 112,970,992 |
+| Logical quotient positions | 64,371,977,335 |
+| Exact integer square tests | 131,751 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,9 +35,9 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |
 | ---: | --- | --- | ---: | ---: |
-| 1 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 3,811,894,272 | 629,204,992 |
-| 2 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 3,809,670,144 | 190,909,440 |
-| 3 | Anish Bhattacharya | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 786,451,456 | 41,956,352 |
+| 1 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 3,897,140,224 | 195,311,616 |
+| 2 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 3,845,977,088 | 630,860,800 |
+| 3 | Anish Bhattacharya | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 788,369,408 | 42,051,584 |
 | 4 | [Anant](<https://anants.studio>) | [@GithubAnant](https://github.com/GithubAnant) | 122,469,376 | 7,676,928 |
 | 5 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 75,799,552 | 34,284,544 |
 | 6 | [1za.ch](<https://1za.ch>) | [@1-zach](https://github.com/1-zach) | 5,324,800 | 704,512 |
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | culnaen | [@culnaen](https://github.com/culnaen) | 1,909,760 | 1,443,840 |
 | 10 | Thanos | [@sparkingcharms](https://github.com/sparkingcharms) | 1,453,056 | 982,016 |
 
-**283,828 / 487,715 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**284,554 / 490,971 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 7620**, frozen from **487,680 verified tasks**. The next policy update needs **29 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 7671**, frozen from **490,944 verified tasks**. The next policy update needs **37 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 7617: 487,488 tasks; c45 5.74%"]
-    H1["Epoch 7618: 487,552 tasks; c45 5.73%"]
+    H0["Epoch 7668: 490,752 tasks; c45 6.10%"]
+    H1["Epoch 7669: 490,816 tasks; c45 6.08%"]
     H0 --> H1
-    H2["Epoch 7619: 487,616 tasks; c45 5.71%"]
+    H2["Epoch 7670: 490,880 tasks; c45 6.07%"]
     H1 --> H2
-    H3["Epoch 7620: 487,680 tasks; c45 5.71%"]
+    H3["Epoch 7671: 490,944 tasks; c45 6.06%"]
     H2 --> H3
-    Policy["Current policy: epoch 7620"]
+    Policy["Current policy: epoch 7671"]
     H3 --> Policy
-    Policy --> Explore["40% predicted CPU exploration across 81 contexts"]
-    Policy --> Cost["60% weighted by geometry-weighted curve exposure / cost"]
+    Policy --> Explore["10% predicted CPU exploration across 54 supported contexts"]
+    Policy --> Cost["90% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c45: 5.71%"]
-    Mix --> C1["c18: 5.67%"]
-    Mix --> C2["c72: 5.63%"]
-    Mix --> Rest["Other 78 contexts: 82.99% combined"]
+    Mix --> C0["c45: 6.06%"]
+    Mix --> C1["c72: 5.98%"]
+    Mix --> C2["c18: 5.95%"]
+    Mix --> Rest["Other 78 contexts: 82.01% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -85,17 +85,17 @@ flowchart TD
     Gate --> Policy
 ```
 
-Weights describe task-selection shares, not CPU-time shares or discovery probabilities. 40% of predicted CPU is reserved equally across contexts; 60% follows geometric exposure/cost. All c
+Weights describe task-selection shares, not CPU-time shares or discovery probabilities. 10% of predicted CPU is reserved equally across the 54 supported contexts; 90% follows geometric exp
 
 ### Model history and evidence
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 7616 | 487,424 | c45 | 5.7445% |
-| 7617 | 487,488 | c45 | 5.7387% |
-| 7618 | 487,552 | c45 | 5.7317% |
-| 7619 | 487,616 | c45 | 5.7087% |
-| 7620 | 487,680 | c45 | 5.7111% |
+| 7667 | 490,688 | c45 | 6.1039% |
+| 7668 | 490,752 | c45 | 6.0963% |
+| 7669 | 490,816 | c45 | 6.0825% |
+| 7670 | 490,880 | c45 | 6.0676% |
+| 7671 | 490,944 | c45 | 6.0576% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -191,7 +191,7 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **487,424 verified tasks**; **118 models** and **117 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **490,496 verified tasks**; **1 models** and **0 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
 The challenger learns residual log-cost and arithmetic exposure from shared coefficient, band and exact shell-bound features. Its comparator already knows provably empty tiles and context costs. Entire geometry cells remain withheld; no discoveries are predicted.
 
@@ -211,22 +211,12 @@ flowchart TD
 
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 
-Latest evaluation: tasks 486,401–487,424. Lower mean absolute log1p prediction error is better.
-
-| Quantity | proof baseline | Shared challenger |
-| --- | ---: | ---: |
-| cpu_ms | 0.8806 | 0.8967 |
-| quotient_points | 0.3613 | 0.3179 |
-| curves | 0.3144 | 0.3004 |
-| exact_tests | 0.1342 | 0.1363 |
-
-Unseen-geometry evaluation: 172 tasks. Full errors and nonzero-count support are in the report.
 
 ![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 
 Historical backfills are retrospective chronological tests, not a randomized A/B experiment. New snapshots remain frozen while later arrivals are evaluated. Arrival time is not computation time; submitted work is selection-biased. Improved prediction error alone cannot promote a search policy.
 
-[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/learning/mg114-spatial-shadow-v2/248a93e660040c08/) · [Design and promotion protocol](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md)
+[Latest report](data/learning/latest.json) · [Frozen model and evaluation records](data/learning/mg114-spatial-shadow-v2/8d62e721df1095e1/) · [Design and promotion protocol](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/LEARNING.md)
 
 <!-- LEARNING:END -->
 

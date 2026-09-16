@@ -121,7 +121,9 @@
   <section id="lanes">
     <h2>The 81 search lanes, explicitly</h2>
     <p>Each lane fixes one class lattice, coefficient shape, divisor shell and quotient band.
-    A task selects at most 128 coefficient rows and 16 offsets in that lane.
+    A task selects at most 1024 coefficient rows and 16 offsets in that lane
+    (engine v2; the original engine v1 task size was 128 rows, and both cover the
+    same positions).
     Different task IDs identify different coefficient blocks; unit-related generators
     can still reach the same mathematical root.</p>
     <p>D₀ = ⌊10¹⁹ / 54⌋ = 185,185,185,185,185,185. The three shells are

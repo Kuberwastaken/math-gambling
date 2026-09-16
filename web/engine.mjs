@@ -2,6 +2,13 @@
  * A receipt is replayable evidence, not a cryptographic proof of donated CPU.
  */
 export const ENGINE = 'mg114-offset-v1';
+/* Engine v2 covers the identical mathematical positions in 8x larger tasks
+ * (1024 rows instead of 128) to cut per-task dispatch, persistence and banking
+ * overhead. Counters and hits of a v2 task equal the sum/concatenation of its
+ * eight aligned v1 sub-tasks; v1 receipts and digests are unchanged. */
+export const ENGINE_V2 = 'mg114-offset-v2';
+export const ENGINES = Object.freeze({1: ENGINE, 2: ENGINE_V2});
+export const ROWS_BY_VERSION = Object.freeze({1: 128, 2: 1024});
 export const MAX_TASKS_PER_RECEIPT = 8;
 export const BLOCK_SIZE = 16;
 export const ROWS_PER_TASK = 128;
@@ -23,6 +30,8 @@ for (const ell of [1, 5, 25]) for (let shape = 0; shape < SHAPES.length; shape++
       totalRows: String(BigInt(2 * radius + 1) ** 2n),
       rowStride: ROWS_PER_TASK,
       rowTasks: String((BigInt(2 * radius + 1) ** 2n + BigInt(ROWS_PER_TASK) - 1n) / BigInt(ROWS_PER_TASK)),
+      rowStrideV2: ROWS_BY_VERSION[2],
+      rowTasksV2: String((BigInt(2 * radius + 1) ** 2n + BigInt(ROWS_BY_VERSION[2]) - 1n) / BigInt(ROWS_BY_VERSION[2])),
       blocks: Math.floor((thi - tlo + BLOCK_SIZE) / BLOCK_SIZE)}));
   }
 }
@@ -52,18 +61,51 @@ export function canonicalJSON(value) {
 export function validateTask(task) {
   if (!task || typeof task !== 'object' || Array.isArray(task) ||
       Object.keys(task).sort().join(',') !== 'block,context,engine,row,version') throw new TypeError('unexpected or missing task fields');
-  if (task.version !== 1 || task.engine !== ENGINE) throw new RangeError('unsupported engine/version');
+  const engine = ENGINES[task.version];
+  if (!Number.isInteger(task.version) || !engine || task.engine !== engine) throw new RangeError('unsupported engine/version');
   const c = byId.get(task.context);
   if (!c) throw new RangeError('unknown fixed context');
-  if (typeof task.row !== 'string' || !/^(0|[1-9][0-9]{0,14})$/.test(task.row) || BigInt(task.row) >= BigInt(c.totalRows) || BigInt(task.row) % BigInt(ROWS_PER_TASK)) throw new RangeError('row outside context or not aligned to rowStride');
+  const stride = BigInt(ROWS_BY_VERSION[task.version]);
+  if (typeof task.row !== 'string' || !/^(0|[1-9][0-9]{0,14})$/.test(task.row) || BigInt(task.row) >= BigInt(c.totalRows) || BigInt(task.row) % stride) throw new RangeError('row outside context or not aligned to rowStride');
   if (!Number.isInteger(task.block) || task.block < 0 || task.block >= c.blocks) throw new RangeError('block outside context');
-  return {version: 1, engine: ENGINE, context: task.context, row: task.row, block: task.block};
+  return {version: task.version, engine, context: task.context, row: task.row, block: task.block};
 }
-export function makeTask(context, row, block = 0) {
+export function makeTask(context, row, block = 0, version = 1) {
   if (typeof row === 'number' && !Number.isSafeInteger(row)) throw new TypeError('row number must be a safe integer');
-  return validateTask({version: 1, engine: ENGINE, context, row: String(row), block});
+  return validateTask({version, engine: ENGINES[version], context, row: String(row), block});
 }
-export function taskId(task) { const t = validateTask(task); return `${ENGINE}:${t.context}:${t.row}:${t.block}`; }
+export function taskId(task) { const t = validateTask(task); return `${t.engine}:${t.context}:${t.row}:${t.block}`; }
+
+/* Number of coefficient rows a task spans (before the context's row limit). */
+export function taskRows(task) { return ROWS_BY_VERSION[validateTask(task).version]; }
+
+/* The aligned v1 tasks whose positions a task covers (itself, for v1). */
+export function subtasks(task) {
+  const t = validateTask(task);
+  if (t.version === 1) return [t];
+  const total = BigInt(byId.get(t.context).totalRows), start = BigInt(t.row);
+  const end = start + BigInt(ROWS_BY_VERSION[2]) < total ? start + BigInt(ROWS_BY_VERSION[2]) : total;
+  const out = [];
+  for (let row = start; row < end; row += BigInt(ROWS_BY_VERSION[1])) out.push(makeTask(t.context, row, t.block, 1));
+  return out;
+}
+
+/* The v2 task containing a v1 task's positions (itself, for v2). */
+export function containerTask(task) {
+  const t = validateTask(task);
+  if (t.version === 2) return t;
+  const stride = BigInt(ROWS_BY_VERSION[2]);
+  return makeTask(t.context, BigInt(t.row) / stride * stride, t.block, 2);
+}
+
+/* Task IDs of the *other* engine version whose positions overlap this task.
+ * A v1 task is already covered if its containing v2 task is verified; a v2 task
+ * is a duplicate if any of its v1 sub-tasks is verified. Coverage and credit
+ * logic must consult these, since the two versions share one search domain. */
+export function overlappingIds(task) {
+  const t = validateTask(task);
+  return t.version === 1 ? [taskId(containerTask(t))] : subtasks(t).map(taskId);
+}
 
 export function isqrt(n) {
   if (typeof n !== 'bigint' || n < 0n) throw new RangeError('isqrt needs a nonnegative BigInt');
@@ -225,7 +267,8 @@ function runRow(task, c, row, onHit) {
 
 export function runTaskCore(input, {onHit} = {}) {
   const task = validateTask(input), c = byId.get(task.context);
-  const start = BigInt(task.row), end = start + BigInt(ROWS_PER_TASK) < BigInt(c.totalRows) ? start + BigInt(ROWS_PER_TASK) : BigInt(c.totalRows);
+  const rows = BigInt(ROWS_BY_VERSION[task.version]);
+  const start = BigInt(task.row), end = start + rows < BigInt(c.totalRows) ? start + rows : BigInt(c.totalRows);
   const counters = emptyCounters(), hits = [];
   for (let row = start; row < end; row++) {
     const found = runRow(task, c, row, onHit);

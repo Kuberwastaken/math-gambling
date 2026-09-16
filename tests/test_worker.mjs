@@ -45,13 +45,13 @@ for (const failure of ["hash", "later-row", "wasm-trap"]) {
       crypto: {subtle: {digest: async () => { throw Error("injected digest failure"); }}},
     });
     vm.runInContext(fixture.replace(/^[ \t]*export /gm, "") + `
-      globalThis.__engine = {runTask, makeTask, ENGINE,
+      globalThis.__engine = {runTask, makeTask, ENGINE, ENGINES,
         verifyTriple: xyz => verifyTriple(xyz, 39)};
     `, context);
     const messages = [], self = {postMessage(value) { messages.push(structuredClone(value)); }};
     const fixtureWorker = workerSource.replace(
       /import \{[^}]+\} from '\.\/engine\.mjs';/,
-      "const {runTask, verifyTriple, ENGINE} = __engine;",
+      "const {runTask, verifyTriple, ENGINE, ENGINES} = __engine;",
     ).replace(/import \{loadWasmKernel\} from '\.\/wasm-kernel\.mjs';/,
       failure === 'wasm-trap'
         ? `const loadWasmKernel = async () => ({runTask(task, options) { options.onHit({xyz: ${JSON.stringify(xyz)}}); throw Error('injected WASM trap'); }});`

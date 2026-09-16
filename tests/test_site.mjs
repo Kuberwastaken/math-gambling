@@ -180,8 +180,11 @@ async function harness({
       celebrations.push(value);
       return true;
     } }),
-    __sessionTools: {...sessionTools, seededRandom: randomFactory || sessionTools.seededRandom, createCoverageClient: () => ({
+    __sessionTools: {...sessionTools, seededRandom: randomFactory || sessionTools.seededRandom},
+    // Both published indexes behind one membership question (web/coverage-v2.mjs).
+    __coverage: {createDualCoverageClient: () => ({
       revision: 128,
+      revisionV2: 0,
       async refresh(force) {
         if (coverageFails) throw Error("fixture coverage offline");
         if (coverageRefreshProbe) return coverageRefreshProbe(force);
@@ -239,8 +242,10 @@ async function harness({
     .replace(/import \{ loadChallenger \} from "\.\/challenger-viz\.mjs";/, "const loadChallenger=async()=>{};")
     .replace(/import \{ createJackpot \} from "\.\/jackpot\.mjs";/,
       "const createJackpot=__jackpot;")
-    .replace(/import \{ createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM \} from "\.\/search-session\.mjs";/,
-      "const { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } = __sessionTools;")
+    .replace(/import \{ newSeed, seededRandom, SEED_ALGORITHM \} from "\.\/search-session\.mjs";/,
+      "const { newSeed, seededRandom, SEED_ALGORITHM } = __sessionTools;")
+    .replace(/import \{ createDualCoverageClient \} from "\.\/coverage-v2\.mjs";/,
+      "const { createDualCoverageClient } = __coverage;")
     .replace(/import \{ setupRunnerDownload \} from "\.\/runner-setup\.mjs";/,
       "const setupRunnerDownload=()=>{};")
     .replace(
@@ -536,7 +541,8 @@ console.log(
   assert.equal(worker.posts.length, 0, "hidden tab dispatched the pending selection");
   h.visibility(false);
   await waitFor(() => worker.posts.length === 1, "unissued selection was incorrectly excluded after resume");
-  assert.equal(engine.taskId(worker.posts[0].task), engine.taskId(engine.makeTask("c00", "0", 0)));
+  assert.equal(engine.taskId(worker.posts[0].task), engine.taskId(engine.makeTask("c00", "0", 0, 2)),
+    "the browser proposes engine v2 (1024-row) tasks");
   h.app.stop();
   await deliver(worker);
   await waitFor(() => worker.terminated, "resumed selection did not drain");

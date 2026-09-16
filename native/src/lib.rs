@@ -5,9 +5,86 @@ use num_traits::{Signed, Zero};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::sync::OnceLock;
+use std::collections::HashMap;
+use std::sync::{Mutex, OnceLock};
 
 pub const ENGINE: &str = "mg114-offset-v1";
+/// Engine v2: the same positions in 1024-row tasks (eight aligned v1 tasks).
+pub const ENGINE_V2: &str = "mg114-offset-v2";
+const SCALE: i128 = 1_000_000_000_000_000_000;
+/// Cross-target engines "mg{k}-offset-v1" (k != 114, ell = 1 contexts only)
+/// mirror tools/multi_target.py: same scan and final check, no k-specific
+/// signed exclusions, hits carry only xyz/D/r/q.
+pub struct Engine {
+    pub k: i128,
+    pub version: u8,
+    pub rows: i128,
+    pub target: bool,
+}
+pub fn engine(task: &Task) -> Result<Engine, String> {
+    let e = task.engine.as_str();
+    if task.version == 1 && e == ENGINE {
+        return Ok(Engine { k: 114, version: 1, rows: 128, target: false });
+    }
+    if task.version == 2 && e == ENGINE_V2 {
+        return Ok(Engine { k: 114, version: 2, rows: 1024, target: false });
+    }
+    if task.version == 1 {
+        if let Some(rest) = e.strip_prefix("mg") {
+            if let Some(digits) = rest.strip_suffix("-offset-v1") {
+                if !digits.is_empty()
+                    && digits.len() <= 4
+                    && digits.bytes().all(|b| b.is_ascii_digit())
+                    && !digits.starts_with('0')
+                {
+                    let k: i128 = digits.parse().map_err(|_| "invalid target")?;
+                    if (3..=1000).contains(&k) && (k % 9 == 3 || k % 9 == 6) && k != 114 {
+                        return Ok(Engine { k, version: 1, rows: 128, target: true });
+                    }
+                }
+            }
+        }
+    }
+    Err("unsupported engine/version".into())
+}
+/// floor(k^(1/3) * SCALE) and floor(k^(2/3) * SCALE), exactly, as in
+/// multi_target.roots. The cubes exceed 128 bits, so this uses big integers once
+/// per target and caches the result.
+fn roots(k: i128) -> (i128, i128) {
+    static CACHE: OnceLock<Mutex<HashMap<i128, (i128, i128)>>> = OnceLock::new();
+    let cache = CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+    if let Some(v) = cache.lock().unwrap().get(&k) {
+        return *v;
+    }
+    let icbrt = |n: BigInt| -> i128 {
+        let mut x = n.nth_root(3);
+        while &x * &x * &x > n {
+            x -= 1;
+        }
+        while (&x + 1) * (&x + 1) * (&x + 1) <= n {
+            x += 1;
+        }
+        x.to_string().parse().unwrap()
+    };
+    let scale = BigInt::from(SCALE);
+    let v = (
+        icbrt(BigInt::from(k) * &scale * &scale * &scale),
+        icbrt(BigInt::from(k) * BigInt::from(k) * &scale * &scale * &scale),
+    );
+    cache.lock().unwrap().insert(k, v);
+    v
+}
+fn filters_for(k: i128) -> &'static Filters {
+    static CACHE: OnceLock<Mutex<HashMap<i128, &'static Filters>>> = OnceLock::new();
+    let cache = CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+    let mut guard = cache.lock().unwrap();
+    if let Some(f) = guard.get(&k) {
+        return f;
+    }
+    let leaked: &'static Filters = Box::leak(Box::new(filters(k)));
+    guard.insert(k, leaked);
+    leaked
+}
 const D0: i128 = 10_000_000_000_000_000_000 / 54;
 const PRIMES: [i64; 15] = [5, 7, 11, 13, 17, 19, 23, 31, 37, 41, 43, 47, 53, 59, 61];
 const NAMES: [&str; 12] = [
@@ -44,9 +121,7 @@ struct Context {
     high: i128,
 }
 fn context(task: &Task) -> Result<(Context, i128), String> {
-    if task.version != 1 || task.engine != ENGINE {
-        return Err("unsupported engine/version".into());
-    }
+    let spec = engine(task)?;
     if task.context.len() != 3
         || !task.context.starts_with('c')
         || !task.context[1..].bytes().all(|b| b.is_ascii_digit())
@@ -82,10 +157,13 @@ fn context(task: &Task) -> Result<(Context, i128), String> {
         high,
     };
     if row >= (2 * radius + 1).pow(2)
-        || row % 128 != 0
+        || row % spec.rows != 0
         || i128::from(task.block) >= (thi - tlo + 16) / 16
     {
         return Err("task outside fixed bounds".into());
+    }
+    if spec.target && c.ell != 1 {
+        return Err("target tasks use ell=1 contexts only".into());
     }
     Ok((c, row))
 }
@@ -187,7 +265,6 @@ fn filters(k: i128) -> Filters {
         .collect();
     Filters { allowed, masks }
 }
-static FILTERS: OnceLock<Filters> = OnceLock::new();
 // Big integers are deliberately confined to the rare final test and identity.
 // z^3 can exceed 128 bits in the public domain. Never truncate it.
 pub fn candidate(k: i128, s: i128, z: i128, minimal: bool) -> Option<Vec<String>> {
@@ -331,23 +408,24 @@ fn shell(
 }
 pub fn run(task: Task, mont: bool, mut on_hit: impl FnMut(&Value)) -> Result<Value, String> {
     let (c, start) = context(&task)?;
-    let f = FILTERS.get_or_init(|| filters(114));
+    let spec = engine(&task)?;
+    let k = spec.k;
+    let f = filters_for(k);
+    let (alpha, alpha2) = if spec.target { roots(k) } else { (4_848_807_585_839_879_338, 23_510_935_004_498_358_840) };
     let mut counts = [0u64; 12];
     let mut hits = Vec::new();
-    for row in start..(start + 128).min((2 * c.radius + 1).pow(2)) {
+    for row in start..(start + spec.rows).min((2 * c.radius + 1).pow(2)) {
         let width = 2 * c.radius + 1;
         let b = row % width - c.radius;
         let cc = row / width - c.radius;
         let residue = (-4 * b - 16 * cc).rem_euclid(c.ell);
-        let numerator = -4_848_807_585_839_879_338 * b
-            - 23_510_935_004_498_358_840 * cc
-            - residue * 1_000_000_000_000_000_000;
-        let denominator = c.ell * 1_000_000_000_000_000_000;
+        let numerator = -alpha * b - alpha2 * cc - residue * SCALE;
+        let denominator = c.ell * SCALE;
         let base = residue + c.ell * (2 * numerator + denominator).div_euclid(2 * denominator);
         let tlo = c.tlo + 16 * i128::from(task.block);
         let thi = (tlo + 15).min(c.thi);
-        let constant = 114 * b * b * b + 12996 * cc * cc * cc;
-        let linear = 342 * b * cc;
+        let constant = k * b * b * b + k * k * cc * cc * cc;
+        let linear = 3 * k * b * cc;
         let (first, last) = shell(
             base,
             c.ell,
@@ -373,21 +451,22 @@ pub fn run(task: Task, mont: bool, mut on_hit: impl FnMut(&Value)) -> Result<Val
                 counts[2] += 1;
                 continue;
             }
-            let s = if d % 3 == 1 { d } else { -d };
-            if [0, 4, 6].contains(&s.rem_euclid(8))
-                || [0, 19, 76, 95, 114, 133, 171, 209, 304, 323].contains(&s.rem_euclid(361))
+            let s = if d % 3 == 2 * (k / 3 % 3) % 3 { d } else { -d };
+            if !spec.target
+                && ([0, 4, 6].contains(&s.rem_euclid(8))
+                    || [0, 19, 76, 95, 114, 133, 171, 209, 304, 323].contains(&s.rem_euclid(361)))
             {
                 counts[3] += 1;
                 continue;
             }
-            let big_b = 114 * cc * cc - a * b;
+            let big_b = k * cc * cc - a * b;
             let big_c = b * b - a * cc;
             let Some(inverse) = inv(big_c, d) else {
                 counts[4] += 1;
                 continue;
             };
             let r = (big_b.rem_euclid(d) * inverse).rem_euclid(d);
-            assert_eq!(cube_mod(r, d, mont), 114 % d);
+            assert_eq!(cube_mod(r, d, mont), k % d);
             let zmin = 100_000_000_000_000_000i128.max(c.low * d);
             let zmax = c.high * d;
             let (qlo, qhi) = if s < 0 {
@@ -395,10 +474,12 @@ pub fn run(task: Task, mont: bool, mut on_hit: impl FnMut(&Value)) -> Result<Val
             } else {
                 (-((zmax + r) / d), -((zmin + r) / d) - 1)
             };
-            scan(114, d, r, qlo, qhi, f, &mut counts, |mut h| {
-                h["abc"] = json!([a.to_string(), b.to_string(), cc.to_string()]);
-                h["t"] = json!(t as i64);
-                h["row"] = json!(row.to_string());
+            scan(k, d, r, qlo, qhi, f, &mut counts, |mut h| {
+                if !spec.target {
+                    h["abc"] = json!([a.to_string(), b.to_string(), cc.to_string()]);
+                    h["t"] = json!(t as i64);
+                    h["row"] = json!(row.to_string());
+                }
                 on_hit(&h);
                 hits.push(h);
             });
@@ -411,7 +492,7 @@ pub fn run(task: Task, mont: bool, mut on_hit: impl FnMut(&Value)) -> Result<Val
         .zip(counts)
         .map(|(n, v)| (n.to_string(), json!(v)))
         .collect();
-    let id = format!("{}:{}:{}:{}", ENGINE, task.context, task.row, task.block);
+    let id = format!("{}:{}:{}:{}", task.engine, task.context, task.row, task.block);
     let mut result = json!({"task":task,"id":id,"counters":counters,"hits":hits});
     let digest = format!("{:x}", Sha256::digest(serde_json::to_vec(&result).unwrap()));
     result["digest"] = json!(digest);
@@ -426,7 +507,7 @@ pub fn regression(k: i128, d: i128, r: i128, qlo: i128, qhi: i128) -> Value {
     assert_eq!(cube_mod(r, d, false), k % d);
     let mut counts = [0; 12];
     let mut hits = Vec::new();
-    scan(k, d, r, qlo, qhi, &filters(k), &mut counts, |h| {
+    scan(k, d, r, qlo, qhi, filters_for(k), &mut counts, |h| {
         hits.push(h)
     });
     json!({"counters":NAMES.iter().zip(counts).map(|(n,v)|(n.to_string(),json!(v))).collect::<serde_json::Map<String,Value>>(),"hits":hits})

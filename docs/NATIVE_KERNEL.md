@@ -2,6 +2,14 @@
 
 The accelerated kernel implements **the same selective `mg114-offset-v1` tasks**, not a new exhaustive Booker–Sutherland campaign. It keeps task IDs, all logical counters, hit order and SHA-256 receipts identical. Since 17 September the GitHub verifier also replays with this kernel (`tools/ingest.py --kernel rust`), built from reviewed `main` source inside the workflow. Python remains the independent reference: every reported identity is re-verified in Python by the bridge, every result is checked for task identity and receipt digest, and a deterministic 1-in-256 share of replayed tasks (selected by task-id hash) is replayed again by the Python engine and must match exactly; any disagreement stops the run as an operational failure. Verified records carry `replay_kernel` with the Rust and Python source hashes. The Rust core handles enumeration and sieving; the existing Python runner handles worker budgets, seeds, checkpoints, GitHub login and banking.
 
+## Engines the kernel accepts (17 September)
+
+- `mg114-offset-v1`, version 1: the original 128-row tasks. Receipts unchanged.
+- `mg114-offset-v2`, version 2: the same positions in 1024-row tasks (eight aligned v1 tasks). Counters are the sums and hits the concatenation of the eight v1 results; the id is `mg114-offset-v2:ctx:row:block`. This exists purely to cut per-task dispatch, persistence and banking overhead, which dominated end-to-end client time.
+- `mg{k}-offset-v1`, version 1, for the other open targets (k in 3..1000 with k ≡ 3 or 6 mod 9, k ≠ 114) on ℓ = 1 contexts only: the exact mirror of `tools/multi_target.py`. The k-specific signed exclusions are dropped (they are optimisations, not correctness), the cube-root offset constants are computed exactly with big integers once per k, and hits carry only `xyz/D/r/q` so digests match the Python target engine.
+
+Rust and Python agree bit-for-bit on the frozen corpus, on random v2 samples across all 81 contexts, and on cross-target samples (`tests/test_native_kernel.py`). The same source builds the WebAssembly module, so the browser accepts the same tasks.
+
 ## Run locally
 
 Install Rust through [rustup](https://rustup.rs/), plus Python 3.11 or newer. From this repository (or the new runner source archive):

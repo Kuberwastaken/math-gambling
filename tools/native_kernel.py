@@ -8,6 +8,16 @@ import subprocess
 import threading
 from search_core import canonical_json, validate_task, task_id, verify_triple
 
+
+def _validate(task):
+    """114 tasks (v1/v2) or cross-target 'mg{k}-offset-v1' tasks (multi_target)."""
+    try:
+        return validate_task(task), task_id(validate_task(task))
+    except ValueError:
+        import multi_target
+        t = multi_target.validate_target_task(task)
+        return t, multi_target.target_task_id(t)
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -47,7 +57,8 @@ class NativeKernel:
 
     def run(self, task, on_hit=None):
         import time
-        task = validate_task(task)
+        task, identifier = _validate(task)
+        k = int(task['engine'][2:].split('-')[0])
         deadline = time.monotonic()+10
         try:
             self.process.stdin.write(canonical_json(task)+'\n')
@@ -67,19 +78,19 @@ class NativeKernel:
                     continue
                 if message.get('type') == 'identity':
                     hit = message['hit']
-                    if not verify_triple(hit.get('xyz')):
+                    if not verify_triple(hit.get('xyz'), k):
                         raise RuntimeError('Native identity failed independent Python verification')
                     if on_hit is not None:
                         on_hit(hit)
                     continue
-                if message.get('task') != task or message.get('id') != task_id(task):
+                if message.get('task') != task or message.get('id') != identifier:
                     raise RuntimeError('Native task identity mismatch')
                 digest = message.get('digest')
                 payload = {key: value for key,value in message.items() if key!='digest'}
                 if hashlib.sha256(canonical_json(payload).encode('ascii')).hexdigest()!=digest:
                     raise RuntimeError('Native receipt digest mismatch')
                 for hit in message.get('hits', []):
-                    if not verify_triple(hit.get('xyz')):
+                    if not verify_triple(hit.get('xyz'), k):
                         raise RuntimeError('Native final identity failed Python verification')
                 return message
         except BaseException:

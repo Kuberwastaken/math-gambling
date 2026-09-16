@@ -32,8 +32,22 @@ jobs:
           fetch-depth: 1
       - name: Overlay the authoritative data branch without checking out its code
         run: python3 tools/branch_state.py overlay --fetch
+      - name: Restore the Rust kernel build cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            native/target
+          key: verifier-kernel-${{ runner.os }}-${{ hashFiles('native/Cargo.lock', 'native/src/**', 'native/Cargo.toml') }}
+      - name: Build the reviewed Rust replay kernel from main
+        env:
+          CARGO_HTTP_USER_AGENT: 'OpenAI File Downloader, XaiImageApiFetch/1.0'
+        run: python3 tools/build_native.py
       - name: Test verification, aggregation and safe README rendering
         run: |
+          python3 -m unittest discover -s tests -p test_native_kernel.py
+          python3 -m unittest discover -s tests -p test_replay_pool.py
           python3 -m unittest discover -s tests -p test_cluster.py
           python3 -m unittest discover -s tests -p test_negative_audit.py
           python3 -m unittest discover -s tests -p test_contribution_credit.py
@@ -47,7 +61,7 @@ jobs:
       - name: Independently replay selected tasks; retain other claims as unverified
         id: replay
         continue-on-error: true
-        run: python3 tools/ingest.py --issues --sample-negatives 20
+        run: python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust
       - name: Fit frozen spatial challenger and score later arrivals
         id: learning
         continue-on-error: true

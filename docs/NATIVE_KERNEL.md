@@ -1,6 +1,6 @@
 # Rust and WebAssembly kernel
 
-The accelerated kernel implements **the same selective `mg114-offset-v1` tasks**, not a new exhaustive Booker–Sutherland campaign. It keeps task IDs, all logical counters, hit order and SHA-256 receipts identical. Python remains the independent verifier and comparison implementation. The Rust core handles enumeration and sieving; the existing Python runner handles worker budgets, seeds, checkpoints, GitHub login and banking.
+The accelerated kernel implements **the same selective `mg114-offset-v1` tasks**, not a new exhaustive Booker–Sutherland campaign. It keeps task IDs, all logical counters, hit order and SHA-256 receipts identical. Since 17 September the GitHub verifier also replays with this kernel (`tools/ingest.py --kernel rust`), built from reviewed `main` source inside the workflow. Python remains the independent reference: every reported identity is re-verified in Python by the bridge, every result is checked for task identity and receipt digest, and a deterministic 1-in-256 share of replayed tasks (selected by task-id hash) is replayed again by the Python engine and must match exactly; any disagreement stops the run as an operational failure. Verified records carry `replay_kernel` with the Rust and Python source hashes. The Rust core handles enumeration and sieving; the existing Python runner handles worker budgets, seeds, checkpoints, GitHub login and banking.
 
 ## Run locally
 

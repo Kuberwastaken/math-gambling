@@ -9,7 +9,7 @@ from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import ingest as ig
-from search_core import ENGINE, make_task, run_task
+from search_core import ENGINE, make_task, run_task, task_id
 
 READY = ig.canonical({"schema": "math-gambling-replay-ready-v1", "engine": ENGINE})
 
@@ -99,3 +99,57 @@ ingest.replay_stream()
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless((Path(__file__).resolve().parents[1] / "tools/bin/math-gambling-kernel").is_file(),
+                     "build Rust with tools/build_native.py")
+class NativeReplayTests(unittest.TestCase):
+    def test_native_replay_matches_python_reference_and_reports_timing(self):
+        import random
+        from search_core import CONTEXTS
+        rng = random.Random(114)
+        tasks = [make_task(c["id"], rng.randrange(int(c["rowTasks"])) * 128, rng.randrange(c["blocks"])) for c in CONTEXTS[::9]]
+        with ig.NativeReplay(cross_check_one_in=1) as replay:
+            for task in tasks:
+                result, cpu = replay(task)
+                self.assertEqual(result, run_task(task))
+                self.assertGreater(cpu, 0)
+            self.assertEqual(replay.cross_checked, len(tasks))
+        self.assertIsNone(replay.kernel)
+
+    def test_cross_check_selection_is_deterministic_and_bounded(self):
+        ids = [f"mg114-offset-v1:c00:{row}:0" for row in range(0, 128 * 4096, 128)]
+        picks = [ig.NativeReplay.selected_for_cross_check(i, 256) for i in ids]
+        self.assertEqual(picks, [ig.NativeReplay.selected_for_cross_check(i, 256) for i in ids])
+        self.assertTrue(0 < sum(picks) < len(picks) // 32)
+        self.assertTrue(all(ig.NativeReplay.selected_for_cross_check(i, 1) for i in ids[:8]))
+
+    def test_python_disagreement_is_an_operational_failure(self):
+        class Wrong:
+            delivers_early_hits = True
+            def __call__(self, task, on_hit=None):
+                result = run_task(task)
+                result["counters"]["curves"] += 1
+                return result, 1.0
+            def close(self):
+                pass
+        with ig.NativeReplay(cross_check_one_in=1, python_replay=Wrong()) as replay:
+            with self.assertRaises(subprocess.CalledProcessError):
+                replay(make_task("c00", 0))
+            self.assertIsNone(replay.kernel)
+
+    def test_bank_verified_with_rust_records_kernel_provenance(self):
+        task = make_task("c00", 128)
+        result = run_task(task)
+        bank = {"schema": "math-gambling-bank-v1", "contributor": {"name": "Fixture", "github": "fixture"},
+                "tasks": [{"task": task, "digest": result["digest"]}]}
+        with tempfile.TemporaryDirectory() as temp, ig.NativeReplay(cross_check_one_in=1) as replay:
+            audit = ig.process_receipt(bank, {"id": "fixture:rust", "kind": "fixture"}, Path(temp), ig.Budget(), replay=replay)
+            self.assertTrue(audit["complete"])
+            self.assertEqual(audit["accepted_tasks"], [task_id(task)])
+            records = list((Path(temp) / "receipts/tasks").glob("*/*.json"))
+            self.assertEqual(len(records), 1)
+            saved = __import__("json").loads(records[0].read_text())
+            self.assertEqual(saved["result"], result)
+            self.assertIn("replay_kernel", saved)
+            self.assertGreater(saved["server_replay_cpu_ms"], 0)

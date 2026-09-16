@@ -23,6 +23,7 @@ class NativeKernel:
         self.process = subprocess.Popen([str(path)], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.DEVNULL, text=True, encoding='ascii')
         self.events = queue.Queue(maxsize=16)
+        self.last_cpu_ms = None
         self.thread = threading.Thread(target=self._read, daemon=True)
         self.thread.start()
 
@@ -58,6 +59,12 @@ class NativeKernel:
                 if not line or size>65536 or not line.endswith('\n'):
                     raise RuntimeError('Native worker exited or exceeded result limit; no task accepted')
                 message = json.loads(line)
+                if message.get('type') == 'timing':
+                    cpu = message.get('cpu_ms')
+                    if isinstance(cpu, bool) or not isinstance(cpu, (int, float)) or cpu != cpu or cpu < 0:
+                        raise RuntimeError('Native worker reported invalid timing')
+                    self.last_cpu_ms = max(float(cpu), 0.01)
+                    continue
                 if message.get('type') == 'identity':
                     hit = message['hit']
                     if not verify_triple(hit.get('xyz')):

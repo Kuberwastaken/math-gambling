@@ -25,16 +25,23 @@ MAX_BANK_BYTES = 60000
 MAX_BODY_BYTES = 61024
 MAX_BANK_TASKS = 256
 MAX_TASKS = 8
-MAX_RECEIPTS = 32
+MAX_RECEIPTS = 256
 MAX_REPLAYS = 16384
 MAX_HITS = 64
 MAX_DIGITS = 128
 # GitHub returns HTTP 422 once offset pagination reaches ~10,000 items
 # (page * per_page). Per_page is 100, so stay strictly under 100 pages.
 MAX_LIST_PAGE = 90
+# Durable pending-bank queue bound and how many queued bodies one run refetches.
+MAX_PENDING = 16384
+PENDING_REFETCH = 128
+# Deterministic share of Rust replays that the Python reference engine re-verifies.
+CROSS_CHECK_ONE_IN = 256
 USER_AGENT = "OpenAI File Downloader, XaiImageApiFetch/1.0"
 ROOT = Path(__file__).resolve().parents[1]
 REPLAY_KERNEL_SHA256 = hashlib.sha256((ROOT / "tools/search_core.py").read_bytes()).hexdigest()
+NATIVE_KERNEL_SHA256 = hashlib.sha256(b"".join((ROOT / "native/src" / name).read_bytes() for name in ("lib.rs", "main.rs"))).hexdigest()
+REPLAY_KERNEL = {"engine": "python", "python_source_sha256": REPLAY_KERNEL_SHA256}
 DECIMAL = re.compile(r"-?(?:0|[1-9][0-9]*)\Z")
 
 
@@ -191,6 +198,8 @@ class WarmReplay:
     The parent owns wall/output deadlines; POSIX children also arm a fresh CPU
     timer per task. A worker is discarded after any timeout or protocol error.
     """
+    delivers_early_hits = True
+
     def __init__(self, max_tasks=256, wall_seconds=6, command=None):
         if type(max_tasks) is not int or not 1 <= max_tasks <= 256:
             raise ValueError("worker batch must contain 1..256 tasks")
@@ -340,6 +349,75 @@ def replay_stream():
         print(canonical({"request_id": request["request_id"], "result": result, "cpu_ms": elapsed}), flush=True)
 
 
+class NativeReplay:
+    """Rust-kernel replay with a deterministic Python reference cross-check.
+
+    The Rust kernel is the same reviewed source the runner and browser use. Every
+    identity it reports is re-verified in Python by the bridge; every result is
+    checked for task identity and digest; and one in CROSS_CHECK_ONE_IN tasks
+    (chosen by task-id hash, so reproducible) is replayed again by the Python
+    reference engine and must match exactly. Any disagreement is an operational
+    failure that stops the run rather than a rejected claim.
+    """
+    delivers_early_hits = True
+
+    def __init__(self, cross_check_one_in=CROSS_CHECK_ONE_IN, python_replay=None):
+        if type(cross_check_one_in) is not int or cross_check_one_in < 1:
+            raise ValueError("cross-check denominator must be a positive integer")
+        from native_kernel import NativeKernel, binary_path
+        if not binary_path().is_file():
+            raise RuntimeError("Rust kernel not built; run python3 tools/build_native.py")
+        self.kernel_factory = NativeKernel
+        self.kernel = None
+        self.one_in = cross_check_one_in
+        self.python = python_replay or WarmReplay()
+        self.cross_checked = 0
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
+    def close(self):
+        if self.kernel is not None:
+            try:
+                self.kernel.close()
+            finally:
+                self.kernel = None
+        self.python.close()
+
+    @staticmethod
+    def selected_for_cross_check(identifier, one_in):
+        digest = hashlib.sha256(("cross-check:" + identifier).encode("ascii")).digest()
+        return int.from_bytes(digest[:8], "big") % one_in == 0
+
+    def __call__(self, task, on_hit=None):
+        from search_core import task_id, validate_task
+        task = validate_task(task)
+        try:
+            if self.kernel is None or self.kernel.process.poll() is not None:
+                self.kernel = self.kernel_factory()
+            self.kernel.last_cpu_ms = None
+            result = self.kernel.run(task, on_hit=on_hit)
+            timing = self.kernel.last_cpu_ms
+        except BaseException:
+            self.close()
+            raise
+        if timing is None:
+            self.close()
+            raise subprocess.CalledProcessError(1, ["math-gambling-kernel"], stderr="native worker reported no timing")
+        identifier = task_id(task)
+        if self.selected_for_cross_check(identifier, self.one_in):
+            reference, _ = self.python(task)
+            if canonical(reference) != canonical(result):
+                self.close()
+                raise subprocess.CalledProcessError(1, ["math-gambling-kernel"],
+                                                    stderr="Rust and Python replays disagree for " + identifier)
+            self.cross_checked += 1
+        return result, max(float(timing), 0.01)
+
+
 class RetryLater(Exception):
     pass
 
@@ -441,7 +519,7 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                     expected, cpu_ms = saved["result"], saved["server_replay_cpu_ms"]
                 else:
                     budget.charge()
-                    if isinstance(replay, WarmReplay):
+                    if getattr(replay, "delivers_early_hits", False):
                         def retain_early(hit):
                             discoveries.extend(preserve_hits(data, {"contributor": receipt["contributor"], "hits": [hit]}, source))
                         expected, cpu_ms = replay(task, on_hit=retain_early)
@@ -471,6 +549,7 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                     atomic_json(path, {"schema": "math-gambling-verified-task-v1", "sequence": budget.next_sequence,
                                        "result": expected, "verified_at": now(), "server_replay_cpu_ms": cpu_ms,
                                        "replay_kernel_sha256": REPLAY_KERNEL_SHA256,
+                                       "replay_kernel": REPLAY_KERNEL,
                                        "audit_selection": {"schema":"mg114-audit-inclusion-v1",
                                            "auditing_source_id":source_id,
                                            "conditional_probability":1/(record.get('negative_audit') or {}).get('one_in',1),
@@ -587,7 +666,7 @@ def collect_issues(repo, token, data, audit_policy=None):
             pending.pop(origin["number"], None)
             available.pop(origin["number"], None)
             return
-        if len(pending) >= 4096 and origin["number"] not in pending:
+        if len(pending) >= MAX_PENDING and origin["number"] not in pending:
             overflow = True
             raise RetryLater("pending-bank cap reached; retain scan position")
         pending[origin["number"]] = {"number": origin["number"], "updated_at": origin["updated_at"]}
@@ -599,8 +678,8 @@ def collect_issues(repo, token, data, audit_policy=None):
             available.pop(origin["number"], None)
 
     try:
-        # At most eight pending requests; every request shares the same 60-second deadline.
-        for number in list(pending)[:8]:
+        # Refetch the oldest queued bodies first; every request shares the same 60-second deadline.
+        for number in list(pending)[:PENDING_REFETCH]:
             try:
                 issue = request(prefix + "/" + str(number), 512 * 1024)
             except HTTPError as exc:
@@ -678,6 +757,7 @@ def main():
     parser.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", "Kuberwastaken/math-gambling"))
     parser.add_argument("--replay-one", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--replay-stream", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--kernel", choices=["python", "rust"], default="python", help="replay engine; rust adds a deterministic 1-in-%d Python cross-check" % CROSS_CHECK_ONE_IN)
     parser.add_argument("--sample-negatives", type=int, default=1, metavar="N", help="replay 1/N new negative tasks after 256 verified tasks/account; unreplayed claims receive no verified credit or coverage")
     args = parser.parse_args()
     from negative_audit import AuditPolicy
@@ -711,7 +791,11 @@ def main():
         entries = []
     budget = Budget()  # Replay receives its own 120 seconds after bounded API collection.
     completed = set()
-    with WarmReplay() as replay:
+    global REPLAY_KERNEL
+    if args.kernel == "rust":
+        REPLAY_KERNEL = {"engine": "rust", "rust_source_sha256": NATIVE_KERNEL_SHA256,
+                         "python_source_sha256": REPLAY_KERNEL_SHA256, "python_cross_check_one_in": CROSS_CHECK_ONE_IN}
+    with (NativeReplay() if args.kernel == "rust" else WarmReplay()) as replay:
         for receipt, source in entries:
             record = process_receipt(receipt, source, args.data, budget, replay=replay, audit_policy=audit_policy)
             summary["processed_receipts"] += 1
@@ -729,6 +813,9 @@ def main():
     from aggregate import aggregate
     aggregate(args.data)
     summary["replay_slots_used"] = MAX_REPLAYS - budget.remaining
+    summary["replay_kernel"] = args.kernel
+    if args.kernel == "rust":
+        summary["python_cross_checks"] = replay.cross_checked
     print(canonical(summary))
     return 2 if summary["operational_errors"] else 0
 

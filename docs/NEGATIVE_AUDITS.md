@@ -12,7 +12,7 @@ A sampled digest mismatch disables sampling for the account, both for remaining 
 
 ## What this saves, and what it costs
 
-For eligible newly submitted negatives, expected replay task count falls by 95%. This is not a claim that total Action runtime falls by 95%: checkout, issue polling, ledger I/O, model fitting and publication remain. After accelerating clients, the remaining Python replay may still dominate. Measure it rather than assuming linear scaling.
+For eligible newly submitted negatives, expected replay task count falls by 95%. This is not a claim that total Action runtime falls by 95%: checkout, issue polling, ledger I/O, model fitting and publication remain. Replay now uses the Rust kernel with a Python cross-check (see [NATIVE_KERNEL.md](NATIVE_KERNEL.md)); issue polling, ledger I/O and publication remain. Measure the remaining cost rather than assuming linear scaling.
 
 There is less new **certified coverage** per bank. Unsampled tasks can be selected again by another client because an unverified claim is not a valid exclusion. Counting them as completed would let a dishonest client suppress an actual solution. Submitted logical counts alone also cannot support a throughput model; training continues exclusively on exact replays.
 

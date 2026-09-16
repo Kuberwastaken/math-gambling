@@ -1,5 +1,13 @@
 # Banking computations and calibrating the cluster
 
+**17 September update:** the verifier accepts **engine v2** tasks
+(`{"version":2,"engine":"mg114-offset-v2",...}`) alongside v1. A v2 task covers
+1024 rows: exactly the eight aligned v1 tasks starting at the same row and block,
+truncated at the context's last row. Its counters are their sum and its hits their
+concatenation, so a v2 receipt is not new mathematics, only fewer, larger units of
+banking and replay. v1 task IDs, digests and receipts are byte-for-byte unchanged.
+See "Engine versions and overlap" below.
+
 **11 September update:** [Negative audits](NEGATIVE_AUDITS.md) now distinguish processed banks from fully verified tasks. New eligible banks may be sampled; unreplayed claims earn no verified score or coverage and never train the model. The exact replay protocol below still governs every task that enters the verified ledger.
 
 
@@ -23,9 +31,36 @@ An issue's content is data. It never becomes executable Python, JavaScript, shel
 {"schema":"math-gambling-bank-v1","contributor":{"name":"Example","github":"example"},"tasks":[{"task":{"version":1,"engine":"mg114-offset-v1","context":"c00","row":"0","block":0},"digest":"<64 lowercase hexadecimal characters>","hits":[]}]}
 ```
 
-The digest placeholder is illustrative, not a valid result. The engine fixes all bounds; a client cannot request arbitrary Python, arbitrary targets, an unbounded row range, or a different modulus. `row` is a canonical decimal string aligned to the engine's 128-row stride; each task covers at most 128 rows and 16 coefficient offsets per row. A bank's fingerprint is SHA-256 of its canonical JSON: recursively sorted object keys, no spaces, ASCII JSON escaping, unchanged array order. `banks[].bank_digest` exposes that fingerprint. It lets a browser recognize its exported bank without asking the user to type an issue number. Matching the fingerprint means the bank was received; the individual audit still distinguishes pending, rejected, duplicate, and accepted tasks.
+An engine v2 claim has the same shape with `"version":2`,
+`"engine":"mg114-offset-v2"` and a `row` aligned to 1024. The bank schema itself is
+unchanged, and a single bank may mix both versions.
+
+The digest placeholder is illustrative, not a valid result. The engine fixes all bounds; a client cannot request arbitrary Python, arbitrary targets, an unbounded row range, or a different modulus. `row` is a canonical decimal string aligned to the engine's row stride (128 for v1, 1024 for v2); a v1 task covers at most 128 rows and a v2 task at most 1024 rows, with 16 coefficient offsets per row in both. A bank's fingerprint is SHA-256 of its canonical JSON: recursively sorted object keys, no spaces, ASCII JSON escaping, unchanged array order. `banks[].bank_digest` exposes that fingerprint. It lets a browser recognize its exported bank without asking the user to type an issue number. Matching the fingerprint means the bank was received; the individual audit still distinguishes pending, rejected, duplicate, and accepted tasks.
 
 `data/receipts/tasks/` stores one full exact replay result per canonical task id, including server CPU time and its first accepted GitHub issue creator. `data/receipts/issues/` records bank revisions and incremental progress. `data/receipts/hits/` preserves independently checked identities. `data/receipts/poll.json` stores an updated-time cursor and bounded pending references, not secrets. The summary contains the latest 500 bank audits; the complete history remains in the sharded ledger and Git history.
+
+## Engine versions and overlap
+
+The two engine versions search the **same positions** with different tile sizes,
+so they can collide. Before crediting any claim the verifier checks
+`search_core.overlapping_ids(task)`: for a v1 task that is the single v2 container
+holding it, and for a v2 task it is the (at most eight) v1 sub-tasks it contains.
+
+**If any overlapping ID already has a verified record in `data/receipts/tasks/`,
+the claim is a duplicate.** It earns no leaderboard credit, adds no coverage, and
+is not replayed a second time. The bank audit records it in `duplicate_tasks` and
+explains it in `overlap_duplicate_tasks` as `{id, covered_by, reason}`, so a
+volunteer can see exactly which already-verified IDs absorbed their work. The rule
+is symmetric: verifying a v2 container makes its v1 sub-tasks duplicates, and
+verifying any single v1 sub-task makes the covering v2 task a duplicate. That
+second direction is deliberately conservative — a v2 container whose sub-task was
+already done is refused whole rather than credited for the seven remaining tiles.
+Clients should avoid mixing tile sizes over the same rows.
+
+Negative-audit sampling and provisional credit treat a v2 task as **one claim**,
+because that is what a bank submits and what a challenge can sample. Its input
+count is the eight tiles' generators (8x a full v1 tile, less for a truncated last
+tile), so leaderboard totals stay in the same generator units across versions.
 
 ## Shared completed-task publication
 
@@ -47,6 +82,17 @@ Runner ZIPs contain their complete standalone snapshots. See the
 Readers support v1 and v2. Public clients older than v0.3.0 require an upgrade;
 existing receipts and ledger credit remain valid.
 
+**`data/coverage/` stays engine-v1-only and byte-compatible.** Deployed clients
+validate `engine == "mg114-offset-v1"` and parse every ID as a 128-row task, so
+placing a v2 ID there would fail them closed. Engine v2 IDs are published in a
+parallel index at **`data/coverage/v2/index.json`** with shards and chunks under
+`data/coverage/v2/`, using identical schemas with `engine` `mg114-offset-v2`. Each
+index's `revision` counts only its own engine's verified tasks; `cluster.json`
+reports the v1 revision plus `coverage.engine_v2`. Retirement and pruning run over
+both directories with the same 24-hour grace. A client that cannot fetch the v2
+index simply has no v2 coverage — absence can only cost duplicate work, never
+exclude a task.
+
 ## Leaderboard and credit
 
 The leaderboard belongs to the **actual GitHub issue creator**, obtained from GitHub's API, not the handle typed into the bank. One unique canonical task receives credit once, when its valid result is first accepted. Rankings use the sum of replayed coefficient-generator computations and show verified task counts alongside them. Submitted hours, submitted counter values, and claimed machine speed cannot increase the ranking.
@@ -55,7 +101,7 @@ A display name and the payload's optional handle remain self-declared. The publi
 
 ## What calibration actually does
 
-Every 64 newly verified unique tasks completes an epoch. Existing epochs stay frozen. The [versioned geometry/cost policy](GEOMETRIC_POLICY.md) uses shrinkage estimates of curve yield and aggregate CPU. New epochs reserve 40% of predicted CPU equally across contexts, then convert CPU shares into task probabilities. Exact tile proofs avoid dispatching provably empty proposals. Costs remain device-dependent estimates, and the geometric objective remains an uncalibrated proxy.
+Every 64 newly verified unique tasks completes an epoch. Existing epochs stay frozen. The [versioned geometry/cost policy](GEOMETRIC_POLICY.md) uses shrinkage estimates of curve yield and aggregate CPU. New epochs reserve 10% of predicted CPU equally across the 54 supported contexts, then convert CPU shares into task probabilities; policy revision 2 retires band `(256,4096]` to a 1e-6 trace weight ([GEOMETRIC_POLICY.md](GEOMETRIC_POLICY.md)). Verified costs are normalised to v1-equivalent units first, so v2 tasks do not skew per-task cost. Exact tile proofs avoid dispatching provably empty proposals. Costs remain device-dependent estimates, and the geometric objective remains an uncalibrated proxy.
 
 This policy has not demonstrated better discovery odds. Timing differs across devices; submitted work is selection-biased. The geometric prior assumes more than our selected norm families have established. The spatial challenger remains in shadow and needs a controlled equal-compute experiment before promotion.
 

@@ -225,7 +225,15 @@ class ClusterTests(unittest.TestCase):
         self.assertEqual(policy["epoch"], 1)
         self.assertEqual(policy["through_verified_tasks"], 64)
         self.assertAlmostEqual(sum(x["weight"] for x in policy["contexts"]), 1)
-        self.assertTrue(all(x["weight"] >= 0.4 / 81 for x in policy["contexts"]))
+        # Policy revision 2: 54 supported lanes share a 10% floor; the retired
+        # band (256,4096] keeps exactly a 1e-6 trace weight.
+        from geometric_policy import ACTIVE_IDS, RETIRED_IDS, RETIRED_WEIGHT
+        self.assertEqual(policy["policy_revision"], 2)
+        self.assertEqual(policy["exploration_fraction"], 0.1)
+        self.assertEqual(policy["retired_bands"], [[256, 4096]])
+        weights = {x["id"]: x["weight"] for x in policy["contexts"]}
+        self.assertTrue(all(weights[c] == RETIRED_WEIGHT for c in RETIRED_IDS))
+        self.assertTrue(all(weights[c] > RETIRED_WEIGHT for c in ACTIVE_IDS))
         self.submit(bank(results[64:]), 3)
         ag.aggregate(self.data)
         self.assertEqual(frozen, (self.data / "strategy.json").read_bytes())
@@ -461,6 +469,70 @@ class ClusterTests(unittest.TestCase):
         rebuilt = ag.aggregate(self.data)
         readme_snapshot.validated_state(rebuilt, ig.read_json(self.data / "strategy.json"))
         self.assertEqual(ig.canonical(rebuilt["calibration_history"]), fingerprint)
+
+
+class EngineV2IngestTests(unittest.TestCase):
+    """v2 banks replay through the ordinary warmed worker; overlaps never pay twice."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.data = Path(self.temporary.name)
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def submit(self, receipt, number=1, replay=None, author="honest-person"):
+        return ig.process_receipt(receipt, source(number, author), self.data, ig.Budget(),
+                                  replay=replay or (lambda task: (run_task(task), 2.5)))
+
+    def test_v2_bank_is_verified_by_the_warm_worker_and_published_as_v2_coverage(self):
+        results = [run_task(make_task("c00", 1024 * i, 0, 2)) for i in range(2)]
+        with ig.WarmReplay() as replay:
+            record = self.submit(bank(results), replay=replay)
+        self.assertEqual(record["status"], "accepted")
+        self.assertEqual(len(record["accepted_tasks"]), 2)
+        saved = ag.load_kind(self.data, "tasks")
+        self.assertEqual({row["result"]["id"] for row in saved}, {r["id"] for r in results})
+        self.assertTrue(all(row["result"]["task"]["engine"] == "mg114-offset-v2" for row in saved))
+        report = ag.aggregate(self.data)
+        self.assertEqual(report["coverage"]["revision"], 0)
+        self.assertEqual(report["coverage"]["engine_v2"]["revision"], 2)
+        self.assertEqual(report["totals"]["verified_computations"],
+                         str(sum(r["counters"]["generators"] for r in results)))
+        person = report["contributors"][0]
+        self.assertEqual(int(person["verified_computations"]),
+                         sum(r["counters"]["generators"] for r in results))
+
+    def test_verified_v2_task_makes_its_v1_sub_tasks_duplicates(self):
+        container = run_task(make_task("c00", 0, 0, 2))
+        self.submit(bank([container]))
+        replayed = []
+        def replay(task, on_hit=None):
+            replayed.append(task)
+            return run_task(task), 2.5
+        sub = run_task(make_task("c00", 256))
+        record = self.submit(bank([sub]), number=2, replay=replay)
+        self.assertEqual(record["duplicate_tasks"], [sub["id"]])
+        self.assertEqual(record["accepted_tasks"], [])
+        self.assertEqual(replayed, [])
+        self.assertEqual(record["overlap_duplicate_tasks"][0]["covered_by"], [container["id"]])
+        self.assertEqual(len(ag.load_kind(self.data, "tasks")), 1)
+        report = ag.aggregate(self.data)
+        self.assertEqual(report["coverage"]["verified_task_count"], 1)
+
+    def test_verified_v1_task_makes_a_covering_v2_task_a_duplicate(self):
+        sub = run_task(make_task("c01", 0))
+        self.submit(bank([sub]))
+        container = run_task(make_task("c01", 0, 0, 2))
+        record = self.submit(bank([container]), number=2)
+        self.assertEqual(record["duplicate_tasks"], [container["id"]])
+        self.assertEqual(record["overlap_duplicate_tasks"][0]["covered_by"], [sub["id"]])
+        self.assertIn("already verified", record["overlap_duplicate_tasks"][0]["reason"])
+        self.assertEqual(len(ag.load_kind(self.data, "tasks")), 1)
+        # No v2 coverage was published for a task that earned no credit.
+        report = ag.aggregate(self.data)
+        self.assertEqual(report["coverage"]["engine_v2"]["revision"], 0)
+        self.assertEqual(report["coverage"]["revision"], 1)
 
 
 if __name__ == "__main__":

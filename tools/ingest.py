@@ -434,6 +434,18 @@ class Budget:
         self.remaining -= 1
 
 
+def covering_ids(data, task):
+    """Verified IDs of the other engine version covering this task's positions.
+
+    Engines v1 and v2 search the same positions with different tile sizes, so a
+    task whose overlapping container (or any of its sub-tasks) is already a
+    verified record adds no new coverage and earns no credit.
+    """
+    from search_core import overlapping_ids
+    return [identifier for identifier in overlapping_ids(task)
+            if ledger_path(data, "tasks", identifier).exists()]
+
+
 def process_receipt(receipt, source, data, budget, replay=replay_task, audit_policy=None):
     """Replay a bank incrementally; its durable cursor survives the hourly budget."""
     from search_core import validate_task, task_id
@@ -501,6 +513,19 @@ def process_receipt(receipt, source, data, budget, replay=replay_task, audit_pol
                 identifier = task_id(task)
                 path = ledger_path(data, "tasks", identifier)
                 saved = read_json(path)
+                overlapping = [] if saved else covering_ids(data, task)
+                if overlapping:
+                    # No credit and no new coverage: the positions are already
+                    # verified under the other engine version. Record the reason.
+                    if identifier not in record["duplicate_tasks"]:
+                        record["duplicate_tasks"].append(identifier)
+                    record.setdefault("overlap_duplicate_tasks", []).append(
+                        {"id": identifier, "covered_by": overlapping,
+                         "reason": "positions already verified under the other engine version"})
+                    record["next_index"] = index + 1
+                    record["discoveries"] = sorted(set(discoveries))
+                    atomic_json(record_path, record)
+                    continue
                 from negative_audit import selected
                 sampling_allowed = (audit_policy is not None and audit_policy.one_in > 1
                                     and source.get('submitter', '').casefold() in audit_policy.eligible)

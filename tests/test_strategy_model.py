@@ -32,6 +32,24 @@ class StrategyModelTests(unittest.TestCase):
                 m.publish(p)
             self.assertEqual(snapshot,{str(f):f.read_bytes() for f in (p/'learning').rglob('*.json')})
             self.assertEqual((p/'strategy.json').read_text(),'UNCHANGED')
+    def test_mixed_engine_v1_v2_ledger_fits_predicts_and_evaluates(self):
+        with tempfile.TemporaryDirectory() as tmp,patch.object(m,'BOUNDARY',4):
+            p=Path(tmp); records=self.records(4)
+            for i in range(4):
+                task=make_task('c00',1024*i,0,2)
+                records.append({'schema':'math-gambling-verified-task-v1','sequence':5+i,
+                                'result':run_task(task),'server_replay_cpu_ms':8+i})
+            self.write(p,records[:4]); m.publish(p)
+            self.write(p,records); report=m.publish(p)
+            self.assertEqual(report['observed_tasks'],8)
+            self.assertEqual(report['completed_evaluations'],1)
+            self.assertEqual(report['latest_evaluation']['results']['future_all']['tasks'],4)
+            rows=m.observations(p)
+            self.assertEqual(rows[4]['task']['version'],2)
+            prediction=m.predict(json.loads((p/report['history']/'model-000000004.json').read_text())['model'],
+                                 make_task('c00',0,0,2))
+            self.assertGreater(prediction['cpu_ms'],0)
+
     def test_changed_frozen_timing_rejected(self):
         with tempfile.TemporaryDirectory() as tmp,patch.object(m,'BOUNDARY',4):
             p=Path(tmp);r=self.records(4);self.write(p,r);m.publish(p);r[0]['server_replay_cpu_ms']=19;self.write(p,r)

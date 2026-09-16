@@ -143,9 +143,20 @@ def ensure_destination(repo, relative):
 
 def validate_snapshot(data):
     """A coverage index cannot replace the authoritative accepted-task ledger."""
-    from coverage_index import read_coverage
+    from coverage_index import coverage_dir, read_coverage
     from search_core import task_id, validate_task
     manifest, completed = read_coverage(Path(data) / 'coverage')
+    published = set().union(*completed.values())
+    revision = manifest['revision']
+    # Engine v2 publishes the same schemas under data/coverage/v2. Its IDs belong
+    # to the same ledger, so both indexes together must equal the accepted tasks.
+    v2_directory = coverage_dir(data, 2)
+    if (v2_directory / 'index.json').exists():
+        v2_manifest, v2_completed = read_coverage(v2_directory, 2)
+        v2_ids = set().union(*v2_completed.values())
+        if v2_ids & published: raise BranchError('Engine v1 and v2 coverage indexes overlap')
+        published |= v2_ids
+        revision += v2_manifest['revision']
     identifiers, sequences = set(), set()
     for path in (Path(data) / 'receipts/tasks').glob('*/*.json'):
         with path.open('rb') as handle: raw = handle.read(1024 * 1024 + 1)
@@ -157,8 +168,7 @@ def validate_snapshot(data):
         if (row['result']['id'] != identifier or identifier in identifiers
                 or row['sequence'] in sequences): raise BranchError('Duplicate or inconsistent accepted-task record')
         identifiers.add(identifier); sequences.add(row['sequence'])
-    expected = set().union(*completed.values())
-    if identifiers != expected or sequences != set(range(1, manifest['revision'] + 1)):
+    if identifiers != published or sequences != set(range(1, revision + 1)):
         raise BranchError('Accepted-task ledger and exact coverage disagree')
     return manifest
 

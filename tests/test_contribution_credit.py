@@ -5,7 +5,7 @@ import unittest
 sys.path[:0]=[str(Path(__file__).resolve().parents[1]/'tools'),str(Path(__file__).resolve().parent)]
 from contribution_credit import provisional_credit,input_count
 from negative_audit import selected
-from search_core import CONTEXTS, make_task, task_id, run_task
+from search_core import CONTEXTS, make_task, subtasks, task_id, run_task
 
 class CreditTests(unittest.TestCase):
     def record(self,number=1,user='Alice'):
@@ -21,6 +21,18 @@ class CreditTests(unittest.TestCase):
             for row,block in [(0,0),((int(c['totalRows'])-1)//128*128,c['blocks']-1)]:
                 task=make_task(c['id'],row,block)
                 self.assertEqual(input_count(task),run_task(task)['counters']['generators'])
+    def test_engine_v2_inputs_are_eight_tiles_including_a_truncated_last_tile(self):
+        for c in CONTEXTS:
+            total=int(c['totalRows'])
+            for row,block in [(0,0),((total-1)//1024*1024,c['blocks']-1)]:
+                task=make_task(c['id'],row,block,2)
+                self.assertEqual(input_count(task),run_task(task)['counters']['generators'])
+                self.assertEqual(input_count(task),sum(input_count(s) for s in subtasks(task)))
+            full=make_task(c['id'],0,0,2)
+            self.assertEqual(input_count(full),8*input_count(make_task(c['id'],0,0,1)))
+            last=make_task(c['id'],(total-1)//1024*1024,0,2)
+            self.assertLess(input_count(last),input_count(full))
+
     def test_full_passed_bank_credit_is_unique_across_banks_and_users(self):
         first=self.record();second=self.record(2,'Bob')
         people=provisional_credit([second,first,copy.deepcopy(first)],set())

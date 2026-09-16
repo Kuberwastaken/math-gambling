@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import shutil
 from pathlib import Path
 import sys
 import tempfile
@@ -9,14 +10,15 @@ import unittest
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+import coverage_client
 import coverage_index as coverage
 import ingest
 import aggregate
 from search_core import make_task, run_task, task_id
 
 
-def verified(sequence, context="c00", row=0):
-    task = make_task(context, row)
+def verified(sequence, context="c00", row=0, version=1):
+    task = make_task(context, row, 0, version)
     return dict(schema="math-gambling-verified-task-v1", sequence=sequence,
                 result=dict(task=task, id=task_id(task)))
 
@@ -166,6 +168,138 @@ class CoverageTests(unittest.TestCase):
         self.assertEqual(summary["coverage"]["revision"], summary["totals"]["verified_unique_tasks"])
         _, completed = coverage.read_coverage(self.directory)
         self.assertEqual(completed["c00"], {result["id"]})
+
+
+class CoverageEngineV2Tests(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.data = Path(self.temporary.name)
+        self.directory = self.data / "coverage"
+        self.v2 = self.directory / "v2"
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def test_v1_index_is_byte_identical_when_v2_records_are_added(self):
+        only_v1 = [verified(1, row=0), verified(2, row=128)]
+        first = coverage.publish_coverage(self.data, only_v1)
+        original = (self.directory / "index.json").read_bytes()
+        mixed = only_v1 + [verified(3, "c01", 0, 2), verified(4, "c01", 1024, 2)]
+        published = coverage.publish_versions(self.data, mixed)
+        self.assertEqual(published[1], first)
+        self.assertEqual((self.directory / "index.json").read_bytes(), original)
+        self.assertEqual(published[2]["engine"], "mg114-offset-v2")
+        self.assertEqual(published[2]["revision"], 2)
+        self.assertEqual(published[2]["verified_task_count"], 2)
+        self.assertEqual(set(published[2]["shards"]), set(coverage.CONTEXT_IDS))
+        manifest, completed = coverage.read_coverage(self.v2, 2)
+        self.assertEqual(manifest, published[2])
+        self.assertEqual(completed["c01"], {task_id(make_task("c01", 0, 0, 2)), task_id(make_task("c01", 1024, 0, 2))})
+        self.assertEqual(completed["c00"], set())
+        # The v1 reader must refuse the v2 index, and the reverse.
+        with self.assertRaises(ValueError):
+            coverage.read_coverage(self.v2, 1)
+        with self.assertRaises(ValueError):
+            coverage.read_coverage(self.directory, 2)
+
+    def test_v2_membership_chunks_prune_and_never_regress(self):
+        from datetime import datetime, timezone, timedelta
+        tasks = [verified(1, "c00", 0, 2)]
+        coverage.publish_versions(self.data, tasks)
+        old = self.v2 / coverage.read_coverage(self.v2, 2)[0]["shards"]["c00"]["file"]
+        tasks.append(verified(2, "c00", 1024, 2))
+        second = coverage.publish_versions(self.data, tasks)[2]
+        self.assertEqual(second["revision"], 2)
+        self.assertTrue(old.exists())
+        stamp = datetime(2026, 9, 17, tzinfo=timezone.utc)
+        self.assertEqual(coverage.prune_retired(self.data, observed=stamp), 0)
+        self.assertGreater(coverage.prune_retired(self.data, observed=stamp + timedelta(hours=25)), 0)
+        self.assertFalse(old.exists())
+        self.assertEqual(coverage.read_coverage(self.v2, 2)[0], second)
+        self.assertEqual(coverage.read_coverage(self.directory, 1)[0]["revision"], 0)
+        with self.assertRaises(ValueError):
+            coverage.publish_versions(self.data, [verified(1, "c00", 1024, 2)])
+
+    def test_aggregate_reports_both_indexes(self):
+        from search_core import run_task
+        result = run_task(make_task("c02", 0, 0, 2))
+        receipt = dict(schema="math-gambling-bank-v1", contributor=dict(name="Example", github="example"),
+                       tasks=[dict(task=result["task"], digest=result["digest"])])
+        ingest.process_receipt(receipt, dict(id="fixture-v2", kind="fixture"), self.data,
+                               ingest.Budget(), replay=lambda task: (run_task(task), 1.0))
+        report = aggregate.aggregate(self.data)
+        self.assertEqual(report["coverage"]["revision"], 0)
+        self.assertEqual(report["coverage"]["engine_v2"]["revision"], 1)
+        self.assertEqual(report["coverage"]["engine_v2"]["index"], "coverage/v2/index.json")
+        self.assertEqual(report["coverage"]["verified_task_count"], 1)
+        self.assertEqual(report["totals"]["verified_computations"], str(result["counters"]["generators"]))
+        _, completed = coverage.read_coverage(self.v2, 2)
+        self.assertEqual(completed["c02"], {result["id"]})
+
+
+class CoverageClientVersionTests(unittest.TestCase):
+    """The runner's client must read both published indexes and apply the exact
+    overlap rule: one engine version's record covers the other's positions."""
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.data = Path(self.temporary.name)
+        self.directory = self.data / "coverage"
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def client(self, offline=True):
+        return coverage_client.CoverageIndex(self.directory, self.data / "cache", offline=offline)
+
+    def test_overlapping_ids_are_covered_across_both_published_indexes(self):
+        v1_only = make_task("c00", 2048)               # one eighth of a v2 task
+        v2_only = make_task("c01", 1024, 0, 2)
+        coverage.publish_versions(self.data, [verified(1, "c00", 2048), verified(2, "c01", 1024, 2)])
+        client = self.client()
+        snapshot = client.refresh()
+        self.assertEqual(snapshot["revision"], 1)
+        self.assertEqual(snapshot["engine_v2"]["revision"], 1)
+        self.assertTrue(client.contains(v1_only))
+        self.assertTrue(client.contains(v2_only))
+        # A v2 task whose aligned v1 sub-task is already published is covered,
+        # and each v1 sub-task of a published v2 task is covered too.
+        self.assertTrue(client.contains(make_task("c00", 2048, 0, 2)))
+        self.assertTrue(client.contains(make_task("c01", 1024 + 128 * 3)))
+        self.assertFalse(client.contains(make_task("c00", 1024, 0, 2)))
+        self.assertFalse(client.contains(make_task("c01", 0)))
+        self.assertEqual(client.known_skips, 4)
+
+    def test_absent_v2_index_is_empty_and_never_pauses_v1_dispatch(self):
+        # An older snapshot, or any release published before the v2 index exists.
+        coverage.publish_coverage(self.data, [verified(1, "c00", 0)])
+        shutil.rmtree(self.directory / "v2", ignore_errors=True)
+        client = self.client()
+        snapshot = client.refresh()
+        self.assertIsNone(snapshot["engine_v2"])
+        self.assertIsNone(client.other.index)
+        self.assertTrue(client.contains(make_task("c00", 0)))
+        self.assertTrue(client.contains(make_task("c00", 0, 0, 2)))
+        self.assertFalse(client.contains(make_task("c05", 0, 0, 2)))
+        self.assertFalse(client.contains(make_task("c00", 1024, 0, 2)))
+
+    def test_unreadable_v2_index_is_discarded_without_blocking_the_campaign(self):
+        coverage.publish_versions(self.data, [verified(1, "c00", 0), verified(2, "c05", 0, 2)])
+        (self.directory / "v2" / "index.json").write_text("{}")
+        client = self.client()
+        client.refresh()
+        self.assertIsNone(client.other.index)
+        self.assertIn("Invalid published coverage index", client.other.unavailable)
+        self.assertTrue(client.contains(make_task("c00", 0)))
+        self.assertFalse(client.contains(make_task("c05", 0, 0, 2)))
+
+    def test_v1_shard_and_index_validation_is_unchanged_for_engine_v1(self):
+        coverage.publish_coverage(self.data, [verified(1, "c00", 0)])
+        raw = (self.directory / "index.json").read_bytes()
+        index = coverage_client.validate_index(raw)
+        self.assertEqual(index["engine"], "mg114-offset-v1")
+        with self.assertRaises(coverage_client.CoverageError):
+            coverage_client.validate_index(raw, 2)
 
 
 if __name__ == "__main__":

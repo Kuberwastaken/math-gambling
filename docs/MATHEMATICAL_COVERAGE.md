@@ -47,6 +47,27 @@ replay timeout or operational failure was deferred. `last-error.json` records a
 recoverable error when storage is available. An optional Actions step should
 continue publishing canonical cluster data if this separate export fails.
 
+## Engine v1 and v2 records
+
+A verified task may be engine v1 (128 rows) or engine v2 (1024 rows, see
+[CLUSTER.md](CLUSTER.md)). Each record carries its own `engine`, and a v2 record
+exports the **union of its eight aligned v1 sub-tasks' intervals**: the exporter
+replays the whole 1024-row tile and merges every completed curve callback exactly
+as it does for one v1 tile, so `raw_scan_interval_count` and `q_positions_replayed`
+are the sums over those sub-tasks. The per-task interval cap and the per-replay
+timeout scale with `task_rows/128`; a mathematically identical span therefore
+exports either as eight v1 records or as one v2 record, with the same intervals.
+
+Because the two engines cover the same positions, the verifier never admits both a
+v2 task and one of its v1 sub-tasks into the ledger (the overlap duplicate rule in
+[CLUSTER.md](CLUSTER.md)), so records here cannot double-count a span for that
+reason. Different parameterizations can still overlap, and the union across tasks
+is still not computed: `global_union_computed` remains false.
+
+The completed-task membership index is likewise split by engine: `data/coverage/`
+stays v1-only and byte-compatible, and v2 IDs live in `data/coverage/v2/`. Neither
+index is an interval list, and this export changes neither.
+
 ## What an interval asserts
 
 Each record supplies canonical decimal strings for:

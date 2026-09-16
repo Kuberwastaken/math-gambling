@@ -23,7 +23,7 @@ import tempfile
 import time
 import types
 
-from search_core import ENGINE, canonical_json, task_id, validate_task, verify_triple
+from search_core import ENGINE, ROWS_PER_TASK, canonical_json, task_id, task_rows, validate_task, verify_triple
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = 'math-gambling-mathematical-coverage-v1'
@@ -34,6 +34,15 @@ MAX_INDEX_BYTES = 32 * 1024 * 1024
 MAX_CURVES = 128 * 16
 MAX_TASKS = 4096
 TASK_SECONDS = 4.0
+
+
+def task_scale(task):
+    """Engine-v2 tiles hold 8x the rows, hence 8x the curves and replay cost."""
+    return task_rows(task)/ROWS_PER_TASK
+
+
+def curve_cap(task):
+    return int(MAX_CURVES*task_scale(task))
 DECIMAL = re.compile(r'-?(?:0|[1-9][0-9]{0,127})\Z')
 HEX = re.compile(r'[0-9a-f]{64}\Z')
 SCOPE = {
@@ -119,7 +128,8 @@ def save_hit(output, hit, task=None):
     destination = Path(output)/'discoveries'/f'{identity}.json'
     try:
         atomic_json(destination, {'schema': 'math-gambling-mathematical-discovery-v1',
-            'engine': ENGINE, 'task': task, 'hit': {**hit, 'xyz': xyz},
+            'engine': task.get('engine', ENGINE) if isinstance(task, dict) else ENGINE,
+            'task': task, 'hit': {**hit, 'xyz': xyz},
             'verification': 'independent integer sum of three cubes equals 114',
             'task_completion_claimed': False})
     except Exception as exc:
@@ -204,9 +214,10 @@ def execute_kernel(task, output, *, kernel_path=None):
     sys.modules[module.__name__] = module
     exec(compile(raw, str(path), 'exec'), module.__dict__)
     curves = []
+    cap = curve_cap(task)
     def curve_complete(curve):
         interval_values(curve)
-        if len(curves) >= MAX_CURVES:
+        if len(curves) >= cap:
             raise ValueError('task exceeded bounded curve callback count')
         curves.append(dict(curve))
     result = module.run_task(task, on_hit=lambda hit: save_hit(output, hit, task), on_curve=curve_complete)
@@ -243,7 +254,7 @@ def build_record(row, replay, output):
     if canonical_json(result) != canonical_json(expected):
         raise ValueError('completed replay differs from the verified ledger result/digest')
     curves = replay.get('curves')
-    if not isinstance(curves, list) or len(curves) > MAX_CURVES:
+    if not isinstance(curves, list) or len(curves) > curve_cap(expected['task']):
         raise ValueError('invalid bounded completed-curve list')
     source_hash = replay.get('kernel_source_sha256')
     if not isinstance(source_hash, str) or not HEX.fullmatch(source_hash):
@@ -254,7 +265,7 @@ def build_record(row, replay, output):
     if len(curves) != counters.get('curves') or positions != counters.get('quotient_points'):
         raise ValueError('completed callbacks do not account for all replayed curves and q positions')
     return {
-        'schema': RECORD_SCHEMA, 'engine': ENGINE, 'sequence': row['sequence'],
+        'schema': RECORD_SCHEMA, 'engine': expected['task']['engine'], 'sequence': row['sequence'],
         'task': expected['task'], 'task_id': expected['id'], 'result_digest': expected['digest'],
         'ledger_record_sha256': sha(canonical_json(row).encode('ascii')),
         'kernel_source_sha256': source_hash,
@@ -407,7 +418,8 @@ def _export(data, output, *, max_tasks, seconds, replay_fn):
         row = rows[len(records)]
         attempted += 1
         try:
-            replay = replay_fn(row['result']['task'], output, min(TASK_SECONDS, remaining))
+            replay = replay_fn(row['result']['task'], output,
+                               min(TASK_SECONDS*task_scale(row['result']['task']), remaining))
             record = build_record(row, replay, output)
             entry = publish_record(output, record)
         except subprocess.TimeoutExpired:

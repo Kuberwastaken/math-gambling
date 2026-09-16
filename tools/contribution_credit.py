@@ -1,13 +1,16 @@
 """Provisional participation credit, deliberately separate from exact coverage."""
 from collections import Counter
 from negative_audit import selected
-from search_core import BLOCK_SIZE, ROWS_PER_TASK, CONTEXT_BY_ID, validate_task, task_id
+from search_core import BLOCK_SIZE, CONTEXT_BY_ID, task_rows, validate_task, task_id
 
 
 def input_count(task):
+    """Generators a task covers. Engine v2 spans 8x the rows of a v1 task, and
+    the last tile of a context is truncated at totalRows, so the row span comes
+    from search_core (task_rows/totalRows) instead of a hard-coded constant."""
     task = validate_task(task)
     context = CONTEXT_BY_ID[task['context']]
-    rows = min(ROWS_PER_TASK, int(context['totalRows']) - int(task['row']))
+    rows = min(task_rows(task), int(context['totalRows']) - int(task['row']))
     first = context['tlo'] + BLOCK_SIZE * task['block']
     return rows * min(BLOCK_SIZE, context['thi'] - first + 1)
 

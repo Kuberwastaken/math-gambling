@@ -52,6 +52,11 @@ def profile_link(alias, raw_url):
     return f"[{label}](<{destination}>)"
 
 
+def revision(policy):
+    value = policy.get('policy_revision', 1)
+    return value if type(value) is int and value >= 1 else 1
+
+
 def weights(value, exploration, cpu=False):
     if not isinstance(value, dict) or set(value) != set(CONTEXTS):
         raise ValueError("snapshot requires exactly the 81 fixed contexts")
@@ -71,14 +76,17 @@ def validated_state(report, policy):
     size = integer(policy["epoch_size"])
     through = integer(policy["through_verified_tasks"])
     exploration = policy["exploration_fraction"]
+    # Policy revision 2 lowered the uniform reserve from 40% to 10%.
+    minimum = 0.1 if revision(policy) >= 2 else 0.4
     if (size != 64 or through != epoch * size or epoch != total // size
             or type(exploration) not in (int, float) or not math.isfinite(exploration)
-            or not 0.4 <= exploration <= 1):
+            or not minimum <= exploration <= 1):
         raise ValueError("report and frozen policy boundaries disagree")
     contexts = policy["contexts"]
     if not isinstance(contexts, list) or len(contexts) != 81:
         raise ValueError("invalid policy context list")
-    current = weights({row["id"]: row["weight"] for row in contexts}, exploration,policy.get('policy_version')=='mg114-cpu-budget-v1')
+    current = weights({row["id"]: row["weight"] for row in contexts}, exploration,
+                      policy.get('policy_version')=='mg114-cpu-budget-v1' or revision(policy)>=2)
     history = report.get("calibration_history", [])
     if not isinstance(history, list):
         raise ValueError("invalid calibration history")
@@ -88,7 +96,8 @@ def validated_state(report, policy):
         if (number <= previous or number > epoch
                 or integer(entry["through_verified_tasks"]) != number * size):
             raise ValueError("invalid calibration history boundary")
-        weights(entry["weights"], exploration,entry.get('policy_version')=='mg114-cpu-budget-v1')
+        weights(entry["weights"], exploration,
+                entry.get('policy_version')=='mg114-cpu-budget-v1' or revision(entry)>=2)
         previous = number
     if epoch and (not history or history[-1]["epoch"] != epoch
                   or history[-1]["weights"] != current):
@@ -155,7 +164,8 @@ def render_snapshot(report, policy, config=None):
     lines += [f'    Policy["Current policy: epoch {epoch}"]']
     if recent:
         lines.append(f"    H{len(recent)-1} --> Policy")
-    unit='predicted CPU exploration across 81 contexts' if policy.get('exploration_unit')=='predicted_cpu' else 'uniform exploration across 81 contexts'
+    lanes='54 supported contexts' if revision(policy)>=2 else '81 contexts'
+    unit=f'predicted CPU exploration across {lanes}' if policy.get('exploration_unit')=='predicted_cpu' else f'uniform exploration across {lanes}'
     lines += [f'    Policy --> Explore["{100*exploration:g}% {unit}"]',
               f'    Policy --> Cost["{100*(1-exploration):g}% weighted by {allocation_label}"]',
               '    Explore --> Mix["Combined task-selection weights"]', '    Cost --> Mix']

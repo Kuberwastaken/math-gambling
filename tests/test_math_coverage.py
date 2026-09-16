@@ -75,6 +75,29 @@ class MathematicalCoverageTests(unittest.TestCase):
         self.assertFalse(full['scope']['global_union_computed'])
         self.assertEqual(full['kernel_source_sha256'], mc.sha(Path(core.__file__).read_bytes()))
 
+    def test_engine_v2_record_exports_the_union_of_its_sub_task_intervals(self):
+        container = core.container_task(NONEMPTY)
+        subs = [core.run_task(t) for t in core.subtasks(container)]
+        write_ledger(self.data, [row(container, 1)])
+        index = mc.export(self.data, seconds=30, replay_fn=self.replay)
+        self.assertEqual(index['status'], 'complete')
+        record = self.read_record(index['records'][0])
+        self.assertEqual(record['engine'], core.ENGINE_V2)
+        self.assertEqual(record['task'], container)
+        self.assertEqual(record['raw_scan_interval_count'],
+                         sum(r['counters']['curves'] for r in subs))
+        self.assertGreater(record['raw_scan_interval_count'], mc.MAX_CURVES)
+        self.assertEqual(int(record['q_positions_replayed']),
+                         sum(r['counters']['quotient_points'] for r in subs))
+        # Each sub-task's own merged intervals must appear in the container union.
+        parts = set()
+        for sub in core.subtasks(container):
+            replay = mc.execute_kernel(sub, self.out)
+            parts.update(tuple(v) for v in mc.merge_intervals(replay['curves']))
+        union = {tuple(v) for v in record['intervals']}
+        self.assertTrue(parts.issubset(union))
+        self.assertEqual(mc.curve_cap(container), 8*mc.curve_cap(NONEMPTY))
+
     def test_incremental_cap_and_repeat_do_not_replay_exported_prefix(self):
         write_ledger(self.data, [self.empty, self.nonempty, self.other])
         first = mc.export(self.data, max_tasks=1, seconds=10, replay_fn=self.replay)

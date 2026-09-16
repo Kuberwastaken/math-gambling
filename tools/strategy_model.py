@@ -23,7 +23,9 @@ def features(task):
     c = CONTEXT_BY_ID[task['context']]
     width = 2*c['radius']+1
     row = int(task['row'])
-    # Group the whole 128-row task by its starting coordinate; no float rounding.
+    # Group a whole task (128 rows for engine v1, 1024 for v2) by its starting
+    # coordinate; no float rounding. A v2 tile can span more than one bin, so its
+    # feature cell is the bin its first row falls in.
     bx, by = min(3, (row % width)*4//width), min(3, (row//width)*4//width)
     block = min(3, task['block']*4//c['blocks'])
     spatial = f"{c['shape']}:{bx}:{by}"

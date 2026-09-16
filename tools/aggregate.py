@@ -9,7 +9,7 @@ from pathlib import Path
 import statistics
 
 from ingest import ROOT, MAX_REPLAYS, atomic_json, ledger_path, now, read_json, safe_profile_url
-from coverage_index import publish_coverage
+from coverage_index import publish_versions
 
 EPOCH_SIZE = 64
 EXPLORATION = 0.4
@@ -80,7 +80,7 @@ def aggregate(data):
     ids = [x["result"]["id"] for x in tasks]
     if len(ids) != len(set(ids)) or [x["sequence"] for x in tasks] != list(range(1, len(tasks) + 1)):
         raise ValueError("duplicate task or noncontiguous verified sequence")
-    coverage = publish_coverage(data, tasks)
+    coverage = publish_versions(data, tasks)
     receipts, hits = load_kind(data, "issues"), load_kind(data, "hits")
     epoch = len(tasks) // EPOCH_SIZE
     previous = read_json(data / "strategy.json")
@@ -102,12 +102,21 @@ def aggregate(data):
         atomic_json(config_path,config)
     cpu_start=config['cpu_budget_start_epoch']
     if type(cpu_start) is not int or cpu_start<start_epoch:raise ValueError('invalid CPU policy boundary')
+    # Policy revision 2 (10% reserve, retired band) also begins only at the first
+    # NEW boundary after it is introduced; frozen epochs are never rewritten.
+    if 'policy_revision_2_start_epoch' not in config:
+        config['policy_revision_2_start_epoch']=max(cpu_start,previous['epoch']+1)
+        atomic_json(config_path,config)
+    revision_start=config['policy_revision_2_start_epoch']
+    if type(revision_start) is not int or revision_start<cpu_start:
+        raise ValueError('invalid policy revision boundary')
     def calibrate(tasks, number):
         if number < start_epoch:
             return legacy_calibrate(tasks, number)
         from geometric_policy import calibrate as geometric_calibrate, cpu_budget_policy
-        policy=geometric_calibrate(tasks, number)
-        return cpu_budget_policy(policy) if number>=cpu_start else policy
+        revision=2 if number>=revision_start else 1
+        policy=geometric_calibrate(tasks, number, revision)
+        return cpu_budget_policy(policy, revision) if number>=cpu_start else policy
     recorded = read_json(data / "cluster.json", {}).get("calibration_history", [])
     if not isinstance(recorded, list):
         raise ValueError("invalid calibration history")
@@ -128,7 +137,9 @@ def aggregate(data):
             computed = calibrate(tasks, update)
             entry = {"epoch": update, "through_verified_tasks": update * EPOCH_SIZE,
                      "updated_at": tasks[update * EPOCH_SIZE - 1]["verified_at"],
-                     "objective": computed["objective"], "policy_version": computed.get("policy_version", "legacy-cost-v1"), "exploration_fraction": EXPLORATION,
+                     "objective": computed["objective"], "policy_version": computed.get("policy_version", "legacy-cost-v1"),
+                     "exploration_fraction": computed.get("exploration_fraction", EXPLORATION),
+                     "policy_revision": computed.get("policy_revision", 1),
                      "weights": {x["id"]: x["weight"] for x in computed["contexts"]}}
         history.append(entry)
     if previous["epoch"] != epoch:
@@ -229,8 +240,11 @@ def aggregate(data):
                           "duplicate_tasks": sum(len(x["duplicate_tasks"]) for x in receipts),
                           "pending_banks": sum(not x.get("complete", True) for x in receipts),
                           "verified_hits": len(hits), "counters": {key: str(value) for key, value in sorted(totals.items())}},
-               "coverage": {"revision": coverage["revision"], "index": "coverage/index.json",
-                            "verified_task_count": coverage["verified_task_count"]},
+               "coverage": {"revision": coverage[1]["revision"], "index": "coverage/index.json",
+                            "verified_task_count": coverage[1]["verified_task_count"] + coverage[2]["verified_task_count"],
+                            "engine_v1_verified_task_count": coverage[1]["verified_task_count"],
+                            "engine_v2": {"revision": coverage[2]["revision"], "index": "coverage/v2/index.json",
+                                          "verified_task_count": coverage[2]["verified_task_count"]}},
                "contexts": contexts,
                "contributors": ranked, "banks": banks,
                "discoveries": hits, "calibration_history": history,

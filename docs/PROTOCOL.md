@@ -55,7 +55,11 @@ context and computer; a representative local 324-task benchmark ranged up to
 measurement, not a time guarantee for every device.
 
 Its stable identity is
-`mg114-offset-v1:<context>:<row>:<block>`.
+`mg114-offset-v1:<context>:<row>:<block>`. Engine **v2** tasks have the same shape
+with `"version":2`, `"engine":"mg114-offset-v2"` and a `row` aligned to 1024; a v2
+task equals its eight aligned v1 sub-tasks (truncated at the context's last row),
+and its ID is `mg114-offset-v2:<context>:<row>:<block>`. v1 ids, digests and
+receipts are unchanged.
 Clients choose tasks from a recorded random seed and reject IDs found in their
 local completed records or the exact published completed-task snapshot. This
 does not reserve globally disjoint unfinished assignments. The server still
@@ -281,7 +285,11 @@ Optional `contributor.url` links the display alias to an http(s) website. It is 
 ## Exact shared completed-task index
 
 `data/coverage/index.json` has schema `math-gambling-coverage-v2`, engine
-`mg114-offset-v1`, integer `revision`, equal `verified_task_count`, UTC
+`mg114-offset-v1`, and lists engine-v1 ids only. The identical structure for
+engine v2 is published at `data/coverage/v2/index.json` with engine
+`mg114-offset-v2`; it is optional, and its absence means no v2 coverage. Each
+index's `revision` counts only its own engine's verified tasks. The rest of this
+section describes both. It has integer `revision`, equal `verified_task_count`, UTC
 `updated_at`, and descriptors for all 81 fixed contexts. A revision counts
 accepted unique tasks; policy epochs still advance at 64-task boundaries.
 

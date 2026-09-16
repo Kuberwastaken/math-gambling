@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 
 from ingest import ROOT, atomic_json, now, parse_json, read_json
-from search_core import CONTEXTS, ENGINE, task_id, validate_task
+from search_core import CONTEXTS, ENGINE, ENGINES, task_id, validate_task
 from coverage_format import CONTEXT_SCHEMA, CHUNK_SCHEMA, CHUNK_SIZE, CHUNK_BYTES, bucket_for, validate_context, validate_chunk
 
 SCHEMA = "math-gambling-coverage-v2"
@@ -20,15 +20,23 @@ CONTEXT_IDS = tuple(c["id"] for c in CONTEXTS)
 MAX_INDEX_BYTES = 128 * 1024
 MAX_SHARD_BYTES = 8 * 1024 * 1024
 MAX_SHARD_TASKS = 100_000
+# Engine v1 keeps data/coverage byte-compatible for deployed clients; engine v2
+# publishes the identical schemas one level down, under data/coverage/v2.
+VERSION_SUBDIR = {1: "", 2: "v2"}
 
 
-def validate_id(identifier, context):
+def coverage_dir(data, version=1):
+    directory = Path(data) / "coverage"
+    return directory / VERSION_SUBDIR[version] if VERSION_SUBDIR[version] else directory
+
+
+def validate_id(identifier, context, version=1):
     if not isinstance(identifier, str) or len(identifier) > 100:
         raise ValueError("coverage task ID must be text")
     parts = identifier.split(":")
-    if len(parts) != 4 or parts[:2] != [ENGINE, context] or not re.fullmatch(r"0|[1-9][0-9]*", parts[3]):
+    if len(parts) != 4 or parts[:2] != [ENGINES[version], context] or not re.fullmatch(r"0|[1-9][0-9]*", parts[3]):
         raise ValueError("coverage task ID has the wrong engine or context")
-    descriptor = validate_task(dict(version=1, engine=parts[0], context=parts[1], row=parts[2], block=int(parts[3])))
+    descriptor = validate_task(dict(version=version, engine=parts[0], context=parts[1], row=parts[2], block=int(parts[3])))
     if task_id(descriptor) != identifier:
         raise ValueError("noncanonical coverage task ID")
     return identifier
@@ -42,13 +50,13 @@ def _bounded_json(path, limit):
     return raw, parse_json(raw.decode("utf-8"), limit)
 
 
-def read_coverage(directory):
+def read_coverage(directory, version=1):
     """Check a published snapshot before relying on it for monotonicity."""
     directory = Path(directory)
     _, manifest = _bounded_json(directory / "index.json", MAX_INDEX_BYTES)
     if (not isinstance(manifest, dict) or set(manifest) !=
             {"schema", "engine", "revision", "verified_task_count", "updated_at", "shards"}
-            or manifest["schema"] not in (SCHEMA, LEGACY_SCHEMA) or manifest["engine"] != ENGINE
+            or manifest["schema"] not in (SCHEMA, LEGACY_SCHEMA) or manifest["engine"] != ENGINES[version]
             or type(manifest["revision"]) is not int or manifest["revision"] < 0
             or manifest["verified_task_count"] != manifest["revision"]
             or type(manifest["verified_task_count"]) is not int
@@ -69,22 +77,22 @@ def read_coverage(directory):
         if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
             raise ValueError("completed-task shard checksum mismatch")
         if manifest["schema"] == SCHEMA:
-            node = validate_context(raw, context, entry, MAX_SHARD_BYTES)
+            node = validate_context(raw, context, entry, MAX_SHARD_BYTES, version=version)
             identifiers = set()
             for bucket, chunks in node['buckets'].items():
                 for chunk in chunks:
-                    ids = validate_chunk((directory / chunk['file']).read_bytes(), context, bucket, chunk)
+                    ids = validate_chunk((directory / chunk['file']).read_bytes(), context, bucket, chunk, version=version)
                     if identifiers.intersection(ids): raise ValueError('duplicate coverage across chunks')
                     identifiers.update(ids)
             if len(identifiers) != entry['count']: raise ValueError('coverage count mismatch')
             completed[context] = identifiers
             continue
         if (not isinstance(shard, dict) or set(shard) != {"schema", "engine", "context", "tasks"}
-                or shard["schema"] != SHARD_SCHEMA or shard["engine"] != ENGINE
+                or shard["schema"] != SHARD_SCHEMA or shard["engine"] != ENGINES[version]
                 or shard["context"] != context or not isinstance(shard["tasks"], list)
                 or len(shard["tasks"]) != entry["count"]):
             raise ValueError("invalid completed-task shard")
-        identifiers = [validate_id(identifier, context) for identifier in shard["tasks"]]
+        identifiers = [validate_id(identifier, context, version) for identifier in shard["tasks"]]
         if identifiers != sorted(set(identifiers)):
             raise ValueError("completed-task shard is unsorted or repeats IDs")
         completed[context] = set(identifiers)
@@ -94,13 +102,22 @@ def read_coverage(directory):
 
 
 def publish_coverage(data, tasks=None):
+    """Publish every engine version and return the engine-v1 manifest verbatim."""
+    return publish_versions(data, tasks)[1]
+
+
+def publish_versions(data, tasks=None):
     """Write immutable shards first, then atomically advance the manifest.
 
     A count is the revision. Old immutable files are retained for cached clients.
     A rejected build cannot truncate a shard or remove prior completed work.
+
+    Verified records are routed by their engine version: engine v1 keeps
+    data/coverage exactly as deployed clients expect, and engine v2 publishes the
+    same schemas under data/coverage/v2. The returned v1 manifest carries the v2
+    manifest under "v2"; the published bytes contain no such key.
     """
     data = Path(data)
-    directory = data / "coverage"
     if tasks is None:
         tasks = [read_json(p) for p in (data / "receipts/tasks").glob("*/*.json")]
     if any(not isinstance(row, dict) or type(row.get("sequence")) is not int for row in tasks):
@@ -108,19 +125,32 @@ def publish_coverage(data, tasks=None):
     tasks = sorted(tasks, key=lambda row: row["sequence"])
     if [row["sequence"] for row in tasks] != list(range(1, len(tasks) + 1)):
         raise ValueError("coverage requires contiguous verified sequence numbers")
-    completed = {context: set() for context in CONTEXT_IDS}
+    by_version = {version: [] for version in VERSION_SUBDIR}
     for row in tasks:
         if row.get("schema") != "math-gambling-verified-task-v1":
             raise ValueError("coverage accepts only verified ledger records")
         descriptor = validate_task(row["result"]["task"])
+        if row["result"]["id"] != task_id(descriptor):
+            raise ValueError("duplicate or mismatched verified task ID")
+        by_version[descriptor["version"]].append(row)
+    return {version: _publish_version(data, by_version[version], version)
+            for version in sorted(VERSION_SUBDIR)}
+
+
+def _publish_version(data, tasks, version):
+    directory = coverage_dir(data, version)
+    engine = ENGINES[version]
+    completed = {context: set() for context in CONTEXT_IDS}
+    for row in tasks:
+        descriptor = validate_task(row["result"]["task"])
         identifier = task_id(descriptor)
-        if row["result"]["id"] != identifier or identifier in completed[descriptor["context"]]:
+        if identifier in completed[descriptor["context"]]:
             raise ValueError("duplicate or mismatched verified task ID")
         completed[descriptor["context"]].add(identifier)
 
     previous = None
     if (directory / "index.json").exists():
-        previous, old_completed = read_coverage(directory)
+        previous, old_completed = read_coverage(directory, version)
         if previous["revision"] > len(tasks) or any(not old_completed[c].issubset(completed[c]) for c in CONTEXT_IDS):
             raise ValueError("completed coverage must never regress or replace earlier IDs")
         if previous["revision"] == len(tasks) and previous['schema'] == SCHEMA:
@@ -155,12 +185,12 @@ def publish_coverage(data, tasks=None):
             chunks = []
             for start in range(0, len(ids), CHUNK_SIZE):
                 part = sorted(ids[start:start+CHUNK_SIZE])
-                payload = dict(schema=CHUNK_SCHEMA, engine=ENGINE, context=context, bucket=bucket, tasks=part)
+                payload = dict(schema=CHUNK_SCHEMA, engine=engine, context=context, bucket=bucket, tasks=part)
                 chunks.append(dict(**immutable(f'{context}-b{bucket}', payload, CHUNK_BYTES), count=len(part)))
             buckets[bucket] = chunks
-        payload = dict(schema=CONTEXT_SCHEMA, engine=ENGINE, context=context, buckets=buckets)
+        payload = dict(schema=CONTEXT_SCHEMA, engine=engine, context=context, buckets=buckets)
         shards[context] = dict(**immutable(context, payload, MAX_SHARD_BYTES), count=len(completed[context]))
-    manifest = dict(schema=SCHEMA, engine=ENGINE, revision=len(tasks), verified_task_count=len(tasks),
+    manifest = dict(schema=SCHEMA, engine=engine, revision=len(tasks), verified_task_count=len(tasks),
                     updated_at=now(), shards=shards)
     # All referenced bytes already exist. The only mutable entry is published last.
     stage = directory / ".index.pending.json"
@@ -172,15 +202,15 @@ def publish_coverage(data, tasks=None):
     return manifest
 
 
-def referenced_files(directory, manifest=None):
+def referenced_files(directory, manifest=None, version=1):
     """Files required by one complete snapshot, for a standalone runner ZIP."""
     directory = Path(directory)
-    if manifest is None: manifest, _ = read_coverage(directory)
+    if manifest is None: manifest, _ = read_coverage(directory, version)
     files = {'index.json'}
     for context, entry in manifest['shards'].items():
         files.add(entry['file'])
         if manifest['schema'] == SCHEMA:
-            node = validate_context((directory/entry['file']).read_bytes(), context, entry, MAX_SHARD_BYTES)
+            node = validate_context((directory/entry['file']).read_bytes(), context, entry, MAX_SHARD_BYTES, version=version)
             files.update(chunk['file'] for chunks in node['buckets'].values() for chunk in chunks)
     return files
 
@@ -191,9 +221,17 @@ def prune_retired(data, *, observed=None):
     Clients refresh each minute. Very old suspended clients must refresh if an
     expired shard is unavailable; this cannot turn missing data into coverage.
     """
-    directory = Path(data)/'coverage'
-    manifest, _ = read_coverage(directory)
-    active = referenced_files(directory, manifest)
+    removed = 0
+    for version in sorted(VERSION_SUBDIR):
+        directory = coverage_dir(data, version)
+        if (directory/'index.json').exists():
+            removed += _prune_one(directory, version, observed)
+    return removed
+
+
+def _prune_one(directory, version, observed=None):
+    manifest, _ = read_coverage(directory, version)
+    active = referenced_files(directory, manifest, version)
     stamp = observed or datetime.now(timezone.utc)
     path = directory/'retention.json'
     old = read_json(path, {})
@@ -218,6 +256,12 @@ if __name__ == "__main__":
     parser.add_argument('--prune', action='store_true', help='Retire unreferenced coverage files after a 24-hour grace period')
     parser.add_argument('--prune-only', action='store_true', help='Prune after aggregate already published this revision; do not scan/rebuild the ledger twice')
     args = parser.parse_args()
-    manifest = read_coverage(args.data/'coverage')[0] if args.prune_only else publish_coverage(args.data)
+    if args.prune_only:
+        manifest = read_coverage(coverage_dir(args.data, 1), 1)[0]
+        v2 = read_coverage(coverage_dir(args.data, 2), 2)[0] if (coverage_dir(args.data, 2)/'index.json').exists() else {'revision': 0}
+    else:
+        published = publish_versions(args.data)
+        manifest, v2 = published[1], published[2]
     if args.prune or args.prune_only: prune_retired(args.data)
-    print(f"Coverage revision {manifest['revision']}: 81 exact context shards")
+    print(f"Coverage revision {manifest['revision']}: 81 exact context shards"
+          f" (engine v2 revision {v2['revision']} under coverage/v2)")

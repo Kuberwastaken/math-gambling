@@ -1,3 +1,21 @@
+# Math Gambling runner v0.7.0 (upcoming)
+
+**Engine v2 tasks.** New work is proposed as `mg114-offset-v2` tasks that span 1,024 coefficient rows instead of 128. A v2 task is exactly its eight aligned v1 sub-tasks: the same positions, the same exact arithmetic, counters summed and hits concatenated in the same order. Eight times fewer dispatches, checkpoint writes and bank claims cover the same search. Version 1 task IDs, receipts, digests and banked bytes are unchanged, and a resumed checkpoint finishes its reserved v1 tasks and banks them normally. A bank may contain both versions.
+
+The client now reads two published coverage indexes: the unchanged v1 index, and the engine v2 index at `data/coverage/v2/index.json`. A task is skipped when its own version's index lists its ID, or the other version's index lists an overlapping ID — a published v2 task covers its eight v1 sub-tasks and vice versa. The v2 index is optional while it is being published: an absent or unreadable one is treated as holding nothing, which can only cost duplicate work and never pauses the campaign. A corrupt or rolled-back **v1** index still stops new dispatch as before.
+
+**Cross-target 60/40 by default.** The runner now spends 40% of its dispatches on the other open cases below 1,000 (390, **627**, 633, 732, 921, 975) and 60% on 114. Targets are drawn from the density prior in `tools/target_bounds.py` (627 carries the highest published density), restricted to ell=1 contexts, and every proposal passes the exact k-general emptiness proof before any scan is spent.
+
+Cross-target results are banked **separately** as `[bank-mt]` issues with schema `math-gambling-target-bank-v1`, verified by the separate target pipeline. A target claim is never mixed into a 114 `[bank]` bank. Target work uses the same crash-safe SQLite checkpoint and outbox as 114 work: reserved tasks resume after a restart, each bank is posted at most once, and any exact identity for any target is written to `discoveries/targets/` before anything else.
+
+- `--targets-share 0.4`: fraction of dispatches given to the other targets. **`--targets-share 0` disables the cross-target slice completely** and runs 114 only, exactly as v0.6.1 did.
+- `--targets 390 627 633 732 921 975`: choose which open cases the slice covers.
+- `tools/target_runner.py` still works as a standalone sub-campaign for anyone who prefers a separate process.
+
+No amount of running guarantees a solution for 114 or for any other open case. The counters remain bounded exact work, not lottery tickets.
+
+## Previous release
+
 # Math Gambling runner v0.6.1
 
 Restarting an existing output directory now reuses its saved name, GitHub username and optional website. Omit those three options to resume without re-entering attribution. Case-only differences in a GitHub username are accepted, including capitalization returned by authenticated GitHub CLI login. Existing receipt spelling, bank bytes, submission records, seeds and task results remain intact.

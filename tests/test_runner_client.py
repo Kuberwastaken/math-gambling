@@ -106,6 +106,10 @@ raise SystemExit(runner.main(['--name','HTTP fixture','--github','test','--worke
             requests = []
             def fetch(url, cap):
                 requests.append(url)
+                # The engine v2 index is published separately; this fixture only
+                # serves v1, so the optional fetch must fail like a real 404.
+                if '/v2/' in url:
+                    raise cc.CoverageError('Coverage download unavailable: HTTPError')
                 body = (root/'server'/url.rsplit('/', 1)[-1]).read_bytes()
                 self.assertLessEqual(len(body), cap)
                 return body
@@ -113,9 +117,12 @@ raise SystemExit(runner.main(['--name','HTTP fixture','--github','test','--worke
             coverage.refresh()
             self.assertTrue(coverage.contains(known))
             self.assertFalse(coverage.contains(other))
-            self.assertEqual(len(requests), 2)
+            primary = [url for url in requests if '/v2/' not in url]
+            self.assertEqual(len(primary), 2)
+            self.assertEqual([url for url in requests if '/v2/' in url], ['https://fixture.invalid/coverage/v2/index.json'])
+            self.assertIsNone(coverage.other.index)
             self.assertTrue(coverage.contains(known))
-            self.assertEqual(len(requests), 2)
+            self.assertEqual(len([url for url in requests if '/v2/' not in url]), 2)
             current = cc.validate_index(raw)
             shard = current['shards']['c05']
             broken = (root/'server'/shard['file']).read_bytes() + b' '

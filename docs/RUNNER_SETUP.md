@@ -79,7 +79,9 @@ You can optionally link your alias with `--url "https://your-site.example"`. On 
 
 - `--minutes 60`: schedule work for up to an hour, then finish the active bounded tasks. The maximum is 1,440 minutes per invocation.
 - `--workers 1`: use one worker process. Try one first; raise it up to the available CPU count, with a maximum of 32. Workers may use their cores fully while running. This is a worker count, not the browser's duty-cycle slider.
-- `--max-tasks 4096`: cap additional completed tasks in this invocation. The runner can finish earlier if it reaches this cap, its outbox limit or an exact discovery.
+- `--max-tasks 4096`: cap additional completed tasks in this invocation, counting both 114 and cross-target tasks. The runner can finish earlier if it reaches this cap, its outbox limit or an exact discovery.
+- `--targets-share 0.4`: fraction of dispatches spent on the other open cases (see "Other open targets" below). Use `--targets-share 0` to run 114 only.
+- `--targets 390 627 633 732 921 975`: choose which open cases the cross-target slice covers.
 - `--output "math-gambling-run"`: choose where results and checkpoints go. Relative paths are relative to your current terminal folder.
 - `--offline`: use the bundled allocation strategy and exact coverage snapshot, with no network requests. It cannot be combined with `--login` or `--submit`. Work banked after the release may be absent from this snapshot. Online coverage failures pause new dispatch rather than silently assuming no task was checked.
 - `--seed`: choose a 256-bit seed using exactly 64 hexadecimal digits. Omit it for a securely generated seed.
@@ -87,6 +89,28 @@ You can optionally link your alias with `--url "https://your-site.example"`. On 
 - `--help`: show all options.
 
 The runner keeps computing when the terminal is behind other windows. It does not pause for a hidden browser tab. Keep the terminal open and the computer awake while you want it to run. A failed strategy download falls back to the bundled policy.
+
+## Task engine v2
+
+New 114 work is proposed as `mg114-offset-v2` tasks covering 1,024 coefficient rows, which is exactly the eight aligned 128-row version 1 tasks combined: same positions, same exact arithmetic, counters summed and hits concatenated. This cuts dispatch, checkpoint and banking overhead eightfold without changing any mathematical result. Older version 1 tasks already reserved in your checkpoint still run and bank normally, and one bank may contain both versions.
+
+The runner checks two published coverage indexes, the version 1 index and the version 2 index under `data/coverage/v2/`. A task is skipped when its own version's index lists it, or when the other version's index lists work covering the same positions. While the version 2 index is not published yet it simply reads as empty; that can only repeat work, and it never causes a task to be wrongly skipped.
+
+## Other open targets (the 60/40 split)
+
+By default the runner gives 60% of its dispatches to 114 and 40% to the other open cases below 1,000 — 390, 627, 633, 732, 921 and 975 — using the declared density prior (627 has the highest published density). Those tasks use the safe `ell=1` generator, and each proposal must first pass an exact proof that it is not empty for that target, so no scan is wasted.
+
+Cross-target results are banked **separately**, as `bank-mt-*.json` files with the `math-gambling-target-bank-v1` schema, and are submitted as `[bank-mt]` issues for the separate target verifier. They are never mixed into a 114 bank. They use the same durable checkpoint, so reserved target work resumes after a restart and each bank is submitted at most once. An exact identity for any target is saved to `discoveries/targets/` immediately, before any other bookkeeping.
+
+To opt out and run the 114 campaign exactly as before:
+
+```sh
+python3 tools/runner.py --minutes 60 --workers 1 --targets-share 0
+```
+
+Manual banking of a target file uses its own issue title: keep `[bank-mt]` at the start of the title and paste one `bank-mt-*.json` file as the body. A separate standalone runner, `tools/target_runner.py`, is still available if you prefer to run the cross-target slice in its own process.
+
+No amount of running guarantees a solution for 114 or for any other open case.
 
 ## 3. Stop and resume
 
@@ -110,9 +134,10 @@ The output folder contains:
 
 - `checkpoint.sqlite3` and its SQLite sidecars: task reservations, completed tasks and bank state.
 - `results.jsonl`: durable exact task results.
-- `banks/bank-*.json`: compact receipts ready for GitHub.
+- `target-results.jsonl`: durable exact cross-target task results.
+- `banks/bank-*.json`: compact 114 receipts ready for GitHub; `banks/bank-mt-*.json`: cross-target receipts for `[bank-mt]` issues.
 - `status.json`: summary written when the run stops.
-- `discoveries/`: independently checked candidate identities, if any.
+- `discoveries/`: independently checked candidate identities for 114, if any, with `discoveries/targets/` holding identities for the other open cases.
 - `runs/`: durable per-invocation seed, runtime, policy snapshots, task assignments and exact-result digests.
 - `cache/coverage/`: content-addressed copies of published exact coverage shards.
 

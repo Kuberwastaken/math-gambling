@@ -2,7 +2,7 @@
 import hashlib
 import json
 import re
-from search_core import ENGINE, make_task, task_id
+from search_core import ENGINE, ENGINES, make_task, task_id
 
 CONTEXT_SCHEMA = 'math-gambling-coverage-context-v2'
 CHUNK_SCHEMA = 'math-gambling-coverage-chunk-v2'
@@ -17,19 +17,20 @@ def checked_json(raw, entry, cap):
         raise ValueError('coverage checksum or size mismatch')
     return json.loads(raw)
 
-def checked_id(identifier, context):
+def checked_id(identifier, context, version=1):
+    """Engine-version aware identity check; version 1 keeps the original bytes."""
     if not isinstance(identifier, str): raise ValueError('invalid coverage identity')
     parts = identifier.split(':')
-    if (len(parts) != 4 or parts[:2] != [ENGINE, context]
+    if (len(parts) != 4 or parts[:2] != [ENGINES[version], context]
             or not re.fullmatch(r'0|[1-9][0-9]{0,5}', parts[3])
-            or task_id(make_task(context, parts[2], int(parts[3]))) != identifier):
+            or task_id(make_task(context, parts[2], int(parts[3]), version)) != identifier):
         raise ValueError('invalid coverage identity')
     return identifier
 
-def validate_context(raw, context, entry, cap=8*1024*1024):
+def validate_context(raw, context, entry, cap=8*1024*1024, *, version=1):
     value = checked_json(raw, entry, cap)
     if (not isinstance(value, dict) or set(value) != {'schema','engine','context','buckets'}
-            or value['schema'] != CONTEXT_SCHEMA or value['engine'] != ENGINE
+            or value['schema'] != CONTEXT_SCHEMA or value['engine'] != ENGINES[version]
             or value['context'] != context or not isinstance(value['buckets'], dict)):
         raise ValueError('invalid chunked coverage context')
     total = 0
@@ -48,10 +49,10 @@ def validate_context(raw, context, entry, cap=8*1024*1024):
     if total != entry['count']: raise ValueError('chunked coverage count mismatch')
     return value
 
-def validate_chunk(raw, context, bucket, entry):
+def validate_chunk(raw, context, bucket, entry, *, version=1):
     value = checked_json(raw, entry, CHUNK_BYTES)
     if (not isinstance(value, dict) or set(value) != {'schema','engine','context','bucket','tasks'}
-            or value['schema'] != CHUNK_SCHEMA or value['engine'] != ENGINE
+            or value['schema'] != CHUNK_SCHEMA or value['engine'] != ENGINES[version]
             or value['context'] != context or value['bucket'] != bucket):
         raise ValueError('invalid coverage chunk')
     ids = value['tasks']
@@ -59,7 +60,7 @@ def validate_chunk(raw, context, bucket, entry):
         raise ValueError('invalid coverage chunk count')
     previous = ''
     for identifier in ids:
-        checked_id(identifier, context)
+        checked_id(identifier, context, version)
         if identifier <= previous or bucket_for(identifier) != bucket:
             raise ValueError('duplicate, unsorted or misrouted coverage identity')
         previous = identifier

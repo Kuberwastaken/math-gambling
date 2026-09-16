@@ -213,8 +213,8 @@ class RunnerRecoveryTests(unittest.TestCase):
                 self.assertNotIn(fresh, old)
                 independent = random.Random(); independent.setstate(expected_context)
                 c = independent.choices(core.CONTEXTS, weights=[1/81]*81, k=1)[0]
-                row = independent.randrange(int(c['rowTasks']))*c['rowStride']
-                expected = core.make_task(c['id'], row, independent.randrange(c['blocks']))
+                row = independent.randrange(int(c['rowTasksV2']))*c['rowStrideV2']
+                expected = core.make_task(c['id'], row, independent.randrange(c['blocks']), 2)
                 self.assertEqual(fresh, expected)
                 saved, exists = runner.restore_rng(db, SEED)
                 self.assertTrue(exists)

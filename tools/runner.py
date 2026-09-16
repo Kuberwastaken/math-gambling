@@ -25,9 +25,19 @@ import time
 from urllib.request import Request, urlopen
 from urllib.parse import urlsplit
 
-from search_core import CONTEXTS, ENGINE, canonical_json, make_task, run_task, task_id, verify_triple
+from search_core import CONTEXTS, ENGINE, ENGINE_V2, canonical_json, make_task, run_task, task_id, verify_triple
 from coverage_client import CoverageError, CoverageIndex
 from client_audit import RunAudit, VERSION, RNG_ALGORITHM, seed_value
+
+try:
+    # The cross-target slice is optional: an older archive without these modules
+    # still runs the 114 campaign exactly as before, with targets disabled.
+    import multi_target as mt
+    import target_bounds as tb
+    TARGETS_AVAILABLE = True
+except ImportError:  # pragma: no cover - only in trimmed archives
+    mt = tb = None
+    TARGETS_AVAILABLE = False
 
 ROOT = Path(__file__).resolve().parents[1]
 UA = 'OpenAI File Downloader, XaiImageApiFetch/1.0'
@@ -36,6 +46,10 @@ SUBMIT_INTERVAL = 10
 BANK_LIMIT = 256
 OUTBOX_LIMIT = 4096
 MIN_PYTHON = (3, 11)
+TASK_VERSION = 2
+TARGET_BANK_SCHEMA = 'math-gambling-target-bank-v1'
+TARGET_SHARE = 0.4
+DEFAULT_TARGETS = tuple(k for k in tb.OPEN_TARGETS if k != tb.PRIMARY) if TARGETS_AVAILABLE else (390, 627, 633, 732, 921, 975)
 
 class PolicyWeights(list):
     def __init__(self, values, policy):
@@ -128,7 +142,12 @@ def open_state(out, contributor):
       CREATE TABLE IF NOT EXISTS coverage_skips(id TEXT PRIMARY KEY,revision INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS bank_priority(id TEXT PRIMARY KEY);
       CREATE TABLE IF NOT EXISTS rng_states(seed TEXT PRIMARY KEY,algorithm TEXT NOT NULL,runtime TEXT NOT NULL,state TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS discoveries(id TEXT PRIMARY KEY,xyz TEXT NOT NULL,bank TEXT NOT NULL);''')
+      CREATE TABLE IF NOT EXISTS discoveries(id TEXT PRIMARY KEY,xyz TEXT NOT NULL,bank TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS target_tasks(id TEXT PRIMARY KEY,task TEXT NOT NULL,result TEXT,bank TEXT);
+      CREATE TABLE IF NOT EXISTS target_discoveries(id TEXT PRIMARY KEY,k INTEGER NOT NULL,xyz TEXT NOT NULL,bank TEXT);''')
+    # Cross-target banks share the durable bank queue but never the 114 namespace.
+    if 'kind' not in {row[1] for row in db.execute('PRAGMA table_info(banks)')}:
+        db.execute("ALTER TABLE banks ADD COLUMN kind TEXT NOT NULL DEFAULT 'bank'")
     identity = canonical_json(dict(engine=ENGINE, contributor=contributor))
     previous = db.execute("SELECT value FROM meta WHERE key='identity'").fetchone()
     if previous and previous[0] != identity:
@@ -270,8 +289,8 @@ def choose_task(rng, weights, db, coverage=None, seed=None):
     c = rng.choices(CONTEXTS, weights=weights, k=1)[0] if preflight else None
     for attempt in range(attempts):
         if not preflight:c = rng.choices(CONTEXTS, weights=weights, k=1)[0]
-        row = rng.randrange(int(c['rowTasks']))*c['rowStride']
-        task = make_task(c['id'], row, rng.randrange(c['blocks']))
+        row = rng.randrange(int(c['rowTasksV2']))*c['rowStrideV2']
+        task = make_task(c['id'], row, rng.randrange(c['blocks']), TASK_VERSION)
         # Hold context fixed: rejection must not silently reweight contexts.
         # Bounded fallback retains liveness even if every tile is empty.
         if preflight and attempt<31 and certified_empty(task):continue
@@ -288,6 +307,148 @@ def choose_task(rng, weights, db, coverage=None, seed=None):
         with db:
             save_rng(db, seed, rng)
     raise RuntimeError('Could not allocate a fresh local task')
+
+
+class TargetLedger:
+    """Set-like view of already reserved/proven-empty target task IDs.
+
+    Reuses target_runner.choose_target_task's contract (membership plus `add`
+    for provably-empty proposals) while the authoritative record stays in the
+    crash-safe checkpoint, so a restart never re-reserves banked work.
+    """
+
+    def __init__(self, db):
+        self.db = db
+        self.memory = set()
+
+    def __contains__(self, tid):
+        return tid in self.memory or self.db.execute(
+            'SELECT 1 FROM target_tasks WHERE id=?', (tid,)).fetchone() is not None
+
+    def add(self, tid):
+        self.memory.add(tid)
+
+
+def target_weights(targets):
+    """Density-prior weights over the cross-target slice (114 excluded)."""
+    split = tb.campaign_split(targets=(tb.PRIMARY,) + tuple(targets))
+    others = {k: v for k, v in split.items() if k != tb.PRIMARY}
+    total = sum(others.values()) or 1.0
+    return {k: v / total for k, v in others.items()}
+
+
+def choose_target_task(rng, weights, db, done=None, seed=None, attempts=200):
+    """Reserve a fresh, not-provably-empty cross-target task, or None.
+
+    Mirrors tools/target_runner.choose_target_task: density-prior target draw,
+    ell=1 contexts, v1-format target tasks (multi_target supports version 1
+    only) and the exact k-general prove_empty_target preflight, which never
+    spends a scan or a bank slot on a task proven to hold no curve.
+    """
+    done = TargetLedger(db) if done is None else done
+    ks = list(weights)
+    ws = [weights[k] for k in ks]
+    for _ in range(attempts):
+        k = rng.choices(ks, weights=ws, k=1)[0]
+        context = rng.choice(mt.ELL1_CONTEXTS)
+        c = mt.sc.CONTEXT_BY_ID[context]
+        row = rng.randrange(int(c['rowTasks']))*c['rowStride']
+        task = mt.make_target_task(k, context, row, rng.randrange(c['blocks']))
+        tid = mt.target_task_id(task)
+        if tid in done:
+            continue
+        if mt.prove_empty_target(task):
+            done.add(tid)
+            continue
+        with db:
+            db.execute('INSERT INTO target_tasks(id,task) VALUES(?,?)', (tid, canonical_json(task)))
+            if seed is not None:
+                save_rng(db, seed, rng)
+        return task
+    if seed is not None:
+        with db:
+            save_rng(db, seed, rng)
+    return None
+
+
+def preserve_target_identity(output, k, hit, task=None):
+    """Identity-first preservation for any target k, kept out of the 114 folder."""
+    if not verify_triple(hit.get('xyz'), k):
+        raise ArithmeticError('independent target discovery verification failed')
+    xyz = sorted(hit['xyz'], key=int)
+    digest = hashlib.sha256(canonical_json([k, xyz]).encode()).hexdigest()
+    path = Path(output)/'discoveries'/'targets'/f'identity-{k}-{digest}.json'
+    try:
+        atomic_json(path, {'schema': 'math-gambling-target-discovery-v1', 'k': k,
+                           'engine': task['engine'] if task else None,
+                           'task': task, 'hit': {**hit, 'xyz': xyz}})
+    except Exception as exc:
+        raise RuntimeError(f'EXACT IDENTITY for k={k} {canonical_json(xyz)} could not be saved: {exc}') from exc
+    return path
+
+
+def execute_target_task(task, output):
+    # Same kernel choice as 114 work: the Rust kernel validates and returns the
+    # identical result dict for mg{k}-offset-v1 tasks, Python is the fallback.
+    k = mt.parse_engine(task['engine'])
+    compute = _native_kernel.run if _native_kernel is not None else mt.run_target_task
+    return compute(task, on_hit=lambda hit: preserve_target_identity(output, k, hit, task))
+
+
+def preserve_target_result(out, db, result):
+    """Same durability as 114 work: identities, then an fsynced result log."""
+    k = mt.parse_engine(result['task']['engine'])
+    for hit in result['hits']:
+        if not verify_triple(hit['xyz'], k):
+            raise ArithmeticError('target cube verification failed')
+        preserve_target_identity(out, k, hit, result['task'])
+    line = canonical_json(result)
+    with (out/'target-results.jsonl').open('a', encoding='utf-8', newline='\n') as handle:
+        handle.write(line+'\n'); handle.flush(); os.fsync(handle.fileno())
+    db.execute('UPDATE target_tasks SET result=? WHERE id=?', (line, result['id']))
+    for hit in result['hits']:
+        xyz = sorted(hit['xyz'], key=int)
+        digest = hashlib.sha256(canonical_json([k, xyz]).encode()).hexdigest()
+        db.execute('INSERT OR IGNORE INTO target_discoveries(id,k,xyz,bank) VALUES(?,?,?,NULL)',
+                   (digest, k, canonical_json(xyz)))
+    db.commit()
+
+
+def write_target_bank(out, db, contributor, force=False, bank_every=BANK_LIMIT, priority_id=None):
+    """Bank cross-target claims separately, never mixed into a 114 bank."""
+    if priority_id is not None:
+        rows = db.execute('SELECT id,result FROM target_tasks WHERE id=? AND result IS NOT NULL AND bank IS NULL', (priority_id,)).fetchall()
+        force = True
+    else:
+        rows = db.execute('SELECT id,result FROM target_tasks WHERE result IS NOT NULL AND bank IS NULL ORDER BY rowid LIMIT ?', (bank_every,)).fetchall()
+    if not rows or (len(rows) < bank_every and not force):
+        return None
+    claims, chosen = [], []
+    for tid, text in rows:
+        result = json.loads(text)
+        claim = dict(task=result['task'], digest=result['digest'])
+        if result['hits']:
+            claim['hits'] = result['hits']
+        trial = dict(schema=TARGET_BANK_SCHEMA, contributor=contributor, tasks=claims+[claim])
+        if len(canonical_json(trial).encode())+1 > 60000:
+            break
+        claims.append(claim); chosen.append(tid)
+    if not chosen:
+        raise RuntimeError('A target claim exceeds bank byte cap; exact hits remain preserved locally')
+    bank = dict(schema=TARGET_BANK_SCHEMA, contributor=contributor, tasks=claims)
+    bid = hashlib.sha256(canonical_json(bank).encode()).hexdigest()
+    path = out/'banks'/f'bank-mt-{bid[:16]}.json'
+    atomic_json(path, bank)
+    with db:
+        db.execute('INSERT OR IGNORE INTO banks(id,path,kind) VALUES(?,?,?)', (bid, path.relative_to(out).as_posix(), 'bank-mt'))
+        if any(claim.get('hits') for claim in claims):
+            db.execute('INSERT OR IGNORE INTO bank_priority(id) VALUES(?)', (bid,))
+        db.executemany('UPDATE target_tasks SET bank=? WHERE id=?', [(bid, tid) for tid in chosen])
+        db.executemany('UPDATE target_discoveries SET bank=? WHERE bank IS NULL AND id=?',
+                       [(bid, hashlib.sha256(canonical_json([mt.parse_engine(claim['task']['engine']), sorted(hit['xyz'], key=int)]).encode()).hexdigest(),)
+                        for claim in claims for hit in claim.get('hits', [])])
+    print(f'Target bank ready: {path} ({len(claims)} tasks; [bank-mt], awaiting independent target replay)', flush=True)
+    return path
 
 
 def preserve_result(out, db, result):
@@ -442,17 +603,19 @@ def maybe_submit(db, repo, last_attempt):
     pacing = db.execute("SELECT value FROM meta WHERE key='submit_after'").fetchone()
     if time.monotonic()-last_attempt < SUBMIT_INTERVAL or (pacing and time.time() < float(pacing[0])):
         return last_attempt
-    pending = db.execute('SELECT id,path FROM banks WHERE submitted IS NULL ORDER BY CASE WHEN id IN (SELECT id FROM bank_priority) THEN 0 ELSE 1 END,rowid LIMIT 1').fetchone()
+    pending = db.execute("SELECT id,path,COALESCE(kind,'bank') FROM banks WHERE submitted IS NULL ORDER BY CASE WHEN id IN (SELECT id FROM bank_priority) THEN 0 ELSE 1 END,rowid LIMIT 1").fetchone()
     if not pending:
         return last_attempt
-    bid, path = pending
+    bid, path, kind = pending
     attempt = time.monotonic()
     with db:
         db.execute("INSERT OR REPLACE INTO meta VALUES('submit_after',?)", (str(time.time()+SUBMIT_INTERVAL),))
     headers = {}
     try:
-        title = f'[bank] Bank-in {bid[:16]}'
-        path, bank_body = resolve_bank(db, bid, path)
+        # Cross-target banks use their own [bank-mt] title so the 114 verifier,
+        # which only reads [bank]/[compute], never sees a target claim.
+        title = f'[bank-mt] Target bank {bid[:16]}' if kind == 'bank-mt' else f'[bank] Bank-in {bid[:16]}'
+        path, bank_body = resolve_bank(db, bid, path, kind)
         lookup = subprocess.run(['gh', 'issue', 'list', '--repo', repo, '--state', 'all',
             '--search', bid[:16], '--json', 'title,url,body', '--limit', '100'], text=True,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=20)
@@ -503,9 +666,9 @@ def maybe_submit(db, repo, last_attempt):
     return attempt
 
 
-def resolve_bank(db, bid, stored):
+def resolve_bank(db, bid, stored, kind='bank'):
     out = Path(db.execute('PRAGMA database_list').fetchone()[2]).resolve().parent
-    expected = f'bank-{bid[:16]}.json'
+    expected = f'bank-mt-{bid[:16]}.json' if kind == 'bank-mt' else f'bank-{bid[:16]}.json'
     if str(stored).replace('\\', '/').rsplit('/', 1)[-1] != expected:
         raise ValueError('Bank filename does not match its checkpoint digest')
     path = out/'banks'/expected
@@ -569,6 +732,10 @@ def main(argv=None):
     parser.add_argument('--mark-banked', metavar='FILENAME', help='mark an existing bank manually submitted, then exit; this is not verification')
     parser.add_argument('--repo', default='Kuberwastaken/math-gambling')
     parser.add_argument('--max-tasks', type=int, default=4096, help='additional completed tasks this invocation; max4096')
+    parser.add_argument('--targets-share', type=float, default=TARGET_SHARE,
+                        help='fraction of dispatches spent on the other open targets (default0.4); 0 disables the cross-target slice entirely')
+    parser.add_argument('--targets', type=int, nargs='+', default=list(DEFAULT_TARGETS),
+                        help='open targets for the cross-target slice; 114 is always the primary campaign')
     args = parser.parse_args(argv)
     if not math.isfinite(args.minutes) or not 0 < args.minutes <= 1440:
         parser.error('--minutes must be in (0,1440]')
@@ -582,6 +749,14 @@ def main(argv=None):
         parser.error('--bank-every must be 1..256')
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', args.repo):
         parser.error('invalid repository')
+    if not math.isfinite(args.targets_share) or not 0 <= args.targets_share <= 1:
+        parser.error('--targets-share must be in [0,1]')
+    args.targets = [k for k in dict.fromkeys(args.targets) if k != (tb.PRIMARY if TARGETS_AVAILABLE else 114)]
+    if args.targets_share > 0:
+        if not TARGETS_AVAILABLE:
+            parser.error('this archive has no cross-target modules; use --targets-share 0')
+        if not args.targets or any(not tb.admissible(k) for k in args.targets):
+            parser.error('--targets must list admissible open cases (3..1000 and 3 or 6 mod 9), excluding 114')
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=True)
     lock = lock_output(out/'runner.lock')
     try:
@@ -628,7 +803,7 @@ def run_campaign(args, out, db, contributor):
         atomic_json(out/'status.json', dict(engine=ENGINE, version=VERSION, state='discovery_found',
             completed_this_run=0, discoveries=identities, queue=bank_queue(db)))
         return 0
-    print(f'Math Gambling {VERSION} | {ENGINE}: {args.workers} workers, at most {args.minutes:g} minutes.', flush=True)
+    print(f'Math Gambling {VERSION} | {ENGINE_V2} (tasks of {1024} rows): {args.workers} workers, at most {args.minutes:g} minutes.', flush=True)
     print('Results are local until banked; GitHub audits before contribution credit; exact replays are shown separately. Ctrl-C stops scheduling and drains current tasks.', flush=True)
     queue = bank_queue(db)
     print(f'Bank every {args.bank_every} completed tasks. Queue: {queue["pending"]} pending, {queue["uncertain"]} uncertain; submitted issues await verification.', flush=True)
@@ -651,6 +826,16 @@ def run_campaign(args, out, db, contributor):
     audit.policy(weights, epoch, snapshot)
     rng, resumed_seed = restore_rng(db, seed)
     audit.write('rng', resumed=resumed_seed, state=rng.getstate())
+    targets = tuple(args.targets) if args.targets_share > 0 else ()
+    target_priors = target_weights(targets) if targets else {}
+    if targets:
+        print(f'Cross-target slice: {args.targets_share:.0%} of dispatches over {targets} '
+              f'(weights {({k: round(v, 3) for k, v in target_priors.items()})}); banked separately as [bank-mt]. '
+              'Use --targets-share 0 to run 114 only.', flush=True)
+        audit.write('targets', share=args.targets_share, targets=list(targets), weights=target_priors)
+    else:
+        print('Cross-target slice disabled; all dispatches go to 114.', flush=True)
+    target_done = TargetLedger(db) if targets else None
     stop = False
     failures = []
     def request_stop(*_):
@@ -659,7 +844,10 @@ def run_campaign(args, out, db, contributor):
     signal.signal(signal.SIGINT, request_stop)
     if hasattr(signal, 'SIGTERM'): signal.signal(signal.SIGTERM, request_stop)
     pending = [json.loads(row[0]) for row in db.execute('SELECT task FROM tasks WHERE result IS NULL AND id NOT IN (SELECT id FROM coverage_skips) ORDER BY rowid')]
+    # Reserved-but-unfinished target work resumes first, exactly like 114 work.
+    pending_targets = [json.loads(row[0]) for row in db.execute('SELECT task FROM target_tasks WHERE result IS NULL ORDER BY rowid')] if TARGETS_AVAILABLE else []
     completed = curves = points = inputs = exact = 0
+    target_completed = target_curves = 0
     deadline = time.monotonic()+args.minutes*60
     last_report = last_refresh = time.monotonic()
     last_refresh_completed = 0
@@ -673,6 +861,7 @@ def run_campaign(args, out, db, contributor):
             last_submit = maybe_submit(db, args.repo, last_submit)
         while True:
             unbanked = db.execute("SELECT count(*) FROM tasks LEFT JOIN banks ON tasks.bank=banks.id WHERE tasks.result IS NOT NULL AND (banks.submitted IS NULL OR banks.submitted LIKE 'uncertain;%')").fetchone()[0]
+            unbanked += db.execute("SELECT count(*) FROM target_tasks LEFT JOIN banks ON target_tasks.bank=banks.id WHERE target_tasks.result IS NOT NULL AND (banks.submitted IS NULL OR banks.submitted LIKE 'uncertain;%')").fetchone()[0]
             if unbanked >= OUTBOX_LIMIT:
                 if not capacity_paused: print('Outbox capacity reached; computation pauses while saved banks await submission.', flush=True)
                 capacity_paused = True
@@ -680,6 +869,7 @@ def run_campaign(args, out, db, contributor):
             else:
                 capacity_paused = False
             while not stop and not capacity_paused and time.monotonic() < deadline and completed+len(active) < args.max_tasks and len(active) < args.workers and unbanked+len(active) < OUTBOX_LIMIT:
+                is_target = False
                 try:
                     if pending:
                         task = pending.pop(0)
@@ -688,18 +878,34 @@ def run_campaign(args, out, db, contributor):
                             db.commit()
                             audit.write('already_published', task_id=task_id(task), revision=coverage.index['revision'])
                             continue
+                    elif pending_targets:
+                        task, is_target = pending_targets.pop(0), True
                     else:
-                        task = choose_task(rng, weights, db, coverage, seed=seed)
+                        # The 60/40 lever: a dispatch goes to another open case
+                        # with probability --targets-share. Target work has its
+                        # own IDs, banks and verifier; 114 state is untouched.
+                        task = None
+                        if targets and rng.random() < args.targets_share:
+                            task = choose_target_task(rng, target_priors, db, target_done, seed=seed)
+                            is_target = task is not None
+                        if task is None:
+                            task = choose_task(rng, weights, db, coverage, seed=seed)
                 except Exception as exc:
                     print(f'Task allocation failed; scheduling paused: {exc}', file=sys.stderr)
                     audit.write('blocked', reason=str(exc))
                     failures.append(str(exc))
                     stop = True
                     break
+                if is_target:
+                    audit.write('dispatch_target', task=task, task_id=mt.target_task_id(task),
+                                k=mt.parse_engine(task['engine']), share=args.targets_share)
+                    active[pool.submit(execute_target_task, task, str(out))] = (True, task)
+                    continue
                 audit.write('dispatch', task=task, task_id=task_id(task), policy_epoch=epoch, coverage_revision=coverage.index['revision'])
-                active[pool.submit(execute_task, task, str(out))] = task
+                active[pool.submit(execute_task, task, str(out))] = (False, task)
             if not active:
                 while write_bank(out, db, contributor, force=True, bank_every=args.bank_every): pass
+                while TARGETS_AVAILABLE and write_target_bank(out, db, contributor, force=True, bank_every=args.bank_every): pass
                 # Automatic mode uses the remaining user-selected time to drain
                 # queued banks at the normal submission rate, without compute.
                 if args.submit and not stop and time.monotonic() < deadline and bank_queue(db)['pending']:
@@ -717,15 +923,29 @@ def run_campaign(args, out, db, contributor):
                 if db.execute('SELECT 1 FROM discoveries LIMIT 1').fetchone():
                     stop = True
             for future in done:
-                task = active.pop(future)
+                is_target, task = active.pop(future)
                 try:
                     result = future.result()
-                    if result['id'] != task_id(task): raise ArithmeticError('worker task identity mismatch')
-                    preserve_result(out, db, result)
+                    expected = mt.target_task_id(task) if is_target else task_id(task)
+                    if result['id'] != expected: raise ArithmeticError('worker task identity mismatch')
+                    preserve_target_result(out, db, result) if is_target else preserve_result(out, db, result)
                 except Exception as exc:
                     failures.append(str(exc))
                     stop = True
                     print(f'Worker failed; reserved task remains retryable: {exc}', file=sys.stderr)
+                    continue
+                if is_target:
+                    target_completed += 1
+                    completed += 1
+                    target_curves += result['counters']['curves']
+                    audit.write('completed_target', task_id=result['id'], digest=result['digest'],
+                                k=mt.parse_engine(task['engine']), counters=result['counters'])
+                    if result['hits']:
+                        k = mt.parse_engine(task['engine'])
+                        print(f'EXACT SOLUTION PRESERVED for k={k}. Banking it first; submit for independent review.', flush=True)
+                        write_target_bank(out, db, contributor, force=True, bank_every=args.bank_every, priority_id=result['id'])
+                    else:
+                        write_target_bank(out, db, contributor, bank_every=args.bank_every)
                     continue
                 completed += 1
                 curves += result['counters']['curves']; points += result['counters']['quotient_points']
@@ -739,7 +959,7 @@ def run_campaign(args, out, db, contributor):
             if args.submit: last_submit = maybe_submit(db, args.repo, last_submit)
             now = time.monotonic()
             if now-last_report >= 5:
-                print(f'{completed:,} tasks | {inputs:,} inputs | {curves:,} curves | {exact:,} exact square tests | {points:,} q positions | {now-started:.1f}s | epoch {epoch} | {bank_queue(db)["pending"]} banks pending', flush=True)
+                print(f'{completed:,} tasks ({target_completed:,} cross-target) | {inputs:,} inputs | {curves:,} curves | {exact:,} exact square tests | {points:,} q positions | {now-started:.1f}s | epoch {epoch} | {bank_queue(db)["pending"]} banks pending', flush=True)
                 last_report = now
             if (completed-last_refresh_completed >= 64 or now-last_refresh >= 60) and not stop:
                 try:
@@ -767,6 +987,13 @@ def run_campaign(args, out, db, contributor):
             except Exception as exc:
                 failures.append(str(exc))
                 break
+        while TARGETS_AVAILABLE:
+            try:
+                if not write_target_bank(out, db, contributor, force=True, bank_every=args.bank_every):
+                    break
+            except Exception as exc:
+                failures.append(str(exc))
+                break
         if args.submit:
             last_submit = maybe_submit(db, args.repo, last_submit)
         identities = [json.loads(row[0]) for row in db.execute('SELECT xyz FROM discoveries ORDER BY id')]
@@ -780,6 +1007,9 @@ def run_campaign(args, out, db, contributor):
             elapsed_seconds=round(time.monotonic()-started, 3), policy_epoch=epoch,
             pending_banks=queue['pending']+queue['uncertain'], uncertain_banks=queue['uncertain'],
             state=state, errors=failures, discoveries=identities,
+            targets_share=args.targets_share, targets=list(targets),
+            target_tasks_this_run=target_completed, target_curves_this_run=target_curves,
+            target_discoveries=[json.loads(row[0]) for row in db.execute('SELECT xyz FROM target_discoveries ORDER BY id')],
             verified_community_credit='check GitHub; local completion is not server verification'))
         audit.write(state, completed=completed, inputs=inputs, curves=curves, exact_tests=exact,
                     queue=queue, errors=failures, discoveries=identities)

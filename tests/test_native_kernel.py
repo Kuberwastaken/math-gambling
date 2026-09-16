@@ -50,7 +50,7 @@ class NativeTests(unittest.TestCase):
         import tempfile
         root=Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory() as out:
-            p=subprocess.run([sys.executable,'tools/runner.py','--kernel','rust','--offline','--name','Native fixture','--github','native-fixture','--workers','1','--max-tasks','2','--minutes','1','--output',out],cwd=root,text=True,capture_output=True,timeout=60)
+            p=subprocess.run([sys.executable,'tools/runner.py','--kernel','rust','--offline','--targets-share','0','--name','Native fixture','--github','native-fixture','--workers','1','--max-tasks','2','--minutes','1','--output',out],cwd=root,text=True,capture_output=True,timeout=60)
             self.assertEqual(p.returncode,0,p.stdout+p.stderr)
             results=[json.loads(x) for x in (Path(out)/'results.jsonl').read_text().splitlines()]
             self.assertEqual(len(results),2)

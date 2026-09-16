@@ -3,7 +3,7 @@
 Only certified_empty may exclude a proposal. Floating point features never prune.
 """
 import math
-from search_core import ALPHA, ALPHA2, SCALE, CONTEXT_BY_ID, ROWS_PER_TASK, BLOCK_SIZE, validate_task
+from search_core import ALPHA, ALPHA2, SCALE, CONTEXT_BY_ID, ROWS_PER_TASK, BLOCK_SIZE, task_rows, validate_task
 
 assert ALPHA**3 <= 114*SCALE**3 < (ALPHA+1)**3
 # The engine's alpha^2 approximation is rounded UP by one scaled unit.
@@ -28,7 +28,8 @@ def norm_bounds(task):
     plus the explicitly bounded error of its rational alpha approximations.
     """
     task=validate_task(task);c=CONTEXT_BY_ID[task['context']];r=c['radius'];width=2*r+1
-    start=int(task['row']);end=min(start+ROWS_PER_TASK,int(c['totalRows']))
+    # Engine v2 tasks span task_rows(task) rows; v1 keeps ROWS_PER_TASK exactly.
+    start=int(task['row']);end=min(start+task_rows(task),int(c['totalRows']))
     tlo=c['tlo']+BLOCK_SIZE*task['block'];thi=min(tlo+BLOCK_SIZE-1,c['thi'])
     ell=c['ell'];bounds=[]
     while start<end:

@@ -12,6 +12,13 @@ import math
 import re
 
 ENGINE = "mg114-offset-v1"
+# Engine v2 covers the identical mathematical positions in 8x larger tasks
+# (1024 rows instead of 128) to cut per-task dispatch, persistence and banking
+# overhead. Counters and hits of a v2 task equal the sum/concatenation of its
+# eight aligned v1 sub-tasks; v1 receipts and digests are unchanged.
+ENGINE_V2 = "mg114-offset-v2"
+ENGINES = {1: ENGINE, 2: ENGINE_V2}
+ROWS_BY_VERSION = {1: 128, 2: 1024}
 MAX_TASKS_PER_RECEIPT = 8
 BLOCK_SIZE = 16
 ROWS_PER_TASK = 128
@@ -33,6 +40,8 @@ for ell in (1, 5, 25):
                     dhi=str(D0 * 2**(shell+1)), low=low, high=high,
                     totalRows=str((2*radius+1)**2), rowStride=ROWS_PER_TASK,
                     rowTasks=str(((2*radius+1)**2+ROWS_PER_TASK-1)//ROWS_PER_TASK),
+                    rowStrideV2=ROWS_BY_VERSION[2],
+                    rowTasksV2=str(((2*radius+1)**2+ROWS_BY_VERSION[2]-1)//ROWS_BY_VERSION[2]),
                     blocks=(thi-tlo+BLOCK_SIZE)//BLOCK_SIZE))
 CONTEXT_BY_ID = {c["id"]: c for c in CONTEXTS}
 
@@ -44,27 +53,64 @@ def canonical_json(value):
 def validate_task(task):
     if not isinstance(task, dict) or set(task) != {"version", "engine", "context", "row", "block"}:
         raise ValueError("task has unexpected or missing fields")
-    if type(task["version"]) is not int or task["version"] != 1 or task["engine"] != ENGINE:
+    if type(task["version"]) is not int or task["version"] not in ENGINES or task["engine"] != ENGINES[task["version"]]:
         raise ValueError("unsupported engine/version")
     if type(task["context"]) is not str or task["context"] not in CONTEXT_BY_ID:
         raise ValueError("unknown fixed context")
     c = CONTEXT_BY_ID[task["context"]]
     if type(task["row"]) is not str or not re.fullmatch(r"0|[1-9][0-9]{0,14}", task["row"]):
         raise ValueError("row must be a canonical bounded decimal string")
-    if int(task["row"]) >= int(c["totalRows"]) or int(task["row"]) % ROWS_PER_TASK:
+    if int(task["row"]) >= int(c["totalRows"]) or int(task["row"]) % ROWS_BY_VERSION[task["version"]]:
         raise ValueError("row outside context or not aligned to rowStride")
     if type(task["block"]) is not int or not 0 <= task["block"] < c["blocks"]:
         raise ValueError("block outside context")
-    return dict(version=1, engine=ENGINE, context=task["context"], row=task["row"], block=task["block"])
+    return dict(version=task["version"], engine=task["engine"], context=task["context"], row=task["row"], block=task["block"])
 
 
-def make_task(context, row, block=0):
-    return validate_task(dict(version=1, engine=ENGINE, context=context, row=str(row), block=block))
+def make_task(context, row, block=0, version=1):
+    return validate_task(dict(version=version, engine=ENGINES[version], context=context, row=str(row), block=block))
 
 
 def task_id(task):
     t = validate_task(task)
-    return f"{ENGINE}:{t['context']}:{t['row']}:{t['block']}"
+    return f"{t['engine']}:{t['context']}:{t['row']}:{t['block']}"
+
+
+def task_rows(task):
+    """Number of coefficient rows a task spans (before the context's row limit)."""
+    return ROWS_BY_VERSION[validate_task(task)["version"]]
+
+
+def subtasks(task):
+    """The aligned v1 tasks whose positions a task covers (itself, for v1)."""
+    t = validate_task(task)
+    if t["version"] == 1:
+        return [t]
+    total = int(CONTEXT_BY_ID[t["context"]]["totalRows"])
+    start = int(t["row"])
+    return [make_task(t["context"], row, t["block"], 1)
+            for row in range(start, min(start + ROWS_BY_VERSION[2], total), ROWS_BY_VERSION[1])]
+
+
+def container_task(task):
+    """The v2 task containing a v1 task's positions (itself, for v2)."""
+    t = validate_task(task)
+    if t["version"] == 2:
+        return t
+    return make_task(t["context"], int(t["row"]) // ROWS_BY_VERSION[2] * ROWS_BY_VERSION[2], t["block"], 2)
+
+
+def overlapping_ids(task):
+    """Task IDs of the *other* engine version whose positions overlap this task.
+
+    A v1 task is already covered if its containing v2 task is verified; a v2 task
+    is a duplicate if any of its v1 sub-tasks is verified. Coverage and credit
+    logic must consult these, since the two versions share one search domain.
+    """
+    t = validate_task(task)
+    if t["version"] == 1:
+        return [task_id(container_task(t))]
+    return [task_id(sub) for sub in subtasks(t)]
 
 
 def verify_triple(xyz, k=114):
@@ -289,7 +335,7 @@ def run_task(task, on_hit=None, on_curve=None):
     c = CONTEXT_BY_ID[task["context"]]
     counters, hits = empty_counters(), []
     start = int(task['row'])
-    for row in range(start, min(start+ROWS_PER_TASK, int(c['totalRows']))):
+    for row in range(start, min(start+task_rows(task), int(c['totalRows']))):
         row_counters, row_hits = _run_row(task, c, row, on_hit=on_hit, on_curve=on_curve)
         for key, value in row_counters.items():
             counters[key] += value
@@ -321,7 +367,7 @@ def prove_empty_task(task):
     thi = min(tlo + BLOCK_SIZE - 1, c["thi"])
     dlo, dhi = int(c["dlo"]), int(c["dhi"])
     start = int(task["row"])
-    for row in range(start, min(start + ROWS_PER_TASK, int(c["totalRows"]))):
+    for row in range(start, min(start + task_rows(task), int(c["totalRows"]))):
         b, cc = row % width - radius, row // width - radius
         base = offset_base(ell, b, cc)
         constant, linear = 114 * b * b * b + 12996 * cc * cc * cc, 342 * b * cc
@@ -341,14 +387,14 @@ def empty_certificate(task):
     task = validate_task(task)
     if not prove_empty_task(task):
         return None
-    return {"schema": EMPTY_TASK_SCHEMA, "engine": ENGINE, "id": task_id(task),
+    return {"schema": EMPTY_TASK_SCHEMA, "engine": validate_task(task)["engine"], "id": task_id(task),
             "task": task, "proof": "shell-interval-empty"}
 
 
 def verify_empty_certificate(cert):
     """Recompute a claimed empty-task certificate against the trusted kernel."""
     if (not isinstance(cert, dict) or cert.get("schema") != EMPTY_TASK_SCHEMA
-            or cert.get("engine") != ENGINE or cert.get("proof") != "shell-interval-empty"
+            or cert.get("engine") not in ENGINES.values() or cert.get("proof") != "shell-interval-empty"
             or not isinstance(cert.get("task"), dict)):
         return False
     task = validate_task(cert["task"])

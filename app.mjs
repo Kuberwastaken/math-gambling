@@ -2,18 +2,21 @@ import {
   CONTEXTS,
   makeTask,
   taskId,
+  taskRows,
+  subtasks,
   canonicalJSON,
   verifyTriple,
   validateTask,
-} from "./engine.mjs?v=eee5288cd1a6";
-import { createLiveVisuals } from "./live-viz.mjs?v=eee5288cd1a6";
-import { createJackpot } from "./jackpot.mjs?v=eee5288cd1a6";
-import { loadChallenger } from "./challenger-viz.mjs?v=eee5288cd1a6";
-import { renderModelEvolution } from "./model-viz.mjs?v=eee5288cd1a6";
-import { setupRunnerDownload } from "./runner-setup.mjs?v=eee5288cd1a6";
-import {certifiedEmpty} from './proposal-proof.mjs?v=eee5288cd1a6';
+} from "./engine.mjs?v=3ba4fb1151c9";
+import { createLiveVisuals } from "./live-viz.mjs?v=3ba4fb1151c9";
+import { createJackpot } from "./jackpot.mjs?v=3ba4fb1151c9";
+import { loadChallenger } from "./challenger-viz.mjs?v=3ba4fb1151c9";
+import { renderModelEvolution } from "./model-viz.mjs?v=3ba4fb1151c9";
+import { setupRunnerDownload } from "./runner-setup.mjs?v=3ba4fb1151c9";
+import {certifiedEmpty} from './proposal-proof.mjs?v=3ba4fb1151c9';
 setupRunnerDownload();
-import { createCoverageClient, newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=eee5288cd1a6";
+import { newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=3ba4fb1151c9";
+import { createDualCoverageClient } from "./coverage-v2.mjs?v=3ba4fb1151c9";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -101,7 +104,10 @@ function fetchJSON(file) {
   reportRequests.set(file, request);
   return request;
 }
-const sharedCoverage = createCoverageClient(BASE);
+// Proposals are engine v2 (1024 rows); the client also excludes any position
+// already verified under engine v1, and vice versa.
+const PROPOSAL_VERSION = 2;
+const sharedCoverage = createDualCoverageClient(BASE);
 let jackpot;
 try {
   jackpot = createJackpot({ onSave: (evidence) => download("math-gambling-identity-evidence.json", JSON.stringify(evidence, null, 2)) });
@@ -1171,16 +1177,23 @@ async function nextTask(generation) {
     }
     const c=context;
     const task = makeTask(c.id,
-      (await rng.below(c.rowTasks)) * BigInt(c.rowStride),
-      Number(await rng.below(c.blocks)));
+      (await rng.below(c.rowTasksV2)) * BigInt(c.rowStrideV2),
+      Number(await rng.below(c.blocks)), PROPOSAL_VERSION);
     if (generation !== sessionGeneration || !running) return null;
-    if (preflight && attempt<31 && certifiedEmpty(task)) continue;
+    // The outward tile proof covers one 128-row tile, so a larger task is only
+    // certified empty when every aligned sub-tile is.
+    if (preflight && attempt<31 && subtasks(task).every(certifiedEmpty)) continue;
     if (seen.has(taskId(task))) continue;
     if (await sharedCoverage.has(task)) continue;
     if (generation !== sessionGeneration || !running) return null;
     return { task, policyEpoch };
   }
   throw Error("No fresh task found in 100 attempts. Saved work is retained; try a new run after the shared index updates.");
+}
+function lastRow(task) {
+  const context = CONTEXTS.find((c) => c.id === task.context);
+  const end = BigInt(task.row) + BigInt(taskRows(task));
+  return (end < BigInt(context.totalRows) ? end : BigInt(context.totalRows)) - 1n;
 }
 function showCoverage() {
   text("run-coverage", sharedCoverage.revision == null ? "Coverage not loaded" :
@@ -1279,7 +1292,7 @@ async function dispatch() {
     text("session-state", "Computing");
     text(
       "task-detail",
-      `${task.context} · rows ${task.row}–${BigInt(task.row) + 127n} · block ${task.block}`,
+      `${task.context} · rows ${task.row}–${lastRow(task)} · block ${task.block}`,
     );
     showRun("dispatch", task);
     worker.postMessage({ type: "start", task });
@@ -1336,7 +1349,7 @@ async function start(e) {
   // The processor slider remains adjustable during a run.
   text("session-message", "");
   try {
-    worker = new Worker(new URL("search-worker.mjs?v=eee5288cd1a6", BASE), { type: "module" });
+    worker = new Worker(new URL("search-worker.mjs?v=3ba4fb1151c9", BASE), { type: "module" });
   } catch (e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;

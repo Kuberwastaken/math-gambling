@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Public search protocol, version 1 · Math Gambling</title><meta name="description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner.">
-<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=eee5288cd1a6">
-<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=eee5288cd1a6">
-<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=eee5288cd1a6"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=eee5288cd1a6" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=eee5288cd1a6"><link rel="canonical" href="https://kuber.studio/math-gambling/research/protocol/">
-<script type="module" src="/math-gambling/app.mjs?v=eee5288cd1a6"></script></head><body data-page="research/protocol/">
+<meta name="color-scheme" content="only light"><meta name="theme-color" content="#ffffff"><meta property="og:title" content="Math Gambling"><meta property="og:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta property="og:type" content="website"><meta property="og:image" content="https://kuber.studio/math-gambling/assets/social.png?v=3ba4fb1151c9">
+<meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="MATH GAMBLING in black Georgia lettering beside a cropped red and black roulette wheel."><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Math Gambling"><meta name="twitter:description" content="Join a volunteer computing search for three integers whose cubes add up to 114. Run exact computations in your browser or contribute with the local runner."><meta name="twitter:image" content="https://kuber.studio/math-gambling/assets/social.png?v=3ba4fb1151c9">
+<link rel="stylesheet" href="/math-gambling/assets/katex/katex.min.css?v=3ba4fb1151c9"><link rel="icon" href="/math-gambling/assets/favicon.svg?v=3ba4fb1151c9" type="image/svg+xml"><link rel="stylesheet" href="/math-gambling/styles.css?v=3ba4fb1151c9"><link rel="canonical" href="https://kuber.studio/math-gambling/research/protocol/">
+<script type="module" src="/math-gambling/app.mjs?v=3ba4fb1151c9"></script></head><body data-page="research/protocol/">
 <a class="skip" href="#main">Skip to content</a><nav class="plain-nav" aria-label="Main"><a href="/math-gambling/">Home</a><a href="/math-gambling/#leaderboard">Leaderboard</a><a href="/math-gambling/approach/">Approach</a><a href="/math-gambling/#learning">Learning</a><a href="/math-gambling/paper/">Paper</a><a href="/math-gambling/research/">Research</a><a href="https://github.com/Kuberwastaken/math-gambling">GitHub</a></nav>
 <main id="main"><article class="article research-document"><div class="research-tools"><a href="/math-gambling/research/">← The notebook</a><a href="https://github.com/Kuberwastaken/math-gambling/blob/main/docs/PROTOCOL.md">Markdown source ↗</a></div><h1 id="public-search-protocol-version-1">Public search protocol, version 1</h1>
 <details class="research-contents"><summary>On this page</summary><ol><li><a href="#canonical-task">Canonical task</a></li><li><a href="#exact-generator-and-checker">Exact generator and checker</a></li><li><a href="#results-digests-and-bank-ins">Results, digests and bank-ins</a></li><li><a href="#shared-adaptation">Shared adaptation</a></li><li><a href="#local-runner">Local runner</a></li><li><a href="#verification-commands-and-limitations">Verification commands and limitations</a></li><li><a href="#exact-shared-completed-task-index">Exact shared completed-task index</a></li><li><a href="#jackpot-and-identity-only-submissions">Jackpot and identity-only submissions</a></li></ol></details>
@@ -68,7 +68,11 @@ context and computer; a representative local 324-task benchmark ranged up to
 76 milliseconds of Python CPU, with a median near 1.4 milliseconds. This is a
 measurement, not a time guarantee for every device.</p>
 <p>Its stable identity is
-<code>mg114-offset-v1:&lt;context&gt;:&lt;row&gt;:&lt;block&gt;</code>.
+<code>mg114-offset-v1:&lt;context&gt;:&lt;row&gt;:&lt;block&gt;</code>. Engine <strong>v2</strong> tasks have the same shape
+with <code>&quot;version&quot;:2</code>, <code>&quot;engine&quot;:&quot;mg114-offset-v2&quot;</code> and a <code>row</code> aligned to 1024; a v2
+task equals its eight aligned v1 sub-tasks (truncated at the context's last row),
+and its ID is <code>mg114-offset-v2:&lt;context&gt;:&lt;row&gt;:&lt;block&gt;</code>. v1 ids, digests and
+receipts are unchanged.
 Clients choose tasks from a recorded random seed and reject IDs found in their
 local completed records or the exact published completed-task snapshot. This
 does not reserve globally disjoint unfinished assignments. The server still
@@ -233,7 +237,11 @@ research challenge.</p>
 <p>Optional <code>contributor.url</code> links the display alias to an http(s) website. It is omitted when empty and is never part of a mathematical task digest. The collector strips malformed URLs, credentials, whitespace and control characters without discarding valid computation. The latest uniquely credited task may update the alias and link for its authenticated submitter; duplicate claims cannot update another participant or earn more credit. Website ownership is self-declared.</p>
 <h2 id="exact-shared-completed-task-index">Exact shared completed-task index</h2>
 <p><code>data/coverage/index.json</code> has schema <code>math-gambling-coverage-v2</code>, engine
-<code>mg114-offset-v1</code>, integer <code>revision</code>, equal <code>verified_task_count</code>, UTC
+<code>mg114-offset-v1</code>, and lists engine-v1 ids only. The identical structure for
+engine v2 is published at <code>data/coverage/v2/index.json</code> with engine
+<code>mg114-offset-v2</code>; it is optional, and its absence means no v2 coverage. Each
+index's <code>revision</code> counts only its own engine's verified tasks. The rest of this
+section describes both. It has integer <code>revision</code>, equal <code>verified_task_count</code>, UTC
 <code>updated_at</code>, and descriptors for all 81 fixed contexts. A revision counts
 accepted unique tasks; policy epochs still advance at 64-task boundaries.</p>
 <p>Each descriptor contains <code>file</code>, <code>sha256</code> and <code>count</code>, with immutable filename

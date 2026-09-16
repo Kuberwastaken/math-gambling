@@ -160,8 +160,9 @@ title beginning <code>[bank]</code> or <code>[compute]</code> so the collector r
 browser offers a copy/download step rather than placing a large payload into a
 URL. Older full-result receipts (<code>math-gambling-receipt-v1</code>, <code>results</code>, 1–8
 results, at most 8,192 bytes) remain supported by ingestion.</p>
-<p>Actions replays new accepted tasks using the trusted Python engine and compares
-the recomputed digest. Self-reported runtime and counters do not determine
+<p>Actions replays new accepted tasks using the reviewed Rust kernel built from
+<code>main</code>, with the Python reference engine re-verifying every identity and a
+deterministic 1-in-256 sample of whole tasks, and compares the recomputed digest. Self-reported runtime and counters do not determine
 credit. The authenticated GitHub issue author is the provenance for a bank;
 the entered name and GitHub field are self-reported. First accepted unique task
 credit is not a scientific authorship decision. Exact discoveries are retained

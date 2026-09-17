@@ -32,7 +32,7 @@
     }
   ],
   "baseline": "proof-aware context baseline",
-  "completed_evaluations": 55,
+  "completed_evaluations": 57,
   "first_training_boundary": 490496,
   "metrics": {
     "cpu_ms": "Server CPU cost",
@@ -41,10 +41,10 @@
     "quotient_points": "Quotient positions"
   },
   "mode": "shadow",
-  "model_count": 56,
+  "model_count": 58,
   "model_version": "mg114-spatial-shadow-v2",
-  "next_boundary": 547840,
-  "observed_tasks": 547608,
+  "next_boundary": 549888,
+  "observed_tasks": 549640,
   "pilot": [
     {
       "label": "Uniform",
@@ -1380,8 +1380,56 @@
       "model_hash": "1d6ec95efb5e2dcad1c15de9042156867d5e93c2b2038cb58418d64ab40fe77a",
       "through": 546816,
       "unseen_tasks": 167
+    },
+    {
+      "from": 546817,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": 0.9868125557987153,
+          "future_unseen_geometry": -1.8421146794762782
+        },
+        "curves": {
+          "future_all": 4.512134759879667,
+          "future_unseen_geometry": 4.771618286449941
+        },
+        "exact_tests": {
+          "future_all": 0.527837467606091,
+          "future_unseen_geometry": 5.04655848524963
+        },
+        "quotient_points": {
+          "future_all": 13.896098260930902,
+          "future_unseen_geometry": 7.970368234207117
+        }
+      },
+      "model_hash": "2f841eae9cb76dd55c21821d83471820819999814b3efedd5291dbad4adb567a",
+      "through": 547840,
+      "unseen_tasks": 165
+    },
+    {
+      "from": 547841,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": -0.791062135782732,
+          "future_unseen_geometry": -2.5353030714950067
+        },
+        "curves": {
+          "future_all": 2.743584173398099,
+          "future_unseen_geometry": -1.9171230523843568
+        },
+        "exact_tests": {
+          "future_all": 0.9845652336022899,
+          "future_unseen_geometry": 5.848847748588192
+        },
+        "quotient_points": {
+          "future_all": 16.76026884118978,
+          "future_unseen_geometry": 9.845798587399601
+        }
+      },
+      "model_hash": "1e4dbe57e8e88561d4a67ff25b4a52dd07563b63684fdc081b3a952ea9ce4c37",
+      "through": 548864,
+      "unseen_tasks": 171
     }
   ],
   "source_hash": "8d62e721df1095e1875678cbdd0eae86ceb2b7213be1ec5260956436990549b4",
-  "through": 546816
+  "through": 548864
 }

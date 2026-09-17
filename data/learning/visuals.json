@@ -32,7 +32,7 @@
     }
   ],
   "baseline": "proof-aware context baseline",
-  "completed_evaluations": 62,
+  "completed_evaluations": 65,
   "first_training_boundary": 490496,
   "metrics": {
     "cpu_ms": "Server CPU cost",
@@ -41,10 +41,10 @@
     "quotient_points": "Quotient positions"
   },
   "mode": "shadow",
-  "model_count": 63,
+  "model_count": 66,
   "model_version": "mg114-spatial-shadow-v2",
-  "next_boundary": 555008,
-  "observed_tasks": 554451,
+  "next_boundary": 558080,
+  "observed_tasks": 557637,
   "pilot": [
     {
       "label": "Uniform",
@@ -1548,8 +1548,80 @@
       "model_hash": "97c973c4cf295129fad255e3d97edf293a40b4114ae3d7af702eb5279e262474",
       "through": 553984,
       "unseen_tasks": 183
+    },
+    {
+      "from": 553985,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": -0.5065333928881443,
+          "future_unseen_geometry": 2.2415418900934725
+        },
+        "curves": {
+          "future_all": 4.425901693260823,
+          "future_unseen_geometry": 4.683516644854248
+        },
+        "exact_tests": {
+          "future_all": -0.8959869890337607,
+          "future_unseen_geometry": 5.152681470458539
+        },
+        "quotient_points": {
+          "future_all": 11.811920374440215,
+          "future_unseen_geometry": 7.466585905630871
+        }
+      },
+      "model_hash": "ae97a7984c5bf2306168d166a85a41762cd2216db4b5f2f6b252b89312140e08",
+      "through": 555008,
+      "unseen_tasks": 194
+    },
+    {
+      "from": 555009,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": 3.0948283416724274,
+          "future_unseen_geometry": -2.627280685354019
+        },
+        "curves": {
+          "future_all": 4.643003111652304,
+          "future_unseen_geometry": 1.5736480284011376
+        },
+        "exact_tests": {
+          "future_all": 0.6286264764017507,
+          "future_unseen_geometry": 0.6139662031667427
+        },
+        "quotient_points": {
+          "future_all": 17.015262560835442,
+          "future_unseen_geometry": 6.877432707250397
+        }
+      },
+      "model_hash": "b5226aacc863a597f80593bc5c5102d8f3296d06fa9aab1f05204b4cbd863031",
+      "through": 556032,
+      "unseen_tasks": 174
+    },
+    {
+      "from": 556033,
+      "metrics": {
+        "cpu_ms": {
+          "future_all": 5.003575226494615,
+          "future_unseen_geometry": -0.42761081061414274
+        },
+        "curves": {
+          "future_all": 4.2422177953516,
+          "future_unseen_geometry": 3.7640382244100947
+        },
+        "exact_tests": {
+          "future_all": -2.8077425044871864,
+          "future_unseen_geometry": 1.4820735602813935
+        },
+        "quotient_points": {
+          "future_all": 8.542009275382838,
+          "future_unseen_geometry": 4.992198349548794
+        }
+      },
+      "model_hash": "d91b7ba2804d5687aeeb71b8c853c1e9a240ad82feaaf90264c7aebf7f17fa2a",
+      "through": 557056,
+      "unseen_tasks": 184
     }
   ],
   "source_hash": "8d62e721df1095e1875678cbdd0eae86ceb2b7213be1ec5260956436990549b4",
-  "through": 553984
+  "through": 557056
 }

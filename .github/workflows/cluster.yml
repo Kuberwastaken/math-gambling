@@ -65,7 +65,9 @@ jobs:
       - name: Fit frozen spatial challenger and score later arrivals
         id: learning
         continue-on-error: true
-        timeout-minutes: 2
+        # Reads every verified receipt each run (~570k on 17 Sep, ~130 s); grows
+        # with the ledger. Make it incremental before this bound is reached again.
+        timeout-minutes: 8
         run: |
           python3 -m unittest discover -s tests -p test_strategy_model.py
           python3 tools/strategy_model.py

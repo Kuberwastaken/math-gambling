@@ -6,7 +6,10 @@ on:
   # or immediately via workflow_dispatch. collect_issues keeps a durable poll
   # cursor, so each run drains up to MAX_RECEIPTS pending banks in one publish.
   schedule:
-    - cron: '*/10 * * * *'
+    # The whole run (overlay + ingest + learning + reports + publish) grew to
+    # ~29 min as the ledger passed 585k tasks, so a 10-min cadence stacked runs
+    # that never reached the publish step. Space to 30 min so each run finishes.
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -20,8 +23,11 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-24.04
-    # Data transfer/publication can exceed ten minutes; replay stays capped at 120 seconds.
-    timeout-minutes: 20
+    # Whole-run budget. Ingest rescans the full receipt ledger on startup, so
+    # overlay+replay alone is ~17 min at 585k tasks; 45 min keeps the publish
+    # step reachable with headroom. The durable fix is incremental processing
+    # off git (docs/INCREMENTAL_CLUSTER.md) before this budget is threatened again.
+    timeout-minutes: 45
     env:
       GITHUB_TOKEN: ${{ github.token }}
     steps:

@@ -6,10 +6,10 @@ on:
   # or immediately via workflow_dispatch. collect_issues keeps a durable poll
   # cursor, so each run drains up to MAX_RECEIPTS pending banks in one publish.
   schedule:
-    # The whole run (overlay + ingest + learning + reports + publish) grew to
-    # ~29 min as the ledger passed 585k tasks, so a 10-min cadence stacked runs
-    # that never reached the publish step. Space to 30 min so each run finishes.
-    - cron: '*/30 * * * *'
+    # Base cadence is */30 (each ~25-33 min run finishes within the 45-min cap).
+    # Temporarily */20 during the 2026-09-18 drain so runs go near back-to-back
+    # under the single-writer concurrency group; restore to */30 after.
+    - cron: '*/20 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -30,6 +30,15 @@ jobs:
     timeout-minutes: 45
     env:
       GITHUB_TOKEN: ${{ github.token }}
+      # DRAIN MODE (temporary, 2026-09-18): after the 21h freeze, catch the scan
+      # cursor up and clear the ~3-4k unprocessed banks. Each run discovers more
+      # (6 scan pages), admits more (768 banks) and verifies for 600s instead of
+      # 120s. ~33 min/run, under the 45-min cap. REVERT to shipped defaults (drop
+      # these four vars, restore cron to */30) once the cursor reaches ~now.
+      MG_SCAN_PAGES: '6'
+      MG_MAX_RECEIPTS: '768'
+      MG_REPLAY_SECONDS: '600'
+      MG_PENDING_REFETCH: '256'
     steps:
       - name: Checkout trusted default branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

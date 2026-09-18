@@ -25,16 +25,18 @@ MAX_BANK_BYTES = 60000
 MAX_BODY_BYTES = 61024
 MAX_BANK_TASKS = 256
 MAX_TASKS = 8
-MAX_RECEIPTS = 256
+MAX_RECEIPTS = int(os.environ.get("MG_MAX_RECEIPTS", "256"))
 MAX_REPLAYS = 16384
 MAX_HITS = 64
 MAX_DIGITS = 128
 # GitHub returns HTTP 422 once offset pagination reaches ~10,000 items
 # (page * per_page). Per_page is 100, so stay strictly under 100 pages.
 MAX_LIST_PAGE = 90
+SCAN_PAGES = max(1, int(os.environ.get("MG_SCAN_PAGES", "2")))  # updated-time scan pages per run; drain mode raises it
+REPLAY_CAP_SECONDS = int(os.environ.get("MG_REPLAY_SECONDS", "120"))  # per-run replay wall budget; drain mode raises it
 # Durable pending-bank queue bound and how many queued bodies one run refetches.
 MAX_PENDING = 16384
-PENDING_REFETCH = 128
+PENDING_REFETCH = int(os.environ.get("MG_PENDING_REFETCH", "128"))
 # Deterministic share of Rust replays that the Python reference engine re-verifies.
 CROSS_CHECK_ONE_IN = 256
 USER_AGENT = "OpenAI File Downloader, XaiImageApiFetch/1.0"
@@ -423,9 +425,9 @@ class RetryLater(Exception):
 
 
 class Budget:
-    def __init__(self, count=MAX_REPLAYS, seconds=120):
+    def __init__(self, count=MAX_REPLAYS, seconds=REPLAY_CAP_SECONDS):
         self.remaining = min(count, MAX_REPLAYS)
-        self.deadline = time.monotonic() + min(seconds, 120)
+        self.deadline = time.monotonic() + min(seconds, REPLAY_CAP_SECONDS)
         self.next_sequence = None
 
     def charge(self):
@@ -723,7 +725,7 @@ def collect_issues(repo, token, data, audit_policy=None):
             else:
                 retain(issue)
         # Incremental scan is a fast path, never the only discovery mechanism.
-        for _ in range(2):
+        for _ in range(SCAN_PAGES):
             page = int(poll.get("scan_page", 1))
             query = {"state": "all", "sort": "updated", "direction": "asc", "per_page": 100, "page": page}
             if poll.get("since"):

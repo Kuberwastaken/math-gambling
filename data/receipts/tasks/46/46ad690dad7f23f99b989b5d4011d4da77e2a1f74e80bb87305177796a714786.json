@@ -1,0 +1,58 @@
+{
+  "audit_selection": {
+    "auditing_source_id": "issue:27600:3d7275aa13414411410b2585d9410f5ee9bfb649caa3a561ceefde9ad61a43bb",
+    "condition": "given this bank and eligibility; not dispatch propensity or overall duplicate-adjusted inclusion",
+    "conditional_probability": 0.05,
+    "schema": "mg114-audit-inclusion-v1"
+  },
+  "contributor": {
+    "github": "kazenoko-git",
+    "github_verified": false,
+    "name": "Ivan"
+  },
+  "replay_kernel": {
+    "engine": "rust",
+    "python_cross_check_one_in": 256,
+    "python_source_sha256": "647496c95b7509e3c36e5d5b80b781b843abb683681f622e3ff7e035eb7821b6",
+    "rust_source_sha256": "7973a50995367165d638830b361b1f01d38f09f6f53a51f6a66c18a996e4df35"
+  },
+  "replay_kernel_sha256": "647496c95b7509e3c36e5d5b80b781b843abb683681f622e3ff7e035eb7821b6",
+  "result": {
+    "counters": {
+      "curves": 40,
+      "exact_tests": 0,
+      "generators": 2048,
+      "hits": 0,
+      "invalid_d": 33,
+      "noninvertible": 1,
+      "outside_shell": 1948,
+      "quotient_points": 2553,
+      "rejected_mod243": 2431,
+      "rejected_parity": 46,
+      "rejected_prime": 76,
+      "signed_excluded": 26
+    },
+    "digest": "b7591533cdbf1fc91365f5c86572dd4e6b4f32cb4b6a11a7f5f4d9b40dac8b32",
+    "hits": [],
+    "id": "mg114-offset-v1:c27:14053947962240:0",
+    "task": {
+      "block": 0,
+      "context": "c27",
+      "engine": "mg114-offset-v1",
+      "row": "14053947962240",
+      "version": 1
+    }
+  },
+  "schema": "math-gambling-verified-task-v1",
+  "sequence": 617298,
+  "server_replay_cpu_ms": 0.129441,
+  "source": {
+    "id": "issue:27600:3d7275aa13414411410b2585d9410f5ee9bfb649caa3a561ceefde9ad61a43bb",
+    "kind": "issue",
+    "number": 27600,
+    "submitter": "kazenoko-git",
+    "updated_at": "2026-09-18T11:12:03Z",
+    "url": "https://github.com/Kuberwastaken/math-gambling/issues/27600"
+  },
+  "verified_at": "2026-09-18T20:46:38Z"
+}

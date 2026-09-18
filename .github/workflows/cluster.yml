@@ -30,15 +30,6 @@ jobs:
     timeout-minutes: 45
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      # DRAIN MODE (temporary, 2026-09-18): after the 21h freeze, catch the scan
-      # cursor up and clear the ~3-4k unprocessed banks. Each run discovers more
-      # (6 scan pages), admits more (768 banks) and verifies for 600s instead of
-      # 120s. ~33 min/run, under the 45-min cap. REVERT to shipped defaults (drop
-      # these four vars, restore cron to */30) once the cursor reaches ~now.
-      MG_SCAN_PAGES: '6'
-      MG_MAX_RECEIPTS: '768'
-      MG_REPLAY_SECONDS: '600'
-      MG_PENDING_REFETCH: '256'
     steps:
       - name: Checkout trusted default branch
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -76,6 +67,15 @@ jobs:
       - name: Independently replay selected tasks; retain other claims as unverified
         id: replay
         continue-on-error: true
+        # DRAIN MODE (temporary, 2026-09-18): scoped to this step only so unit
+        # tests run at shipped defaults. Discovers more (6 scan pages), admits
+        # more (768 banks) and verifies 600s instead of 120s to clear the freeze
+        # backlog; ~33 min/run under the 45-min cap. Drop this env after catch-up.
+        env:
+          MG_SCAN_PAGES: '6'
+          MG_MAX_RECEIPTS: '768'
+          MG_REPLAY_SECONDS: '600'
+          MG_PENDING_REFETCH: '256'
         run: python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust
       - name: Fit frozen spatial challenger and score later arrivals
         id: learning

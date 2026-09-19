@@ -15,7 +15,7 @@ jobs:
     # so our label can be removed; all other labels stay untouched.
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (!startsWith(github.event.issue.title, '[bank]') && !startsWith(github.event.issue.title, '[compute]')) ||
+      (!startsWith(github.event.issue.title, '[bank') && !startsWith(github.event.issue.title, '[compute]')) ||
       contains(github.event.issue.labels.*.name, 'project-issue')
     runs-on: ubuntu-24.04
     timeout-minutes: 5

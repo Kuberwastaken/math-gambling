@@ -23,7 +23,8 @@ def api(method,path,body=None):
 
 
 def is_project_issue(issue):
-    return 'pull_request' not in issue and not issue.get('title','').lower().startswith(('[bank]','[compute]'))
+    # Any compute submission ('[bank]', '[bank-mt]', '[compute]') is not a project issue.
+    return 'pull_request' not in issue and not issue.get('title','').lower().startswith(('[bank','[compute]'))
 
 
 def classify(number,dry_run=False):

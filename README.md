@@ -80,7 +80,19 @@ flowchart TD
 ```
 
 <!-- TARGETS:START -->
-_Live per-target progress appears here once the cross-target verifier has processed banks._
+_Published 2026-09-21T11:43:06Z. Verified target tasks are independently replayed; a null result proves nothing (selective search)._
+
+| Target | Verified tasks | Curve intervals | Empty % | Exact tests |
+| ---: | ---: | ---: | ---: | ---: |
+| 390 | 1,764 | 1,088,743 | 0% | 1,645 |
+| 627 | 1,819 | 1,111,152 | 0% | 4,249 |
+| 633 | 1,337 | 820,365 | 0% | 1,983 |
+| 732 | 1,225 | 750,270 | 0% | 2,592 |
+| 921 | 1,062 | 655,338 | 0% | 1,637 |
+| 975 | 985 | 626,631 | 0% | 1,051 |
+
+**Top target contributors:** @kazenoko-git (8,192)
+**Verified target identities found:** 0
 <!-- TARGETS:END -->
 
 **Status:** the generalized engine and the allocation machinery are built, tested and open here. Wiring the cross-target share into the live cluster is in progress and kept deliberately separate, so the 114 pipeline and everyone's current runners are unaffected. No solution has been found for any target. The website and its jackpot stay centered on 114.

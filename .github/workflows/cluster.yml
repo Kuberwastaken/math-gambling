@@ -77,7 +77,9 @@ jobs:
           MG_MAX_RECEIPTS: '256'
           MG_REPLAY_SECONDS: '120'
           MG_PENDING_REFETCH: '256'
-        run: python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust | tee /tmp/replay-summary.json
+        run: |
+          set -o pipefail
+          python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust | tee /tmp/replay-summary.json
       - name: Fit frozen spatial challenger and score later arrivals
         id: learning
         continue-on-error: true

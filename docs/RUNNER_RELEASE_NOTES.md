@@ -8,7 +8,7 @@ The client now reads two published coverage indexes: the unchanged v1 index, and
 
 Cross-target results are banked **separately** as `[bank-mt]` issues with schema `math-gambling-target-bank-v1`, verified by the separate target pipeline. A target claim is never mixed into a 114 `[bank]` bank. Target work uses the same crash-safe SQLite checkpoint and outbox as 114 work: reserved tasks resume after a restart, each bank is posted at most once, and any exact identity for any target is written to `discoveries/targets/` before anything else.
 
-- `--targets-share 0.4`: fraction of dispatches given to the other targets. **`--targets-share 0` disables the cross-target slice completely** and runs 114 only, exactly as v0.6.1 did.
+- `--targets-share 0` by default during verifier catch-up (set `--targets-share 0.4` explicitly to opt in): fraction of dispatches given to the other targets. **`--targets-share 0` disables the cross-target slice completely** and runs 114 only, exactly as v0.6.1 did.
 - `--targets 390 627 633 732 921 975`: choose which open cases the slice covers.
 - `tools/target_runner.py` still works as a standalone sub-campaign for anyone who prefers a separate process.
 

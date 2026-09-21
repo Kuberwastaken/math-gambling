@@ -48,7 +48,7 @@ OUTBOX_LIMIT = 4096
 MIN_PYTHON = (3, 11)
 TASK_VERSION = 2
 TARGET_BANK_SCHEMA = 'math-gambling-target-bank-v1'
-TARGET_SHARE = 0.4
+TARGET_SHARE = 0.0
 DEFAULT_TARGETS = tuple(k for k in tb.OPEN_TARGETS if k != tb.PRIMARY) if TARGETS_AVAILABLE else (390, 627, 633, 732, 921, 975)
 
 class PolicyWeights(list):

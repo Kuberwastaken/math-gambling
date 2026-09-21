@@ -82,9 +82,12 @@ jobs:
           python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust | tee /tmp/replay-summary.json
       # The shadow model is intentionally off the critical verifier path. It
       # scans the full ledger, has no production influence, and is evaluated in
-      # a separate daily workflow. Ingest already writes aggregate/strategy data.
+      # a separate daily workflow. Replay can be killed after writing accepted
+      # task records but before ingest's final aggregate, so repair the generated
+      # snapshot from the authoritative ledger before rendering and publishing.
       - name: Generate verified reports with trusted main code
         run: |
+          python3 tools/aggregate.py
           python3 tools/coverage_index.py --prune-only
           python3 tools/readme_charts.py
       - name: Export a bounded mathematical coverage increment

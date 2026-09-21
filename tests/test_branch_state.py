@@ -14,6 +14,17 @@ from ingest import atomic_json
 from search_core import make_task, task_id
 
 
+class WorkflowRecoveryTests(unittest.TestCase):
+    def test_reports_reaggregate_after_a_bounded_replay_timeout(self):
+        workflow = (Path(__file__).resolve().parents[1] / '.github/workflows/cluster.yml').read_text()
+        reports = workflow.index('- name: Generate verified reports with trusted main code')
+        publish = workflow.index('- name: Publish only generated data', reports)
+        block = workflow[reports:publish]
+        self.assertIn('python3 tools/aggregate.py', block)
+        self.assertLess(block.index('python3 tools/aggregate.py'),
+                        block.index('python3 tools/readme_charts.py'))
+
+
 class BranchStateTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()

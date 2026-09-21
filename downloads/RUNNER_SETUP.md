@@ -80,7 +80,7 @@ You can optionally link your alias with `--url "https://your-site.example"`. On 
 - `--minutes 60`: schedule work for up to an hour, then finish the active bounded tasks. The maximum is 1,440 minutes per invocation.
 - `--workers 1`: use one worker process. Try one first; raise it up to the available CPU count, with a maximum of 32. Workers may use their cores fully while running. This is a worker count, not the browser's duty-cycle slider.
 - `--max-tasks 4096`: cap additional completed tasks in this invocation, counting both 114 and cross-target tasks. The runner can finish earlier if it reaches this cap, its outbox limit or an exact discovery.
-- `--targets-share 0.4`: fraction of dispatches spent on the other open cases (see "Other open targets" below). Use `--targets-share 0` to run 114 only.
+- `--targets-share 0` by default during verifier catch-up (set `--targets-share 0.4` explicitly to opt in): fraction of dispatches spent on the other open cases (see "Other open targets" below). Use `--targets-share 0` to run 114 only.
 - `--targets 390 627 633 732 921 975`: choose which open cases the cross-target slice covers.
 - `--output "math-gambling-run"`: choose where results and checkpoints go. Relative paths are relative to your current terminal folder.
 - `--offline`: use the bundled allocation strategy and exact coverage snapshot, with no network requests. It cannot be combined with `--login` or `--submit`. Work banked after the release may be absent from this snapshot. Online coverage failures pause new dispatch rather than silently assuming no task was checked.

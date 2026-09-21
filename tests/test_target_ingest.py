@@ -10,6 +10,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
@@ -76,6 +77,31 @@ class TargetIngestTests(unittest.TestCase):
         summary = ti.aggregate_targets(self.data)
         self.assertEqual(summary["targets"]["627"]["verified_tasks"], 2)
         self.assertEqual(summary["leaderboard"]["kazenoko-git"], 2)
+
+    def test_title_search_does_not_depend_on_labels_and_persists_cursor(self):
+        issue = dict(number=77, title="[bank-mt] Target bank x", body=json.dumps(bank_for(627, (0,))),
+                     user={"login": "p"}, labels=[])
+        calls = []
+        def api(url, *_args, **_kwargs):
+            calls.append(url)
+            return {"items": [issue]} if "search/issues" in url else issue
+        with mock.patch.object(ti, "api_request", side_effect=api):
+            entries, poll = ti.collect_target_issues("example/test", "token", self.data, float("inf"))
+        self.assertEqual(entries[0][1]["number"], 77)
+        self.assertIn("in%3Atitle", calls[0])
+        self.assertEqual(poll["pending"], [{"number": 77}])
+
+    def test_native_target_replay_cross_checks_deterministically(self):
+        task = mt.make_target_task(627, "c00", 0)
+        expected = mt.run_target_task(task)
+        class Kernel:
+            last_cpu_ms = 1.5
+            def run(self, supplied): return expected
+            def close(self): pass
+        replay = object.__new__(ti.NativeTargetReplay)
+        replay.kernel, replay.one_in, replay.python_replay, replay.cross_checked = Kernel(), 1, lambda t: (expected, 2), 0
+        result, cpu = replay(task)
+        self.assertEqual(result, expected); self.assertEqual(cpu, 1.5); self.assertEqual(replay.cross_checked, 1)
 
     def test_mutual_isolation_of_the_two_verifiers(self):
         # The 114 verifier ignores [bank-mt]; the target verifier ignores [bank].

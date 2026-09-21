@@ -31,8 +31,12 @@ from ingest import (ROOT, atomic_json, canonical, now, read_json, parse_json,
 import multi_target as mt
 
 TARGET_BANK_SCHEMA = "math-gambling-target-bank-v1"
-REPLAY_KERNEL_SHA256 = hashlib.sha256((ROOT / "tools/multi_target.py").read_bytes()).hexdigest()
+REPLAY_KERNEL_SHA256 = hashlib.sha256(b"".join((ROOT / "native/src" / name).read_bytes() for name in ("lib.rs", "main.rs"))).hexdigest()
 REPLAY_CMD = [sys.executable, str(ROOT / "tools/multi_target.py")]
+CROSS_CHECK_ONE_IN = 256
+PENDING_REFETCH = 256
+SCAN_PAGES = 6
+MAX_PENDING = 16384
 
 
 def ledger_path(data, k, task_id):
@@ -55,6 +59,42 @@ def replay_target(task):
     if not isinstance(cpu, (int, float)) or isinstance(cpu, bool) or cpu < 0 or cpu != cpu:
         raise ValueError("invalid trusted replay timing")
     return payload["result"], max(float(cpu), 0.01)
+
+
+
+class NativeTargetReplay:
+    """Warmed Rust target replay with deterministic Python reference checks."""
+    def __init__(self, one_in=CROSS_CHECK_ONE_IN, python_replay=replay_target):
+        from native_kernel import NativeKernel
+        self.kernel = NativeKernel()
+        self.one_in = one_in
+        self.python_replay = python_replay
+        self.cross_checked = 0
+
+    def close(self):
+        if self.kernel is not None:
+            self.kernel.close()
+            self.kernel = None
+
+    def __enter__(self): return self
+    def __exit__(self, *_): self.close()
+
+    def __call__(self, task):
+        identifier = mt.target_task_id(mt.validate_target_task(task))
+        try:
+            expected = self.kernel.run(task)
+            cpu = self.kernel.last_cpu_ms
+            if cpu is None: raise RuntimeError("native target worker reported no timing")
+            selected = int.from_bytes(hashlib.sha256(("target-cross-check:" + identifier).encode()).digest()[:8], "big") % self.one_in == 0
+            if selected:
+                reference, _ = self.python_replay(task)
+                if canonical(reference) != canonical(expected):
+                    raise RuntimeError("Rust and Python target replays disagree for " + identifier)
+                self.cross_checked += 1
+            return expected, max(float(cpu), 0.01)
+        except BaseException:
+            self.close()
+            raise
 
 
 def save_discoveries(data, k, hits, source, person):
@@ -196,24 +236,62 @@ def parse_target_issue(issue, repo):
     return bank, source
 
 
-def collect_target_issues(repo, token, deadline):
-    """Bounded scan of open [bank-mt] issues, capped under GitHub's 10k offset
-    pagination limit (the same cap the 114 verifier learned the hard way)."""
-    prefix = "https://api.github.com/repos/" + repo + "/issues"
-    banks, page = [], 1
-    while page <= MAX_LIST_PAGE and time.monotonic() < deadline:
-        query = {"state": "open", "labels": "bank-mt", "per_page": 100, "page": page}
-        issues = api_request(prefix + "?" + urlencode(query), token, timeout=8)
-        if not isinstance(issues, list):
-            raise ValueError("invalid GitHub issue response")
-        for issue in issues:
-            parsed = parse_target_issue(issue, repo)
-            if parsed is not None:
-                banks.append(parsed)
-        if len(issues) < 100:
-            break
-        page += 1
-    return banks
+def collect_target_issues(repo, token, data, deadline):
+    """Discover `[bank-mt]` by title, independent of mutable labels.
+
+    GitHub issue search supplies the title index and a durable oldest-first page
+    cursor. The pending queue survives replay limits and process interruption.
+    """
+    poll_path = Path(data) / "targets" / "poll.json"
+    poll = read_json(poll_path, {"schema": "math-gambling-target-poll-v1",
+                                "search_page": 1, "pending": []})
+    pending = {int(x["number"]): x for x in poll.get("pending", [])}
+    available = {}
+    issue_prefix = "https://api.github.com/repos/" + repo + "/issues"
+    search_prefix = "https://api.github.com/search/issues"
+
+    def request(url, limit=32 * 1024 * 1024):
+        if time.monotonic() >= deadline: raise RetryLater("target API time budget exhausted")
+        return api_request(url, token, limit=limit, timeout=min(8, max(1, deadline-time.monotonic())))
+
+    def retain(issue):
+        parsed = parse_target_issue(issue, repo)
+        if parsed is None: return
+        number = parsed[1]["number"]
+        if len(pending) >= MAX_PENDING and number not in pending:
+            raise RetryLater("target pending cap reached")
+        pending[number] = {"number": number}
+        available[number] = parsed
+
+    try:
+        for number in list(pending)[:PENDING_REFETCH]:
+            try: issue = request(issue_prefix + "/" + str(number), 512 * 1024)
+            except HTTPError as exc:
+                if exc.code not in (404, 410): raise
+                exc.close(); pending.pop(number, None); continue
+            if parse_target_issue(issue, repo) is None: pending.pop(number, None)
+            else: retain(issue)
+        for _ in range(SCAN_PAGES):
+            page = int(poll.get("search_page", 1))
+            query = {"q": f'repo:{repo} is:issue in:title "[bank-mt]"',
+                     "sort": "created", "order": "asc", "per_page": 100, "page": page}
+            result = request(search_prefix + "?" + urlencode(query))
+            issues = result.get("items") if isinstance(result, dict) else None
+            if not isinstance(issues, list): raise ValueError("invalid GitHub issue search response")
+            for issue in issues: retain(issue)
+            # GitHub search exposes at most 1,000 results. Start another sweep
+            # after the cap; completed task IDs make repeats idempotent.
+            if len(issues) < 100 or page >= 10:
+                poll["search_page"] = 1
+                break
+            poll["search_page"] = page + 1
+    except RetryLater as exc:
+        poll["deferred_reason"] = str(exc)
+    else:
+        poll.pop("deferred_reason", None)
+    poll["pending"] = list(pending.values())
+    atomic_json(poll_path, poll)
+    return [available[n] for n in pending if n in available], poll
 
 
 def main(argv=None):
@@ -231,18 +309,26 @@ def main(argv=None):
                     "submitter": str(x.get("submitter", ""))[:39],
                     "url": "fixture"}) for i, x in enumerate(payload["banks"])]
     elif args.issues:
-        entries = collect_target_issues(args.repo, os.environ.get("GITHUB_TOKEN", ""), time.monotonic() + 60)
+        entries, poll = collect_target_issues(args.repo, os.environ.get("GITHUB_TOKEN", ""), args.data, time.monotonic() + 60)
     else:
         entries = []
+    poll = locals().get("poll")
     budget = Budget()
-    summary = {"processed": 0, "deferred": False}
-    for bank, source in entries:
-        try:
-            process_target_bank(bank, source, args.data, budget)
-            summary["processed"] += 1
-        except RetryLater:
-            summary["deferred"] = True
-            break
+    summary = {"processed": 0, "deferred": False, "python_cross_checks": 0}
+    completed = set()
+    with NativeTargetReplay() as replay:
+        for bank, source in entries:
+            try:
+                process_target_bank(bank, source, args.data, budget, replay=replay)
+                summary["processed"] += 1
+                completed.add(source.get("number"))
+            except RetryLater:
+                summary["deferred"] = True
+                break
+        summary["python_cross_checks"] = replay.cross_checked
+    if poll is not None:
+        poll["pending"] = [x for x in poll["pending"] if x["number"] not in completed]
+        atomic_json(args.data / "targets" / "poll.json", poll)
     aggregate_targets(args.data)
     print(canonical(summary))
     return 0

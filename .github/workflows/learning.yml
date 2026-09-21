@@ -1,0 +1,33 @@
+name: Evaluate shadow strategy model
+
+on:
+  schedule:
+    - cron: '13 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: community-receipt-ledger
+  cancel-in-progress: false
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          fetch-depth: 1
+      - name: Overlay the authoritative data branch
+        run: python3 tools/branch_state.py overlay --fetch
+      - name: Test and evaluate the frozen shadow model
+        run: |
+          python3 -m unittest discover -s tests -p test_strategy_model.py
+          python3 tools/strategy_model.py
+          python3 tools/learning_visuals.py
+      - name: Publish shadow evaluation without changing production policy
+        run: python3 tools/branch_state.py publish-data --push

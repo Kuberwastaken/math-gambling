@@ -80,21 +80,13 @@ jobs:
         run: |
           set -o pipefail
           python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust | tee /tmp/replay-summary.json
-      - name: Fit frozen spatial challenger and score later arrivals
-        id: learning
-        continue-on-error: true
-        # Reads every verified receipt each run (~570k on 17 Sep, ~130 s); grows
-        # with the ledger. Make it incremental before this bound is reached again.
-        timeout-minutes: 8
-        run: |
-          python3 -m unittest discover -s tests -p test_strategy_model.py
-          python3 tools/strategy_model.py
+      # The shadow model is intentionally off the critical verifier path. It
+      # scans the full ledger, has no production influence, and is evaluated in
+      # a separate daily workflow. Ingest already writes aggregate/strategy data.
       - name: Generate verified reports with trusted main code
         run: |
-          python3 tools/aggregate.py
           python3 tools/coverage_index.py --prune-only
           python3 tools/readme_charts.py
-          python3 tools/learning_visuals.py
       - name: Export a bounded mathematical coverage increment
         id: geometry
         continue-on-error: true
@@ -114,11 +106,6 @@ jobs:
           fi
           exit 1
 
-      - name: Surface challenger failure without discarding verified coverage
-        if: steps.learning.outcome == 'failure'
-        run: |
-          echo 'Challenger learning failed; existing production policy retained. See learning step logs.' >> "$GITHUB_STEP_SUMMARY"
-          exit 1
       - name: Report deferred mathematical coverage export
         if: always() && steps.geometry.outcome == 'failure'
         run: echo 'Mathematical coverage export was deferred. Verified task coverage remains authoritative; inspect the exporter logs and data/math-coverage/last-error.json.' >> "$GITHUB_STEP_SUMMARY"

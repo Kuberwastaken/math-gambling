@@ -80,18 +80,18 @@ flowchart TD
 ```
 
 <!-- TARGETS:START -->
-_Published 2026-09-21T21:41:57Z. Verified target tasks are independently replayed; a null result proves nothing (selective search)._
+_Published 2026-09-21T22:43:22Z. Verified target tasks are independently replayed; a null result proves nothing (selective search)._
 
 | Target | Verified tasks | Curve intervals | Empty % | Exact tests |
 | ---: | ---: | ---: | ---: | ---: |
-| 390 | 20,047 | 12,404,105 | 0% | 18,923 |
-| 627 | 19,933 | 12,305,257 | 0% | 46,813 |
-| 633 | 14,353 | 8,891,675 | 0% | 23,732 |
-| 732 | 13,261 | 8,174,655 | 0% | 27,201 |
-| 921 | 11,590 | 7,209,286 | 0% | 18,085 |
-| 975 | 10,928 | 6,813,329 | 0% | 11,837 |
+| 390 | 21,323 | 13,193,709 | 0% | 20,057 |
+| 627 | 21,256 | 13,137,754 | 0% | 50,082 |
+| 633 | 15,325 | 9,510,403 | 0% | 25,441 |
+| 732 | 14,129 | 8,711,939 | 0% | 28,900 |
+| 921 | 12,305 | 7,643,725 | 0% | 19,242 |
+| 975 | 11,660 | 7,271,806 | 0% | 12,616 |
 
-**Top target contributors:** @kazenoko-git (90,112)
+**Top target contributors:** @kazenoko-git (95,998)
 **Verified target identities found:** 0
 <!-- TARGETS:END -->
 

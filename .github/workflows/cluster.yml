@@ -98,10 +98,17 @@ jobs:
         run: python3 tools/math_coverage.py --data data --max-tasks 32 --seconds 15
       - name: Publish only generated data and a freshly rendered README
         run: python3 tools/branch_state.py publish-data --push
-      - name: Surface operational failure after preserving verified progress
-        if: steps.replay.outcome == 'failure'
+      - name: Surface replay failure or cancellation with diagnostics
+        if: always() && steps.replay.outcome != 'success'
         run: |
-          echo 'Receipt replay had an operational error. Verified progress was committed; affected banks remain pending.' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Receipt replay did not complete' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Outcome: `${{ steps.replay.outcome }}`. The durable queue and per-bank cursor retain unfinished work.' >> "$GITHUB_STEP_SUMMARY"
+          if test -s /tmp/replay-summary.json; then
+            echo 'Last verifier summary:' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 1 /tmp/replay-summary.json >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'The verifier produced no final summary; inspect the replay step for a runner kill or timeout.' >> "$GITHUB_STEP_SUMMARY"
+          fi
           exit 1
 
       - name: Surface challenger failure without discarding verified coverage

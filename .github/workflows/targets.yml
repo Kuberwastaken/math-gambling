@@ -35,6 +35,18 @@ jobs:
             git fetch --no-tags --depth=1 origin targets-data
             git checkout FETCH_HEAD -- data/targets README.md || true
           fi
+      - name: Restore the Rust target-kernel build cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            native/target
+          key: target-verifier-${{ runner.os }}-${{ hashFiles('native/Cargo.lock', 'native/src/**', 'native/Cargo.toml') }}
+      - name: Build the reviewed Rust target replay kernel from main
+        env:
+          CARGO_HTTP_USER_AGENT: 'OpenAI File Downloader, XaiImageApiFetch/1.0'
+        run: python3 tools/build_native.py
       - name: Test the target verifier, allocation and renderer
         run: |
           python3 -m unittest discover -s tests -p test_multi_target.py

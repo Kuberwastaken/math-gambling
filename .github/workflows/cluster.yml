@@ -6,10 +6,10 @@ on:
   # or immediately via workflow_dispatch. collect_issues keeps a durable poll
   # cursor, so each run drains up to MAX_RECEIPTS pending banks in one publish.
   schedule:
-    # Base cadence is */30 (each ~25-33 min run finishes within the 45-min cap).
-    # Temporarily */20 during the 2026-09-18 drain so runs go near back-to-back
-    # under the single-writer concurrency group; restore to */30 after.
-    - cron: '*/20 * * * *'
+    # Catch-up cadence: bounded runs queue behind the single-writer group instead
+    # of making one runner hold the whole backlog. Restore to */30 once the
+    # durable poll watermark catches current issue traffic.
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -67,16 +67,17 @@ jobs:
       - name: Independently replay selected tasks; retain other claims as unverified
         id: replay
         continue-on-error: true
-        # DRAIN MODE (temporary, 2026-09-18): scoped to this step only so unit
-        # tests run at shipped defaults. Discovers more (6 scan pages), admits
-        # more (768 banks) and verifies 600s instead of 120s to clear the freeze
-        # backlog; ~33 min/run under the 45-min cap. Drop this env after catch-up.
+        # Catch up by running bounded batches more often. A killed process cannot
+        # publish its in-memory progress, so never stretch one replay across the
+        # whole backlog. The durable issue queue and per-bank cursor carry the
+        # remainder into the next run without losing claims or verified tasks.
+        timeout-minutes: 5
         env:
           MG_SCAN_PAGES: '6'
-          MG_MAX_RECEIPTS: '768'
-          MG_REPLAY_SECONDS: '600'
+          MG_MAX_RECEIPTS: '256'
+          MG_REPLAY_SECONDS: '120'
           MG_PENDING_REFETCH: '256'
-        run: python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust
+        run: python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust | tee /tmp/replay-summary.json
       - name: Fit frozen spatial challenger and score later arrivals
         id: learning
         continue-on-error: true

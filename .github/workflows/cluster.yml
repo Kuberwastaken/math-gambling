@@ -71,11 +71,11 @@ jobs:
         # publish its in-memory progress, so never stretch one replay across the
         # whole backlog. The durable issue queue and per-bank cursor carry the
         # remainder into the next run without losing claims or verified tasks.
-        timeout-minutes: 5
+        timeout-minutes: 3
         env:
           MG_SCAN_PAGES: '6'
           MG_MAX_RECEIPTS: '256'
-          MG_REPLAY_SECONDS: '120'
+          MG_REPLAY_SECONDS: '60'
           MG_PENDING_REFETCH: '256'
         run: |
           set -o pipefail

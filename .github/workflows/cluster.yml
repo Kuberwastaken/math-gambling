@@ -6,10 +6,13 @@ on:
   # or immediately via workflow_dispatch. collect_issues keeps a durable poll
   # cursor, so each run drains up to MAX_RECEIPTS pending banks in one publish.
   schedule:
-    # Catch-up cadence: bounded runs queue behind the single-writer group instead
-    # of making one runner hold the whole backlog. Restore to */30 once the
-    # durable poll watermark catches current issue traffic.
-    - cron: '*/15 * * * *'
+    # The cadence MUST be slower than one run's wall time. With
+    # cancel-in-progress:false a faster cron does NOT catch up: runs serialize and
+    # the queued backlog makes GitHub cancel the *running* job ("runner has
+    # received a shutdown signal") ~13-15 min in, before publish. A healthy run is
+    # ~24 min, so fire every 30 min and drain more banks per run (MG_MAX_RECEIPTS),
+    # never more often. Throughput is batch size, not fire rate.
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -67,15 +70,17 @@ jobs:
       - name: Independently replay selected tasks; retain other claims as unverified
         id: replay
         continue-on-error: true
-        # Catch up by running bounded batches more often. A killed process cannot
-        # publish its in-memory progress, so never stretch one replay across the
-        # whole backlog. The durable issue queue and per-bank cursor carry the
-        # remainder into the next run without losing claims or verified tasks.
-        timeout-minutes: 3
+        # Give replay a real budget: at 3 min it timed out every run and verified
+        # almost nothing, so the epoch stayed frozen. A killed process cannot
+        # publish its in-memory progress, so keep the internal budget safely under
+        # the step cap and the step cap well under the whole-run budget, leaving
+        # room for aggregate + publish. The durable issue queue and per-bank cursor
+        # carry the remainder into the next run without losing claims.
+        timeout-minutes: 10
         env:
           MG_SCAN_PAGES: '6'
           MG_MAX_RECEIPTS: '256'
-          MG_REPLAY_SECONDS: '60'
+          MG_REPLAY_SECONDS: '480'
           MG_PENDING_REFETCH: '256'
         run: |
           set -o pipefail

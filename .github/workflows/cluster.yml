@@ -39,6 +39,21 @@ jobs:
         with:
           ref: main
           fetch-depth: 1
+      - name: Enlarge swap so the full-ledger load fits in the 16 GB runner
+        # ingest.py and aggregate.py load the whole receipt ledger (698k tasks +
+        # 34k banks, ~8.5M task references) into RAM, which now climbs to ~15 GB
+        # and pins the 16 GB runner at the OOM edge; the job then dies mid-step
+        # with exit 143 / "runner has received a shutdown signal" (this is what
+        # froze publishing since 2026-09-20 21:44Z). The work is memory-resident
+        # but not CPU-bound (load ~1.0) and /mnt has ~80 GB free, so a large swap
+        # file lets the load complete. Durable fix is incremental off-git
+        # processing (docs/INCREMENTAL_CLUSTER.md) so the working set stops growing.
+        run: |
+          sudo fallocate -l 24G /mnt/mg-swapfile
+          sudo chmod 600 /mnt/mg-swapfile
+          sudo mkswap /mnt/mg-swapfile
+          sudo swapon /mnt/mg-swapfile
+          echo "swap after enlargement:"; free -h
       - name: Overlay the authoritative data branch without checking out its code
         run: python3 tools/branch_state.py overlay --fetch
       - name: Restore the Rust kernel build cache
@@ -84,9 +99,9 @@ jobs:
           MG_PENDING_REFETCH: '256'
         run: |
           set -o pipefail
-          # DIAGNOSTIC (temporary): heartbeat runner resources every 10s so the log
-          # captures mem/disk/load/procs in the seconds before any shutdown signal.
-          ( while true; do echo "HB $(date -u +%T) mem=$(free -m 2>/dev/null | awk '/Mem:/{print $3"/"$2"MB avail="$7}') disk=$(df -m / 2>/dev/null | awk 'NR==2{print $3"/"$2"MB avail="$4}') load=$(cut -d' ' -f1-3 /proc/loadavg) procs=$(ps -e --no-headers 2>/dev/null | wc -l)"; sleep 10; done ) &
+          # DIAGNOSTIC (temporary): heartbeat runner resources every 15s so the log
+          # captures mem/swap/disk/load in the seconds before any shutdown signal.
+          ( while true; do echo "HB $(date -u +%T) mem=$(free -m 2>/dev/null | awk '/Mem:/{print $3"/"$2"MB avail="$7}') swap=$(free -m 2>/dev/null | awk '/Swap:/{print $3"/"$2"MB"}') disk=$(df -m / 2>/dev/null | awk 'NR==2{print $3"/"$2"MB avail="$4}') load=$(cut -d' ' -f1-3 /proc/loadavg)"; sleep 15; done ) &
           HB=$!
           python3 tools/ingest.py --issues --sample-negatives 20 --kernel rust | tee /tmp/replay-summary.json
           kill $HB 2>/dev/null || true
@@ -97,9 +112,14 @@ jobs:
       # snapshot from the authoritative ledger before rendering and publishing.
       - name: Generate verified reports with trusted main code
         run: |
+          # DIAGNOSTIC (temporary): heartbeat while aggregate loads the full ledger,
+          # to confirm swap absorbs the peak instead of the runner dying at 16 GB.
+          ( while true; do echo "HB $(date -u +%T) mem=$(free -m 2>/dev/null | awk '/Mem:/{print $3"/"$2"MB avail="$7}') swap=$(free -m 2>/dev/null | awk '/Swap:/{print $3"/"$2"MB"}') load=$(cut -d' ' -f1-3 /proc/loadavg)"; sleep 15; done ) &
+          HB=$!
           python3 tools/aggregate.py
           python3 tools/coverage_index.py --prune-only
           python3 tools/readme_charts.py
+          kill $HB 2>/dev/null || true
       - name: Export a bounded mathematical coverage increment
         id: geometry
         continue-on-error: true

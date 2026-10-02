@@ -16,7 +16,7 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-27 20:14:03 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-09-27 20:14:45 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
@@ -191,7 +191,7 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **697,344 verified tasks**; **203 models** and **202 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **754,688 verified tasks**; **259 models** and **258 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
 The challenger learns residual log-cost and arithmetic exposure from shared coefficient, band and exact shell-bound features. Its comparator already knows provably empty tiles and context costs. Entire geometry cells remain withheld; no discoveries are predicted.
 
@@ -209,20 +209,18 @@ flowchart TD
 ```
 
 
-**Learning report is behind the ledger; inspect the latest Action before interpreting freshness.**
-
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 
-Latest evaluation: tasks 696,321–697,344. Lower mean absolute log1p prediction error is better.
+Latest evaluation: tasks 753,665–754,688. Lower mean absolute log1p prediction error is better.
 
 | Quantity | proof baseline | Shared challenger |
 | --- | ---: | ---: |
-| cpu_ms | 0.3053 | 0.3073 |
-| quotient_points | 0.6103 | 0.6003 |
-| curves | 0.5653 | 0.5573 |
-| exact_tests | 0.1749 | 0.1735 |
+| cpu_ms | 0.1647 | 0.1693 |
+| quotient_points | 0.4052 | 0.3777 |
+| curves | 0.3364 | 0.3381 |
+| exact_tests | 0.1244 | 0.1191 |
 
-Unseen-geometry evaluation: 199 tasks. Full errors and nonzero-count support are in the report.
+Unseen-geometry evaluation: 178 tasks. Full errors and nonzero-count support are in the report.
 
 ![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 

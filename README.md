@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-09-27 20:14:45 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-10-03 03:29:11 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 755,206 |
-| Coefficient-generator inputs | 1,656,628,224 |
-| Bounded curve intervals | 288,516,902 |
-| Logical quotient positions | 100,848,226,627 |
-| Exact integer square tests | 206,246 |
+| Unique finite tasks | 757,404 |
+| Coefficient-generator inputs | 1,670,081,536 |
+| Bounded curve intervals | 291,770,154 |
+| Logical quotient positions | 101,377,240,510 |
+| Exact integer square tests | 207,370 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -35,18 +35,18 @@ These are actual fixed-task units from independent replay, not claimed client se
 
 | Rank | Alias | Authenticated GitHub account | Contributed inputs | Verified inputs |
 | ---: | --- | --- | ---: | ---: |
-| 1 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 12,118,168,576 | 605,990,912 |
-| 2 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 6,912,171,008 | 784,328,704 |
+| 1 | Ivan | [@kazenoko-git](https://github.com/kazenoko-git) | 12,337,730,560 | 616,656,896 |
+| 2 | [Benjamaxxing](<https://everyreason.bandcamp.com>) | [@EveryReasonTo](https://github.com/EveryReasonTo) | 6,962,665,472 | 786,892,800 |
 | 3 | Aditya | [@adityajatad-spec](https://github.com/adityajatad-spec) | 1,246,332,928 | 82,429,952 |
 | 4 | Anish Bhattacharya | [@Anish-MutliTalent](https://github.com/Anish-MutliTalent) | 1,037,347,840 | 54,616,064 |
-| 5 | [Anant](<https://anants.studio>) | [@GithubAnant](https://github.com/GithubAnant) | 835,667,968 | 43,348,992 |
+| 5 | [Anant](<https://anants.studio>) | [@GithubAnant](https://github.com/GithubAnant) | 840,088,576 | 43,572,224 |
 | 6 | Varun | [@weavermonkey](https://github.com/weavermonkey) | 75,799,552 | 34,284,544 |
 | 7 | kanishk | [@can-ishk](https://github.com/can-ishk) | 15,950,848 | 1,868,800 |
 | 8 | [Dr. Ashish Bamania](<https://www.intoai.pub/>) | [@ashishbamania](https://github.com/ashishbamania) | 7,726,080 | 839,680 |
 | 9 | robert | [@rsokolewicz](https://github.com/rsokolewicz) | 7,610,368 | 7,610,368 |
 | 10 | [1za.ch](<https://1za.ch>) | [@1-zach](https://github.com/1-zach) | 5,324,800 | 704,512 |
 
-**350,910 / 755,206 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**351,914 / 757,404 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 11800**, frozen from **755,200 verified tasks**. The next policy update needs **58 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 11834**, frozen from **757,376 verified tasks**. The next policy update needs **36 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 11797: 755,008 tasks; c27 7.37%"]
-    H1["Epoch 11798: 755,072 tasks; c27 7.35%"]
+    H0["Epoch 11831: 757,184 tasks; c27 6.94%"]
+    H1["Epoch 11832: 757,248 tasks; c27 7.00%"]
     H0 --> H1
-    H2["Epoch 11799: 755,136 tasks; c27 7.32%"]
+    H2["Epoch 11833: 757,312 tasks; c27 7.14%"]
     H1 --> H2
-    H3["Epoch 11800: 755,200 tasks; c27 7.29%"]
+    H3["Epoch 11834: 757,376 tasks; c27 7.41%"]
     H2 --> H3
-    Policy["Current policy: epoch 11800"]
+    Policy["Current policy: epoch 11834"]
     H3 --> Policy
     Policy --> Explore["10% predicted CPU exploration across 54 supported contexts"]
     Policy --> Cost["90% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c27: 7.29%"]
-    Mix --> C1["c00: 6.62%"]
-    Mix --> C2["c54: 6.52%"]
-    Mix --> Rest["Other 78 contexts: 79.58% combined"]
+    Mix --> C0["c27: 7.41%"]
+    Mix --> C1["c54: 6.83%"]
+    Mix --> C2["c00: 6.81%"]
+    Mix --> Rest["Other 78 contexts: 78.94% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -91,11 +91,11 @@ Weights describe task-selection shares, not CPU-time shares or discovery probabi
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 11796 | 754,944 | c27 | 7.3999% |
-| 11797 | 755,008 | c27 | 7.3690% |
-| 11798 | 755,072 | c27 | 7.3503% |
-| 11799 | 755,136 | c27 | 7.3200% |
-| 11800 | 755,200 | c27 | 7.2853% |
+| 11830 | 757,120 | c27 | 6.9643% |
+| 11831 | 757,184 | c27 | 6.9359% |
+| 11832 | 757,248 | c27 | 6.9974% |
+| 11833 | 757,312 | c27 | 7.1417% |
+| 11834 | 757,376 | c27 | 7.4098% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 
@@ -208,6 +208,8 @@ flowchart TD
     Gate --> NoPromotion[No automatic discovery-policy promotion]
 ```
 
+
+**Learning report is behind the ledger; inspect the latest Action before interpreting freshness.**
 
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 

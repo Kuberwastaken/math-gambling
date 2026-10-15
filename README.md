@@ -16,15 +16,15 @@ This is an open computational research project by Kuber Mehta. The gamble is spa
 
 ## Current verified campaign
 
-Published observation: **2026-10-15 05:55:20 UTC**. This section updates after trusted receipt processing.
+Published observation: **2026-10-15 07:20:37 UTC**. This section updates after trusted receipt processing.
 
 | Quantity | Verified total |
 | --- | ---: |
-| Unique finite tasks | 762,612 |
-| Coefficient-generator inputs | 1,746,410,496 |
-| Bounded curve intervals | 313,951,248 |
-| Logical quotient positions | 103,227,759,727 |
-| Exact integer square tests | 211,176 |
+| Unique finite tasks | 762,742 |
+| Coefficient-generator inputs | 1,748,368,384 |
+| Bounded curve intervals | 314,503,903 |
+| Logical quotient positions | 103,269,886,964 |
+| Exact integer square tests | 211,249 |
 | Independently verified identities for 114 | 0 |
 
 ![Verified work and changing allocation](data/readme-progress.svg)
@@ -46,7 +46,7 @@ These are actual fixed-task units from independent replay, not claimed client se
 | 9 | robert | [@rsokolewicz](https://github.com/rsokolewicz) | 7,610,368 | 7,610,368 |
 | 10 | [1za.ch](<https://1za.ch>) | [@1-zach](https://github.com/1-zach) | 5,324,800 | 704,512 |
 
-**351,922 / 762,612 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
+**351,922 / 762,742 verified tasks contain no admitted curve intervals.** They remain completed coefficient-domain checks; task counts are not distinct-curve coverage. Exact shell pruning can certify those exclusions without visiting every coefficient individually.
 
 [Mathematical interval export](data/math-coverage/index.json) · [Export scope and limitations](https://github.com/Kuberwastaken/math-gambling/blob/main/docs/MATHEMATICAL_COVERAGE.md)
 
@@ -55,27 +55,27 @@ Rank counts unique contributed inputs: exact replays plus provisional work from 
 
 ### The current allocation
 
-**Epoch 11915**, frozen from **762,560 verified tasks**. The next policy update needs **12 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
+**Epoch 11917**, frozen from **762,688 verified tasks**. The next policy update needs **10 more accepted unique tasks**. The arrows below are regenerated from the current weights and recorded epoch history.
 
 ```mermaid
 flowchart TD
-    H0["Epoch 11912: 762,368 tasks; c00 7.62%"]
-    H1["Epoch 11913: 762,432 tasks; c00 7.61%"]
+    H0["Epoch 11914: 762,496 tasks; c00 7.62%"]
+    H1["Epoch 11915: 762,560 tasks; c00 7.58%"]
     H0 --> H1
-    H2["Epoch 11914: 762,496 tasks; c00 7.62%"]
+    H2["Epoch 11916: 762,624 tasks; c00 7.55%"]
     H1 --> H2
-    H3["Epoch 11915: 762,560 tasks; c00 7.58%"]
+    H3["Epoch 11917: 762,688 tasks; c27 7.61%"]
     H2 --> H3
-    Policy["Current policy: epoch 11915"]
+    Policy["Current policy: epoch 11917"]
     H3 --> Policy
     Policy --> Explore["10% predicted CPU exploration across 54 supported contexts"]
     Policy --> Cost["90% weighted by geometry-weighted curve exposure / cost"]
     Explore --> Mix["Combined task-selection weights"]
     Cost --> Mix
-    Mix --> C0["c00: 7.58%"]
-    Mix --> C1["c27: 7.51%"]
-    Mix --> C2["c54: 7.30%"]
-    Mix --> Rest["Other 78 contexts: 77.61% combined"]
+    Mix --> C0["c27: 7.61%"]
+    Mix --> C1["c00: 7.58%"]
+    Mix --> C2["c54: 7.15%"]
+    Mix --> Rest["Other 78 contexts: 77.66% combined"]
     C0 --> Check["Skip completed IDs; run exact bounded task"]
     C1 --> Check
     C2 --> Check
@@ -91,11 +91,11 @@ Weights describe task-selection shares, not CPU-time shares or discovery probabi
 
 | Epoch | Verified-task boundary | Largest allocation | Weight |
 | ---: | ---: | --- | ---: |
-| 11911 | 762,304 | c00 | 7.6044% |
-| 11912 | 762,368 | c00 | 7.6179% |
 | 11913 | 762,432 | c00 | 7.6140% |
 | 11914 | 762,496 | c00 | 7.6179% |
 | 11915 | 762,560 | c00 | 7.5808% |
+| 11916 | 762,624 | c00 | 7.5468% |
+| 11917 | 762,688 | c27 | 7.6086% |
 
 Every accepted task retains its full replay result and server timing. Seeds and dispatch provenance stay with client evidence. Complete policy vectors, historical boundaries and bank decisions remain inspectable:
 

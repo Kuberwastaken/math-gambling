@@ -80,7 +80,7 @@ flowchart TD
 ```
 
 <!-- TARGETS:START -->
-_Published 2026-10-20T15:44:07Z. Verified target tasks are independently replayed; a null result proves nothing (selective search)._
+_Published 2026-10-20T16:45:57Z. Verified target tasks are independently replayed; a null result proves nothing (selective search)._
 
 | Target | Verified tasks | Curve intervals | Empty % | Exact tests |
 | ---: | ---: | ---: | ---: | ---: |

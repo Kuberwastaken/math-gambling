@@ -1,9 +1,9 @@
-import {runTask, verifyTriple, ENGINE, ENGINES} from './engine.mjs?v=3ba4fb1151c9';
+import {runTask, verifyTriple, ENGINE, ENGINES} from './engine.mjs?v=fe9a3ed0b6dc';
 
 // A worker accepts one task at a time. The page decides when to queue the next.
 // Stop is a task-boundary instruction; terminating a worker discards only its
 // unfinished task, which must never be submitted as completed coverage.
-import {loadWasmKernel} from './wasm-kernel.mjs?v=3ba4fb1151c9';
+import {loadWasmKernel} from './wasm-kernel.mjs?v=fe9a3ed0b6dc';
 const accelerated = await loadWasmKernel();
 // An accelerated kernel that predates engine v2 rejects a version-2 task before
 // computing anything. Falling back to the audited BigInt engine keeps the page

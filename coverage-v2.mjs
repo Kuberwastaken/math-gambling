@@ -11,8 +11,8 @@
  * treated as an empty index; anything that is served but does not validate
  * fails closed, exactly as the v1 index does.
  */
-import {CONTEXTS, ENGINE_V2, containerTask, makeTask, subtasks, taskId, validateTask} from './engine.mjs?v=3ba4fb1151c9';
-import {createCoverageClient} from './search-session.mjs?v=3ba4fb1151c9';
+import {CONTEXTS, ENGINE_V2, containerTask, makeTask, subtasks, taskId, validateTask} from './engine.mjs?v=fe9a3ed0b6dc';
+import {createCoverageClient} from './search-session.mjs?v=fe9a3ed0b6dc';
 
 const INDEX_CAP = 128 * 1024, SHARD_CAP = 8 * 1024 * 1024, CHUNK_CAP = 32768;
 export const V2_COVERAGE_PATH = 'data/coverage/v2/';

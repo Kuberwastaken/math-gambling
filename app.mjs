@@ -7,16 +7,16 @@ import {
   canonicalJSON,
   verifyTriple,
   validateTask,
-} from "./engine.mjs?v=3ba4fb1151c9";
-import { createLiveVisuals } from "./live-viz.mjs?v=3ba4fb1151c9";
-import { createJackpot } from "./jackpot.mjs?v=3ba4fb1151c9";
-import { loadChallenger } from "./challenger-viz.mjs?v=3ba4fb1151c9";
-import { renderModelEvolution } from "./model-viz.mjs?v=3ba4fb1151c9";
-import { setupRunnerDownload } from "./runner-setup.mjs?v=3ba4fb1151c9";
-import {certifiedEmpty} from './proposal-proof.mjs?v=3ba4fb1151c9';
+} from "./engine.mjs?v=fe9a3ed0b6dc";
+import { createLiveVisuals } from "./live-viz.mjs?v=fe9a3ed0b6dc";
+import { createJackpot } from "./jackpot.mjs?v=fe9a3ed0b6dc";
+import { loadChallenger } from "./challenger-viz.mjs?v=fe9a3ed0b6dc";
+import { renderModelEvolution } from "./model-viz.mjs?v=fe9a3ed0b6dc";
+import { setupRunnerDownload } from "./runner-setup.mjs?v=fe9a3ed0b6dc";
+import {certifiedEmpty} from './proposal-proof.mjs?v=fe9a3ed0b6dc';
 setupRunnerDownload();
-import { newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=3ba4fb1151c9";
-import { createDualCoverageClient } from "./coverage-v2.mjs?v=3ba4fb1151c9";
+import { newSeed, seededRandom, SEED_ALGORITHM } from "./search-session.mjs?v=fe9a3ed0b6dc";
+import { createDualCoverageClient } from "./coverage-v2.mjs?v=fe9a3ed0b6dc";
 const BASE = new URL("./", import.meta.url),
   REPO = "https://github.com/Kuberwastaken/math-gambling";
 const $ = (id) => document.getElementById(id),
@@ -1349,7 +1349,7 @@ async function start(e) {
   // The processor slider remains adjustable during a run.
   text("session-message", "");
   try {
-    worker = new Worker(new URL("search-worker.mjs?v=3ba4fb1151c9", BASE), { type: "module" });
+    worker = new Worker(new URL("search-worker.mjs?v=fe9a3ed0b6dc", BASE), { type: "module" });
   } catch (e) {
     failStop(`Could not start a browser worker: ${e.message}`);
     return;

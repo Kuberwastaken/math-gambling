@@ -1,4 +1,4 @@
-import { CONTEXTS, ENGINE, makeTask, taskId } from './engine.mjs?v=3ba4fb1151c9';
+import { CONTEXTS, ENGINE, makeTask, taskId } from './engine.mjs?v=fe9a3ed0b6dc';
 
 const INDEX_CAP = 128 * 1024, SHARD_CAP = 8 * 1024 * 1024;
 const hex = bytes => [...bytes].map(x => x.toString(16).padStart(2, '0')).join('');

@@ -1,0 +1,59 @@
+{
+  "audit_selection": {
+    "auditing_source_id": "issue:42017:6d1d9213e166610ac33ffb2e7a11dbeef87cd5efce65489b2e09d2a3f7a294b4",
+    "condition": "given this bank and eligibility; not dispatch propensity or overall duplicate-adjusted inclusion",
+    "conditional_probability": 1.0,
+    "schema": "mg114-audit-inclusion-v1"
+  },
+  "contributor": {
+    "github": "R-Camacho",
+    "github_verified": false,
+    "name": "Rodrigo Camacho",
+    "url": "https://rcamacho.pt"
+  },
+  "replay_kernel": {
+    "engine": "rust",
+    "python_cross_check_one_in": 256,
+    "python_source_sha256": "647496c95b7509e3c36e5d5b80b781b843abb683681f622e3ff7e035eb7821b6",
+    "rust_source_sha256": "7973a50995367165d638830b361b1f01d38f09f6f53a51f6a66c18a996e4df35"
+  },
+  "replay_kernel_sha256": "647496c95b7509e3c36e5d5b80b781b843abb683681f622e3ff7e035eb7821b6",
+  "result": {
+    "counters": {
+      "curves": 652,
+      "exact_tests": 4,
+      "generators": 2048,
+      "hits": 0,
+      "invalid_d": 682,
+      "noninvertible": 179,
+      "outside_shell": 0,
+      "quotient_points": 2503680,
+      "rejected_mod243": 2380049,
+      "rejected_parity": 49497,
+      "rejected_prime": 74130,
+      "signed_excluded": 535
+    },
+    "digest": "ecce68ca4089384fcfd966bf450777903a2e89b165029a1abb3ca2a511e71f71",
+    "hits": [],
+    "id": "mg114-offset-v1:c41:725401837824:4",
+    "task": {
+      "block": 4,
+      "context": "c41",
+      "engine": "mg114-offset-v1",
+      "row": "725401837824",
+      "version": 1
+    }
+  },
+  "schema": "math-gambling-verified-task-v1",
+  "sequence": 787349,
+  "server_replay_cpu_ms": 2.801512,
+  "source": {
+    "id": "issue:42017:6d1d9213e166610ac33ffb2e7a11dbeef87cd5efce65489b2e09d2a3f7a294b4",
+    "kind": "issue",
+    "number": 42017,
+    "submitter": "R-Camacho",
+    "updated_at": "2026-11-13T20:09:22Z",
+    "url": "https://github.com/Kuberwastaken/math-gambling/issues/42017"
+  },
+  "verified_at": "2026-11-19T07:39:12Z"
+}

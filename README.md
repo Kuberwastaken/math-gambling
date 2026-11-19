@@ -191,7 +191,7 @@ The mathematical approaches are credited to Booker–Sutherland, Grantham–Wals
 
 ## Experimental task learning
 
-Frozen through **761,856 verified tasks**; **266 models** and **265 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
+Frozen through **778,240 verified tasks**; **282 models** and **281 completed forward-window evaluations**. Mode: **shadow**, with no production influence.
 
 The challenger learns residual log-cost and arithmetic exposure from shared coefficient, band and exact shell-bound features. Its comparator already knows provably empty tiles and context costs. Entire geometry cells remain withheld; no discoveries are predicted.
 
@@ -209,20 +209,18 @@ flowchart TD
 ```
 
 
-**Learning report is behind the ledger; inspect the latest Action before interpreting freshness.**
-
 ![Challenger prediction error through frozen evaluations](data/learning/evolution.svg)
 
-Latest evaluation: tasks 760,833–761,856. Lower mean absolute log1p prediction error is better.
+Latest evaluation: tasks 777,217–778,240. Lower mean absolute log1p prediction error is better.
 
 | Quantity | proof baseline | Shared challenger |
 | --- | ---: | ---: |
-| cpu_ms | 0.7043 | 0.6971 |
-| quotient_points | 1.6829 | 1.6429 |
-| curves | 1.6826 | 1.6927 |
-| exact_tests | 0.4035 | 0.3967 |
+| cpu_ms | 0.0923 | 0.0956 |
+| quotient_points | 0.1966 | 0.1918 |
+| curves | 0.1549 | 0.1487 |
+| exact_tests | 0.0930 | 0.0915 |
 
-Unseen-geometry evaluation: 185 tasks. Full errors and nonzero-count support are in the report.
+Unseen-geometry evaluation: 152 tasks. Full errors and nonzero-count support are in the report.
 
 ![Exploratory controlled pilot: quotient exposure per CPU](data/learning/pilot.svg)
 
